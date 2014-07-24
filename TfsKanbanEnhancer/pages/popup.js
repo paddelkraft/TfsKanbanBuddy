@@ -1,21 +1,22 @@
 
-	
+	var GET_KANBAN_BOARD_MAPPING = "get-color-map";
+  var GET_TASK_BOARD_MAPPING = "get-task-color-map";
+  var SET_KANBAN_BOARD_MAPPING = "set-color-map";
+  var SET_TASK_BOARD_MAPPING = "set-task-color-map";
 
+  var saveType = null;
    
    function saveMapping(){
-        //var newColorMap = jsonDecode(document.getElementById("colorMap").value) ;
         var newColorMap = createColorMap() ;
         
-        //localStorage["user"] = user ;
-        //localStorage.setItem("colorMap", colorMap) ;
         var message = {
-            type: "set-color-map",
+            type: saveType,
             colorMap : newColorMap
         }
         chrome.extension.sendMessage(message,function(response){
             console.log("response = " + response)
         });
-        console.log("colorMap sent to background");
+        console.log("colorMap "+ saveType +" sent to background");
 
     }
 
@@ -38,12 +39,19 @@
         return colorMap;
     }
 
-    function getColorMapping(){
-        chrome.runtime.sendMessage({type: "get-color-map"}, function(response) {
+    function getColorMapping(type){
+        console.log("sending " + type +" request to background")
+        chrome.runtime.sendMessage({type: type}, function(response) {
+             console.log("recieveing colorMap from background")
+        
              for(var property in response){
                 document.getElementById(response[property]).value = property;
              }
         });
+        saveType = SET_KANBAN_BOARD_MAPPING;
+        if (type == GET_TASK_BOARD_MAPPING){
+          saveType = SET_TASK_BOARD_MAPPING;
+        }
     }
 
     
@@ -65,10 +73,19 @@
       return matchingElements;
     }
 
+    function loadMapping(){
+      var type = GET_KANBAN_BOARD_MAPPING;
+      if (document.getElementById("board-select").value=="task"){
+        type = GET_TASK_BOARD_MAPPING;
+      }
+      getColorMapping(type);
+    }
+
     window.onload = function() {
-        getColorMapping();
+        getColorMapping(GET_KANBAN_BOARD_MAPPING);
         document.getElementById("save").onclick = saveMapping;
         document.getElementById("close").onclick = closeWindow;
+        document.getElementById("board-select").onchange = loadMapping;
     };
 
     

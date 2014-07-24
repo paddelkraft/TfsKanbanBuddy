@@ -1,0 +1,30 @@
+.left {
+  float: left;
+  width: 130px;
+  padding: 5px;
+}
+
+.left300 {
+  float: left;
+  width: 300px;
+  padding: 5px;
+}
+
+.link {
+  width: 280px;
+}
+
+.row {
+  width: 300px;
+  padding: 5px;
+}
+
+.row500 {
+  float: left;
+  width: 500px;
+  padding: 5px;
+}
+.header {
+  width: 300px;
+  padding: 5px;
+}

@@ -24,7 +24,11 @@
 
 	"content_scripts": [
     	{
-        	"matches": ["http://*/*/*/_backlogs/board*", "https://*/*/*/_backlogs/board*"],
+        	"matches": ["http://*/*/*/_backlogs/board*", 
+                        "https://*/*/*/_backlogs/board*",
+                        "http://*/*/*/_backlogs/TaskBoard*", 
+                        "https://*/*/*/_backlogs/TaskBoard*"
+                        ],
         	"js": ["utils_js/json.js","utils_js/jquery-2.1.1.min.js","content_scripts/board.js","content_scripts/projectUrl.js"]
     	},
         {

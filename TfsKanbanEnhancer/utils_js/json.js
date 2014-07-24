@@ -2,7 +2,11 @@
         try {
             return JSON.parse(string);
         } catch (e) {
-            return JSON.decode(string);
+            try{
+                return JSON.decode(string);
+            }catch(e2){
+                return {};
+            }
         }
     }
     
@@ -10,6 +14,11 @@
         try {
             return JSON.stringify(obj);
         } catch (e) {
-            return JSON.encode(obj);
+            try{
+                return JSON.encode(obj);
+            }catch(e2){
+                return "{}";
+            }
+            
         }
     }

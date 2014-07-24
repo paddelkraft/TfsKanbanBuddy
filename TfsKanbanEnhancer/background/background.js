@@ -1,27 +1,49 @@
 // listening for an event / one-time requests
 // coming from the popup/and content
+var GET_KANBAN_BOARD_MAPPING = "get-color-map";
+  var GET_TASK_BOARD_MAPPING = "get-task-color-map";
+  var SET_KANBAN_BOARD_MAPPING = "set-color-map";
+  var SET_TASK_BOARD_MAPPING = "set-task-color-map";
 
-var colorMap = null;
+
+
+var kanbanColorMap = null;
+var taskColorMap = null;
 var links = null;
 var url = null;
 
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     
     switch(request.type) {
-        case "set-color-map":
-            colorMap = request.colorMap;
-            var colorMapJson =jsonEncode(colorMap)
-            localStorage.setItem("colorMap", colorMapJson) ;
+        case SET_KANBAN_BOARD_MAPPING:
+            kanbanColorMap = request.ColorMap;
+            var kanbanColorMapJson =jsonEncode(kanbanColorMap)
+            localStorage.setItem("colorMap", kanbanColorMapJson) ;
             sendResponse("Saved " );
-            console.log("color-map saved to local storage " + localStorage.getItem("colorMap"));
+            console.log("Kanban color-map saved to local storage " + localStorage.getItem("colorMap"));
             break;
-        case "get-color-map":
-            if(colorMap == null){
-                colorMap = jsonDecode(localStorage.getItem("colorMap")) ;
-                console.log("colorMap read from local storage")
+        case GET_KANBAN_BOARD_MAPPING:
+            if(kanbanColorMap == null){
+                kanbanColorMap = jsonDecode(localStorage.getItem("colorMap")) ;
+                console.log("ColorMap read from local storage")
             }
-            sendResponse(colorMap);
-            console.log("color-map sent " + jsonEncode(colorMap));
+            sendResponse(kanbanColorMap);
+            console.log("color-map sent " + jsonEncode(kanbanColorMap));
+            break;
+        case SET_TASK_BOARD_MAPPING:
+            taskColorMap = request.colorMap;
+            var taskColorMapJson =jsonEncode(taskColorMap)
+            localStorage.setItem("taskColorMap", taskColorMapJson) ;
+            sendResponse("Saved " );
+            console.log("Task color-map saved to local storage " + localStorage.getItem("taskColorMap"));
+            break;
+        case GET_TASK_BOARD_MAPPING:
+            if(taskColorMap == null){
+                taskColorMap = jsonDecode(localStorage.getItem("taskColorMap")) ;
+                console.log("taskColorMap read from local storage")
+            }
+            sendResponse(taskColorMap);
+            console.log("task-color-map sent " + jsonEncode(taskColorMap));
             break;
         case "set-links":
             links = request.links;

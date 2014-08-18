@@ -4,6 +4,17 @@
   padding: 5px;
 }
 
+.right {
+  float: right;
+  width: 130px;
+  padding: 5px;
+}
+.right300 {
+  float: right;
+  width: 130px;
+  padding: 5px;
+}
+
 .left300 {
   float: left;
   width: 300px;

@@ -6,15 +6,19 @@
     var is_focused = true;
 
     var kanbanBoard = {
+        "type"      : "kanbanBoard",
         "tileClass" : "board-tile",
-        "relations" : "false"
+        "relations" : true,
+        "wip"       : true
     }
 
     var taskBoard   = {
+        "type"      : "taskBoard",
         "tileClass" : "tbTileContent",
         "removeClass" :"witTitle",
-        "update"    : "true",
-        "relations" : "false"
+        "update"    : true,
+        "relations" : false,
+        "wip"       : false
     }
 
     var customStylePale =
@@ -69,11 +73,121 @@
                 $element.removeClass(board.removeClass);
             });
         }
+        if (board.wip) {
+            checkWip();
+        };
+        
 
-        if(board.update!="undefined"){
+        if(board.update){
             setTimeout(function(){improveBoard(colorMap,board)}, 5000);
         }
     }
+
+function checkWip(){
+    var i;
+    var columns = getColumns();
+    var thisColumn,nextColumn ;
+     for (i = 1 ; i < columns.length-1 ; i++) {
+            thisColumn = columns[i];
+            nextColumn = columns[i +1];
+            console.log("check wip " + columns[i].title);
+            var wip, wipLimit, useNext = false;
+            if(thisColumn.wipLimit){
+                wipLimit = thisColumn.wipLimit;
+                wip = thisColumn.getCurrentWip();
+                //if next column is a done column (Wiplimit == 0)
+                if(nextColumn && !nextColumn.wipLimit ){
+                    console.log("Include " + nextColumn.title + "in wip");
+                    useNext = true;
+                        wip += nextColumn.getCurrentWip();
+                    thisColumn.setCurrentWip(wip);
+                    nextColumn.setCurrentWip("");
+                }
+
+                if(wip > wipLimit){
+                    console.log("wipLimit broken");
+                    thisColumn .setColumnColor("#FBEFEF");
+                    if(useNext){
+                        nextColumn.setColumnColor("#FBEFEF");
+                    }
+                }else if(wip == wipLimit){
+                    console.log("on wiplimit");
+                    thisColumn.setColumnColor("#FBFBEF");
+                    if(useNext){
+                        nextColumn.setColumnColor("#FBFBEF");
+                    }
+                }else{
+                    console.log("on wiplimit");
+                    thisColumn.setColumnColor("#FFFFFF");
+                    if(useNext){
+                        nextColumn.setColumnColor("#FFFFFF");;
+                    }
+                }
+            }
+            
+    }
+    setTimeout(checkWip, 3000);
+}
+
+function getColumns(){
+
+    var headerContainer = document.getElementsByClassName("header-container")[0];
+    var headers = headerContainer.getElementsByClassName("member-header-content");
+    var columnContainer = document.getElementsByClassName("content-container")[0];
+    var columnContainers = columnContainer.getElementsByClassName("member-content");
+    var columns =[];
+    for (i in headers) {
+        if(headers[i].textContent != undefined){
+            console.log(headers[i].textContent);
+            column = {};
+            column.title = headers[i].getAttribute("title");
+            column.header = headers[i];
+            column.container = columnContainers[i];
+            column.setColumnColor = setColumnColor;
+            column.setCurrentWip = setCurrentWip;
+            column.getCurrentWip = getCurrentWip;
+            //Set current wip
+            /*if(column.header.getElementsByClassName("current")[0]){
+                column.wipCurrent = parseInt(column.header.getElementsByClassName("current")[0].textContent);
+                console.log("wipCurrent ="+column.wipCurrent);
+
+            }*/
+            //set wipLimit
+            if(column.header.getElementsByClassName("limit")[0])
+            {
+                column.wipLimit = parseInt(column.header.getElementsByClassName("limit")[0].textContent.replace("/",""));
+                console.log("wipLimit ="+column.wipLimit);
+            }
+
+
+            
+            
+           columns.push(column);
+        }
+    }
+
+    return columns;
+
+}
+
+function setCurrentWip(currentWip){
+    try{
+        this.header.getElementsByClassName("current")[0].textContent = currentWip;
+    }catch(e){}
+}
+
+function getCurrentWip(){
+    return this.container.getElementsByClassName(kanbanBoard.tileClass).length;
+}
+
+function setColumnColor( color){
+    var style = "background-color:"+color;
+    console.log("setColumnColor");
+    this.container.setAttribute("style",style);
+    
+    this.header.parentNode.setAttribute("style",style);
+    console.log(this.title + " style = " + this.container.getAttribute("style"));
+}
 
 
 
@@ -149,7 +263,7 @@
     
     
     function isKanbanBoard(){
-        return document.URL.indexOf("/board/")>-1;
+        return document.URL.indexOf("/_backlogs/board")>-1;
     }
 
     function getMessageType(){
@@ -193,9 +307,14 @@
         var type = getMessageType();
         
         chrome.runtime.sendMessage({type: type}, function(response) {
+            
             var board = getBoardType();
             console.log("Board data " + jsonEncode(board) );
-            improveBoard(response, board);
+            console.log("colorMap " + jsonEncode(response));
+            if(response){
+                improveBoard(response, board);
+            }
+
             
             if(board.relations){
                 setCaseHighLight();

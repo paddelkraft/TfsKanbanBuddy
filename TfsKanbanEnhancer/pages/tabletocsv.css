@@ -1,0 +1,164 @@
+#tabletocsv-btn {
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: normal;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.428571429;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+#tabletocsv-modal-header a {
+  text-decoration: none;
+}
+#tabletocsv-btn:focus {
+  outline: thin dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+#tabletocsv-btn:hover,
+#tabletocsv-btn:focus {
+  color: #333333;
+  text-decoration: none;
+}
+#tabletocsv-btn {
+  color: #333333;
+  background-color: #ffffff;
+  border-color: #cccccc;
+}
+#tabletocsv-btn:hover,
+#tabletocsv-btn:focus,
+#tabletocsv-btn:active,
+#tabletocsv-btn.active {
+  color: #333333;
+  background-color: #ebebeb;
+  border-color: #adadad;
+}
+
+#tabletocsv-modal-open {
+  overflow: hidden;
+}
+#tabletocsv-modal {
+  display: block;
+  overflow: auto;
+  overflow-y: scroll;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1040;
+}
+#tabletocsv-modal.fade #tabletocsv-modal-dialog {
+  -webkit-transform: translate(0, -25%);
+  -ms-transform: translate(0, -25%);
+  transform: translate(0, -25%);
+  -webkit-transition: -webkit-transform 0.3s ease-out;
+  -moz-transition: -moz-transform 0.3s ease-out;
+  -o-transition: -o-transform 0.3s ease-out;
+  transition: transform 0.3s ease-out;
+}
+#tabletocsv-modal.in #tabletocsv-modal-dialog {
+  -webkit-transform: translate(0, 0);
+  -ms-transform: translate(0, 0);
+  transform: translate(0, 0);
+}
+#tabletocsv-modal-dialog {
+  position: relative;
+  width: auto;
+  margin: 10px;
+  z-index: 1050;
+}
+#tabletocsv-modal-content {
+  position: relative;
+  background-color: #ffffff;
+  border: 1px solid #999999;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+  background-clip: padding-box;
+  outline: none;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#tabletocsv-modal-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1030;
+  background-color: #000000;
+}
+#tabletocsv-modal-backdrop.fade {
+  opacity: 0;
+  filter: alpha(opacity=0);
+}
+#tabletocsv-modal-backdrop.in {
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+}
+#tabletocsv-modal-header {
+  padding: 15px;
+  border-bottom: 1px solid #e5e5e5;
+  min-height: 16.428571429px;
+}
+#tabletocsv-modal-header .close {
+  margin-top: -2px;
+}
+#tabletocsv-modal-title {
+  margin: 0;
+  line-height: 1.428571429;
+}
+#tabletocsv-modal-body {
+  position: relative;
+  padding: 20px;
+}
+#tabletocsv-modal-footer {
+  margin-top: 15px;
+  padding: 19px 20px 20px;
+  text-align: right;
+  border-top: 1px solid #e5e5e5;
+}
+#tabletocsv-modal-footer:before,
+#tabletocsv-modal-footer:after {
+  content: " ";
+  display: table;
+}
+#tabletocsv-modal-footer:after {
+  clear: both;
+}
+#tabletocsv-modal-footer #tabletocsv-btn + #tabletocsv-btn {
+  margin-left: 5px;
+  margin-bottom: 0;
+}
+#tabletocsv-modal-footer #tabletocsv-btn-group #tabletocsv-btn + #tabletocsv-btn {
+  margin-left: -1px;
+}
+#tabletocsv-modal-footer #tabletocsv-btn-block + #tabletocsv-btn-block {
+  margin-left: 0;
+}
+
+@media screen and (min-width: 768px) {
+  #tabletocsv-modal-dialog {
+    width: 600px;
+    margin: 30px auto;
+  }
+  #tabletocsv-modal-content {
+    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  }
+}
+@-ms-viewport {
+  width: device-width;
+}

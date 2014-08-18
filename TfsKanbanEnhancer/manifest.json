@@ -1,6 +1,6 @@
 {
-    "name": "TFS kanban board enhancer",
-    "version": "0.0.2",
+    "name": "TFS kanban buddy",
+    "version": "0.1.1",
     "manifest_version": 2,
     "browser_action": {
         "default_title": "TFS kanban board enhancer",
@@ -15,10 +15,12 @@
         "32": "icons/icon32.png",
         "128": "icons/icon128.png" 
     },
+    
+    
 
     "background": 
     {
-    	"scripts": ["utils_js/json.js","background/background.js"],
+    	"scripts": ["utils_js/util.js","background/background.js"],
     	"persistent": false
 	},
 
@@ -27,10 +29,20 @@
         	"matches": ["http://*/*/*/_backlogs/board*", 
                         "https://*/*/*/_backlogs/board*",
                         "http://*/*/*/_backlogs/TaskBoard*", 
-                        "https://*/*/*/_backlogs/TaskBoard*"
+                        "https://*/*/*/_backlogs/TaskBoard*",
+                        "http://*/*/*/_backlogs/taskboard*", 
+                        "https://*/*/*/_backlogs/taskboard*",
+                        "http://*/*/*/_boards*"
                         ],
-        	"js": ["utils_js/json.js","utils_js/jquery-2.1.1.min.js","content_scripts/board.js","content_scripts/projectUrl.js"]
+        	"js": ["utils_js/util.js","utils_js/jquery-2.1.1.min.js","content_scripts/board.js","content_scripts/projectUrl.js"]
     	},
+        {
+            "matches": [
+                        "http://*/*/*/_backlogs/board*", 
+                        "https://*/*/*/_backlogs/board*"
+                       ],
+            "js": ["utils_js/util.js","utils_js/jquery-2.1.1.min.js","content_scripts/snapshot.js"]
+        },
         {
             "matches": ["http://*/*/*", "https://*/*/*"],
             "js": ["content_scripts/boardlinks.js"]

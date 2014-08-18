@@ -7,8 +7,8 @@ var GET_KANBAN_BOARD_MAPPING = "get-color-map";
 
 
 
-var kanbanColorMap = null;
-var taskColorMap = null;
+var kanbanBoardColorMap = null;
+var taskBoardColorMap = null;
 var links = null;
 var url = null;
 
@@ -16,66 +16,123 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     
     switch(request.type) {
         case SET_KANBAN_BOARD_MAPPING:
-            kanbanColorMap = request.ColorMap;
-            var kanbanColorMapJson =jsonEncode(kanbanColorMap)
-            localStorage.setItem("colorMap", kanbanColorMapJson) ;
+            kanbanBoardColorMap = request.colorMap;
+            saveObjectToStorage( "colorMap" , kanbanBoardColorMap);
             sendResponse("Saved " );
             console.log("Kanban color-map saved to local storage " + localStorage.getItem("colorMap"));
             break;
         case GET_KANBAN_BOARD_MAPPING:
-            if(kanbanColorMap == null){
-                kanbanColorMap = jsonDecode(localStorage.getItem("colorMap")) ;
-                console.log("ColorMap read from local storage")
-            }
-            sendResponse(kanbanColorMap);
-            console.log("color-map sent " + jsonEncode(kanbanColorMap));
+            sendResponse(getKanbanBoardColorMap());
+            console.log("color-map sent " + jsonEncode(getKanbanBoardColorMap()));
             break;
         case SET_TASK_BOARD_MAPPING:
-            taskColorMap = request.colorMap;
-            var taskColorMapJson =jsonEncode(taskColorMap)
-            localStorage.setItem("taskColorMap", taskColorMapJson) ;
+            taskBoardColorMap = request.colorMap;
+            saveObjectToStorage("taskBoardColorMap", taskBoardColorMap) ;
             sendResponse("Saved " );
-            console.log("Task color-map saved to local storage " + localStorage.getItem("taskColorMap"));
+            console.log("task-color-map saved to local storage " + localStorage.getItem("taskBoardColorMap"));
             break;
         case GET_TASK_BOARD_MAPPING:
-            if(taskColorMap == null){
-                taskColorMap = jsonDecode(localStorage.getItem("taskColorMap")) ;
-                console.log("taskColorMap read from local storage")
-            }
-            sendResponse(taskColorMap);
-            console.log("task-color-map sent " + jsonEncode(taskColorMap));
+            sendResponse(getTaskBoardColorMap());
+            console.log("task-color-map sent " + jsonEncode(getTaskBoardColorMap()));
             break;
         case "set-links":
             links = request.links;
-            var linksJson =jsonEncode(links)
-            localStorage.setItem("links", linksJson) ;
+            saveObjectToStorage("links", links) ;
             sendResponse("Saved " );
             console.log("Links saved to local storage " + localStorage.getItem("links"));
             break;
         case "get-links":
-            if(links == null){
-                links = jsonDecode(localStorage.getItem("links")) ;
-                console.log("links read from local storage")
-            }
-            sendResponse(links);
-            console.log("links sent " + jsonEncode(links));
+            var boardLinks = getBoardLinks();
+            sendResponse(boardLinks);
+            console.log("links sent " + jsonEncode(boardLinks));
             break;
         case "set-url":
             url = request.url;
-            var urlJson =jsonEncode(url)
-            localStorage.setItem("url", urlJson) ;
-            sendResponse("Saved " );
+            saveStringToStorage ("url", url) ;
+            sendResponse ("Saved " );
             console.log("url saved to local storage " + localStorage.getItem("url"));
             break;
         case "get-url":
             if(url == null){
-                url = jsonDecode(localStorage.getItem("url")) ;
-                console.log("url read from local storage")
+                url = getStringFromStorage("url") ;
+                console.log("url read from local storage");
             }
             sendResponse(url);
             console.log("url sent " + jsonEncode(url));
+            break;
+        case "get-settings":
+            var settings = {
+                kanbanBoardColorMap : getKanbanBoardColorMap(),
+                taskBoardColorMap : getTaskBoardColorMap(),
+                boardLinks : getBoardLinks()
+            }
+            sendResponse(settings);
+            console.log("settings sent " + jsonEncode(settings));
+            break;
+        case "save-snapshot":
+            var snapshot = request.snapshot;
+            var key = "snapshots_" + snapshot.board;
+            var snapshots = getObjectFromStorage("snapshots_" + snapshot.board);
+           // Reset snapshot var snapshots = {};
+           if(!snapshots.board){
+                snapshots = {};
+                snapshots.board = snapshot.board;
+                snapshots.snapshots = [];
+            }
+            //Should only save first and last snapshot of day.
+            if( snapshots.snapshots.length >1 && isSameDay(snapshots.snapshots[snapshots.snapshots.length-2].time, snapshot.time )){
+                snapshots.snapshots[snapshots.snapshots.length-1] = snapshot;
+            } else {
+                snapshots.snapshots.push(snapshot);
+            }
+
+            saveObjectToStorage(key, snapshots);
+            sendResponse("Saved");
+            console.log("snapshot stored with key " + key);
+            //console.log(getStringFromStorage(key));
+            break;
+        case "show-flow-data":
+            saveStringToStorage("flowBoard", request.board);//Todo show flow data in new tab
+            var newURL = "pages/flowData.html";
+            chrome.tabs.create({ url: newURL });
+            sendResponse("OK");
+            console.log("show-flow-data handled flowdata.html opened")
+            break;
+        case "get-flow-data":
+            var key = "snapshots_" + request.board;
+            if(!request.board){
+                key = "snapshots_" + getStringFromStorage("flowBoard");    
+            }
+            else
+            console.log("getflowData with key " +key)
+            var response = getObjectFromStorage(key);
+            sendResponse(response);
+            console.log("Flowdata sent to flowdata.html")
             break;
     }
     return true;
 });
 
+function getBoardLinks(){
+    if(links == null){
+        links = getObjectFromStorage("links") ;
+        console.log("links read from local storage");
+    }
+    return links;
+}
+
+function getTaskBoardColorMap(){
+    if(taskBoardColorMap == null){
+                taskBoardColorMap = getObjectFromStorage("taskBoardColorMap") ;
+                console.log("taskColorMap read from local storage");
+    }
+    return taskBoardColorMap
+}
+
+function getKanbanBoardColorMap(){
+    if(kanbanBoardColorMap == null){
+        kanbanBoardColorMap = getObjectFromStorage("colorMap");//jsonDecode(localStorage.getItem("colorMap")) ;
+        console.log("ColorMap read from local storage");
+    }
+    return kanbanBoardColorMap;
+}

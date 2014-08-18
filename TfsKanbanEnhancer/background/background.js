@@ -74,7 +74,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             var key = "snapshots_" + snapshot.board;
             var snapshots = getObjectFromStorage("snapshots_" + snapshot.board);
            // Reset snapshot var snapshots = {};
-           if(!snapshots.board){
+           if(!snapshots || !snapshots.board){
                 snapshots = {};
                 snapshots.board = snapshot.board;
                 snapshots.snapshots = [];
@@ -93,6 +93,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             break;
         case "show-flow-data":
             saveStringToStorage("flowBoard", request.board);//Todo show flow data in new tab
+            console.log("flowdata for"  + request.board + " requested");
             var newURL = "pages/flowData.html";
             chrome.tabs.create({ url: newURL });
             sendResponse("OK");
@@ -103,11 +104,16 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             if(!request.board){
                 key = "snapshots_" + getStringFromStorage("flowBoard");    
             }
-            else
+            
             console.log("getflowData with key " +key)
             var response = getObjectFromStorage(key);
-            sendResponse(response);
-            console.log("Flowdata sent to flowdata.html")
+            if(!response){
+                console.log("No flowdata available");
+            }else{
+               sendResponse(response);
+               console.log("Flowdata sent to flowdata.html") 
+            }
+            
             break;
     }
     return true;

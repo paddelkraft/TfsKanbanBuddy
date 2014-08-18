@@ -7,7 +7,7 @@
     function onloadSnapshot(){
         var tiles = $(".board-tile");
         if(tiles.length == 0){
-            setTimeout(initialSnapshot,5000);
+            setTimeout(onloadSnapshot,5000);
             return;
         }
         takeSnapshot(false);

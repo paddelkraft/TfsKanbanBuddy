@@ -40,7 +40,7 @@
     }
 
     function saveStringToStorage(key, content){
-        localStorage.getItem(key, content);
+        localStorage.setItem(key, content);
         
     }
 

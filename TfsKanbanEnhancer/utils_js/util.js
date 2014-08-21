@@ -126,10 +126,13 @@
 
           tableData.forEach(function(rowData) {
             var row = document.createElement('tr');
-
+            var col =0;
             rowData.forEach(function(cellData) {
               var cell = document.createElement('td');
-              cell.appendChild(document.createTextNode(cellData));
+              //cell.appendChild(document.createTextNode(cellData));
+              cell.setAttribute("class","col"+col);
+              cell.innerHTML = cellData;
+              col ++;
               row.appendChild(cell);
             });
 
@@ -137,5 +140,19 @@
           });
 
           table.appendChild(tableBody);
-          document.body.appendChild(table);
+          return table ;
+    }
+
+    function setColumnWidths(tableElement, columnWidths){
+      var column = [];
+      for (var i = 0; i<columnWidths.length; i++) {
+        if(columnWidths[i] && columnWidths[i]!=""){
+          column = tableElement.getElementsByClassName("col"+i);
+          
+          for (var cell = 0; cell<column.length; cell++){
+            //console.log("Cellindex = "+ cell);
+            column[cell].setAttribute("style", "width:"+columnWidths[i]);
+          }
+        }
+      }
     }

@@ -1,6 +1,5 @@
 	
 	
-	var flowDataGrid
 	
 	function getBoard(response){
 		return response.board;
@@ -96,14 +95,23 @@
 					if(!flowTicket.lanes[lane.name]){
 						flowTicket.lanes[lane.name]={};
 						flowTicket.lanes[lane.name].enter = snapshot.time;
-						flowTicket.lanes[lane.name].exit = snapshot.time;
-					}else{
-						flowTicket.lanes[lane.name].exit = snapshot.time;
+						flowTicket.lanes[lane.name].enterMilliseconds = snapshot.milliseconds;
+						
 					}
+
+					flowTicket.lanes[lane.name].exit = snapshot.time;
+					flowTicket.lanes[lane.name].exitMilliseconds = snapshot.milliseconds;
 
 				}
 			} 
 		}
+		flowData.getEnterDate = function (id,lane){
+			return this[id].lanes[lane].enter
+		};
+
+		flowData.getEnterMilliseconds = function (id,lane){
+			return this[id].lanes[lane].enterMilliseconds;
+		};
 		return flowData;
 	}
 
@@ -152,7 +160,7 @@
 			} 
 			grid.push(row);
 		}
-		flowDataGrid = grid;
+		return grid;
 		
 	}
 
@@ -170,13 +178,57 @@
 			} 
 			flowReport.push( ["","","",""] );
 		}
-		document.getElementById("csv").onclick = function(){ table2csv("FlowReport")};
-		document.getElementById("json").onclick = function(){
-				downloadAsJson(flowData,"FlowReport");
-			};
-		createHandsOnTable(flowReport,"flowReportTable");
+		
+		return flowReport;
+		
 		
 	}
+
+	function daysSince(date){
+		var day = 86400000;
+		var now = new Date();
+		return Math.floor((now-date)/day);
+	}
+
+	function highlightTime(days){
+		if(days<2){
+			return "new";
+		}
+
+		return days;
+	}
+
+	function buildSnapshot(snapshot, flowData){
+		
+		var snapshotDiv = document.createElement("div");
+
+			for(laneIndex in snapshot.lanes){
+				var laneDiv =document.createElement("div");
+				snapshotDiv.appendChild(laneDiv);
+				
+				var lane = snapshot.lanes[laneIndex];
+				var laneHeader = document.createElement("h2");
+				laneHeader.textContent = lane.name;
+				laneDiv.appendChild(laneHeader);
+				var laneGrid = [];
+				laneGrid.push(["Id","title","days in lane"]);
+				for(var i = 0 ; i < lane.tickets.length ; i++ ){
+					var ticket = lane.tickets[i];
+					laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title, ,highlightTime(daysSince(flowData.getEnterMilliseconds(ticket.id,lane.name)))]);
+				}
+				if (laneGrid.length == 1){
+					
+					laneGrid = [["Lane is empty"]];
+				}
+				var dataTable = createDataTable(laneGrid);
+				dataTable.setAttribute("class","presentationTable");
+				laneDiv.appendChild(dataTable);
+			} 
+		
+		return snapshotDiv;
+	}
+
+	
 
 	function getLaneIndexes(lanes){
 		var indexes = {};
@@ -187,10 +239,7 @@
 	}
 
 
-	
-  
- 
-    function setTableData(data , tableId){
+	function setTableData(data , tableId){
     	$('#'+tableId).handsontable({
     			data: data,
     			minSpareRows: 1,
@@ -209,27 +258,66 @@
     	setTableData(data,tableId);
     }
 
+    function presentFlowReport(flowData){
+		var flowReport = buildFlowReport(flowData)
+		document.getElementById("csv").onclick = function(){ table2csv("FlowReport")};
+		document.getElementById("json").onclick = function(){
+			downloadAsJson(flowData,"FlowReport");
+		};
+		//createHandsOnTable(flowReport,"flowReportTable");
+		var flowReportTable = createDataTable(flowReport);
+    	flowReportTable.setAttribute("class","presentationTable");
+		
+    	var tableContainer = $("#tableContainer");
+    	//setColumnWidths(snapshotPresentation,["80px","","150px"])
+    	tableContainer.empty();
+    	tableContainer.append(flowReportTable);
 
+	}
 
-	function showFlowData(board){
+    function presentFlowDataGrid(flowData , lanes){
+    	
+		var flowDataGrid = bulidFlowDataGrid(flowData,lanes);
+		createHandsOnTable(flowDataGrid,"flowDataTable");
+		document.getElementById("csv").onclick = function(){ table2csv("FlowDataGrid")};
+		document.getElementById("json").addEventListener("click", function (a){
+			downloadAsJson(flowDataGrid,"FlowDataGrid");
+		});
+    }
+
+    function presentBoardSnapshot(snapshots,flowData){
+    	var snapshot = snapshots[snapshots.length-1];
+    	var snapshotPresentation = buildSnapshot(snapshot,flowData);
+    	var tableContainer = $("#tableContainer");
+    	setColumnWidths(snapshotPresentation,["80px","","150px"])
+    	tableContainer.empty();
+    	tableContainer.append(snapshotPresentation);
+    	//createHandsOnTable(snapshotPresentation, "snapshotTable")
+    	document.getElementById("csv").onclick = function(){alert("No csv downoload of snapshot")};
+		document.getElementById("json").addEventListener("click", function (a){
+			downloadAsJson(snapshot,"BoardSnapshot");
+		});
+
+    }
+
+	function setup(board){
 		var message = {type:"get-flow-data"};
 		if(board){
 			message.board = board;
 		}
 		chrome.runtime.sendMessage({type:"get-flow-data"}, function(response){
 			var flowBoard = getBoard(response);
-			var lanes = getLaneHeaders(response);
-			console.log("Lanes = " + jsonEncode(lanes));
 			var flowData = getFlowData(response);
-			bulidFlowDataGrid(flowData,lanes);
-			createHandsOnTable(flowDataGrid,"flowDataTable");
-			document.getElementById("update").onclick = function(){showFlowData(flowBoard);};
-			document.getElementById("csv").onclick = function(){ table2csv("FlowDataGrid")};
-			document.getElementById("json").addEventListener("click", function (a){
-				downloadAsJson(flowDataGrid,"FlowDataGrid");
-			});
-			document.getElementById("flowReport").onclick = function(){buildFlowReport(flowData);};
+			var lanes = getLaneHeaders(response);
+			document.getElementById("snapshot").onclick= function(){presentBoardSnapshot(response.snapshots,flowData)};
+			document.getElementById("flowDataGrid").onclick = function(){presentFlowDataGrid(flowData,lanes);};
+			document.getElementById("flowReport").onclick = function(){presentFlowReport(flowData);};
+			document.getElementById("rawDataJson").onclick = function(){ 
+				downloadAsJson(response, "TfsFlowRawData");
+			};
+			document.getElementById("board").innerHTML = "Data collected from " + flowBoard;
+			presentBoardSnapshot(response.snapshots,flowData);
 		})
 	}
 
-showFlowData();
+setup();

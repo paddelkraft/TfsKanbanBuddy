@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>TFS Kanban Buddy settings</title>
+<title>TFS Kanban Buddy Flow data</title>
 <script type="text/javascript" src="../utils_js/jquery-2.1.1.min.js"></script>
 <script type="text/javascript" src="../utils_js/filesaver.js"></script>
 <script src="jquery.handsontable.full.js"></script>
@@ -8,14 +8,19 @@
 <script type="text/javascript" src="flowdata.js"></script>
 <link rel="stylesheet" media="screen" href="jquery.handsontable.full.css">
 <link rel="stylesheet" media="screen" href="samples.css">
+<link rel="stylesheet" media="screen" href="presentationTable.css">
 
 </head>
 <body>
-  <button id="update">Show flow data grid</button>
+  
+  <button id="snapshot">Show board snapshot</button>
+  <button id="flowDataGrid">Show flow data grid</button>
   <button id="flowReport">Show flow report</button>
-  <button id="csv">download as Csv</button>
-  <button id="json">download as JSON</button>
- 
+  <button id="csv">Download as Csv</button>
+  <button id="json">Download as JSON</button>
+  <button id="rawDataJson">Download raw data as JSON</button>
+ <div id="board"> </div>
+ <div id="report"> </div>
   <div id="tableContainer">
   </div>
 </body>

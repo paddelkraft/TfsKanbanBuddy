@@ -72,21 +72,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
         case "save-snapshot":
             var snapshot = request.snapshot;
             var key = "snapshots_" + snapshot.board;
-            var snapshots = getObjectFromStorage("snapshots_" + snapshot.board);
-           // Reset snapshot var snapshots = {};
-           if(!snapshots || !snapshots.board){
-                snapshots = {};
-                snapshots.board = snapshot.board;
-                snapshots.snapshots = [];
-            }
-            //Should only save first and last snapshot of day.
-            if( snapshots.snapshots.length >1 && isSameDay(snapshots.snapshots[snapshots.snapshots.length-2].time, snapshot.time )){
-                snapshots.snapshots[snapshots.snapshots.length-1] = snapshot;
-            } else {
-                snapshots.snapshots.push(snapshot);
-            }
-
-            saveObjectToStorage(key, snapshots);
+            var boardData = new BoardData( getObjectFromStorage(key));
+            boardData.addSnapshot(snapshot);
+            saveObjectToStorage(key, boardData);
             sendResponse("Saved");
             console.log("snapshot stored with key " + key);
             //console.log(getStringFromStorage(key));
@@ -110,7 +98,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             if(!response){
                 console.log("No flowdata available");
             }else{
-               sendResponse(response);
+               sendResponse(new BoardData(response));
                console.log("Flowdata sent to flowdata.html") 
             }
             
@@ -118,6 +106,11 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     }
     return true;
 });
+
+
+
+
+
 
 function getBoardLinks(){
     if(links == null){

@@ -120,7 +120,7 @@
     }
 
     //addProductBacklogViewTabsLink("Take board Snapshot", "#","takeSnapshot", takeSnapshot);
-    addProductBacklogViewTabsLink("board snapshot", "#","showFlowData", showFlowData);
+    addProductBacklogViewTabsLink("flow data", "#","showFlowData", showFlowData);
     var genericItemUrl = getGenericItemUrl();
     onloadSnapshot();
 

@@ -1,6 +1,6 @@
 {
     "name": "TFS kanban buddy",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "manifest_version": 2,
     "browser_action": {
         "default_title": "TFS kanban board enhancer",
@@ -15,12 +15,16 @@
         "32": "icons/icon32.png",
         "128": "icons/icon128.png" 
     },
+
+    "permissions": [
+        "unlimitedStorage"
+    ],
     
     
 
     "background": 
     {
-    	"scripts": ["utils_js/util.js","background/background.js"],
+    	"scripts": ["utils_js/boarddata.js","utils_js/util.js","background/background.js"],
     	"persistent": false
 	},
 

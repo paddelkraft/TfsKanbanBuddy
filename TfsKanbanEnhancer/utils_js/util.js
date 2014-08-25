@@ -23,6 +23,12 @@
         }
     }
 
+  function daysSince(date){
+    var day = 86400000;
+    var now = new Date();
+    return Math.floor((now-date)/day);
+  }
+
     function saveObjectToStorage(key, toSave){
         var content = jsonEncode(toSave);
         localStorage.setItem(key,content);

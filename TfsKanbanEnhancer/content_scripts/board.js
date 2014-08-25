@@ -87,9 +87,9 @@ function checkWip(){
     var i;
     var columns = getColumns();
     var thisColumn,nextColumn ;
-     for (i = 1 ; i < columns.length-1 ; i++) {
+     for (i = 1 ; i < columns.length-1 ; i++) { //fist and last column dont have wips.
             thisColumn = columns[i];
-            nextColumn = columns[i +1];
+            nextColumn = (i<columns.length-2)? columns[i +1]:null; //Last lane never part of wip.
             console.log("check wip " + columns[i].title);
             var wip, wipLimit, useNext = false;
             if(thisColumn.wipLimit){

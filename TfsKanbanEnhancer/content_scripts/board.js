@@ -50,8 +50,8 @@
     
     
     function improveBoard(colorMap, board) {
-        console.log("colorMap = " + jsonEncode(colorMap));
-        console.log("Board data " + jsonEncode(board) );
+        //console.log("colorMap = " + jsonEncode(colorMap));
+        //console.log("Board data " + jsonEncode(board) );
         if (!is_focused || (getTiles(board).length < 1)) { //Todo fix so it works in taskboard getTiles()
             setTimeout(function(){improveBoard(colorMap,board)}, 1000);
             return;
@@ -67,7 +67,7 @@
         });
         
         if(board.removeClass != "undefined"){
-            console.log("Removing class " + board.removeClass);
+            //console.log("Removing class " + board.removeClass);
             $("."+board.removeClass).each(function(){
                 var $element = $(this);
                 $element.removeClass(board.removeClass);
@@ -90,14 +90,14 @@ function checkWip(){
      for (i = 1 ; i < columns.length-1 ; i++) { //fist and last column dont have wips.
             thisColumn = columns[i];
             nextColumn = (i<columns.length-2)? columns[i +1]:null; //Last lane never part of wip.
-            console.log("check wip " + columns[i].title);
+            //console.log("check wip " + columns[i].title);
             var wip, wipLimit, useNext = false;
             if(thisColumn.wipLimit){
                 wipLimit = thisColumn.wipLimit;
                 wip = thisColumn.getCurrentWip();
                 //if next column is a done column (Wiplimit == 0)
                 if(nextColumn && !nextColumn.wipLimit ){
-                    console.log("Include " + nextColumn.title + "in wip");
+                    //console.log("Include " + nextColumn.title + "in wip");
                     useNext = true;
                         wip += nextColumn.getCurrentWip();
                     thisColumn.setCurrentWip(wip);
@@ -105,19 +105,19 @@ function checkWip(){
                 }
 
                 if(wip > wipLimit){
-                    console.log("wipLimit broken");
+                    //console.log("wipLimit broken");
                     thisColumn .setColumnColor("#FBEFEF");
                     if(useNext){
                         nextColumn.setColumnColor("#FBEFEF");
                     }
                 }else if(wip == wipLimit){
-                    console.log("on wiplimit");
+                    //console.log("on wiplimit");
                     thisColumn.setColumnColor("#FBFBEF");
                     if(useNext){
                         nextColumn.setColumnColor("#FBFBEF");
                     }
                 }else{
-                    console.log("on wiplimit");
+                    //console.log("on wiplimit");
                     thisColumn.setColumnColor("#FFFFFF");
                     if(useNext){
                         nextColumn.setColumnColor("#FFFFFF");;
@@ -126,7 +126,7 @@ function checkWip(){
             }
             
     }
-    setTimeout(checkWip, 3000);
+    setTimeout(checkWip, 5000);
 }
 
 function getColumns(){
@@ -138,7 +138,7 @@ function getColumns(){
     var columns =[];
     for (i in headers) {
         if(headers[i].textContent != undefined){
-            console.log(headers[i].textContent);
+           // console.log(headers[i].textContent);
             column = {};
             column.title = headers[i].getAttribute("title");
             column.header = headers[i];
@@ -146,17 +146,11 @@ function getColumns(){
             column.setColumnColor = setColumnColor;
             column.setCurrentWip = setCurrentWip;
             column.getCurrentWip = getCurrentWip;
-            //Set current wip
-            /*if(column.header.getElementsByClassName("current")[0]){
-                column.wipCurrent = parseInt(column.header.getElementsByClassName("current")[0].textContent);
-                console.log("wipCurrent ="+column.wipCurrent);
-
-            }*/
             //set wipLimit
             if(column.header.getElementsByClassName("limit")[0])
             {
                 column.wipLimit = parseInt(column.header.getElementsByClassName("limit")[0].textContent.replace("/",""));
-                console.log("wipLimit ="+column.wipLimit);
+                //console.log("wipLimit ="+column.wipLimit);
             }
 
 
@@ -182,11 +176,11 @@ function getCurrentWip(){
 
 function setColumnColor( color){
     var style = "background-color:"+color;
-    console.log("setColumnColor");
+    //console.log("setColumnColor");
     this.container.setAttribute("style",style);
     
     this.header.parentNode.setAttribute("style",style);
-    console.log(this.title + " style = " + this.container.getAttribute("style"));
+    //console.log(this.title + " style = " + this.container.getAttribute("style"));
 }
 
 

@@ -82,13 +82,14 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
         case "show-flow-data":
             saveStringToStorage("flowBoard", request.board);//Todo show flow data in new tab
             console.log("flowdata for"  + request.board + " requested");
-            var newURL = "pages/flowData.html";
+            var newURL = "pages/flowData.html?"+encodeURIComponent(request.board);
             chrome.tabs.create({ url: newURL });
             sendResponse("OK");
             console.log("show-flow-data handled flowdata.html opened")
             break;
         case "get-flow-data":
             var key = "snapshots_" + request.board;
+            console.log("get-flow-data for board "+ request.board);
             if(!request.board){
                 key = "snapshots_" + getStringFromStorage("flowBoard");    
             }
@@ -106,10 +107,6 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     }
     return true;
 });
-
-
-
-
 
 
 function getBoardLinks(){

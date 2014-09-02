@@ -92,6 +92,10 @@ function BoardData(data){
         return header;
     }
 
+    this.size = function(){
+        return jsonEncode(this).length * 2;
+    }
+
     //construction
            
 

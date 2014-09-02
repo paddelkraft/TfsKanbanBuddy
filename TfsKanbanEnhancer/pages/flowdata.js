@@ -165,10 +165,12 @@
 
 	function setup(board){
 		var message = {type:"get-flow-data"};
-		if(board){
-			message.board = board;
-		}
-		chrome.runtime.sendMessage({type:"get-flow-data"}, function(response){
+		message.board = decodeURIComponent(document.URL.split("?")[1]);
+		console.log(message.board);
+		//if(board){
+		//	message.board = board;
+		//}
+		chrome.runtime.sendMessage(message, function(response){
 			var boardData = new BoardData(response);
 			var lanes = boardData.getLaneHeaders();
 			document.getElementById("snapshot").onclick= function(){presentBoardSnapshot(boardData.snapshots,boardData.flowData)};
@@ -178,6 +180,7 @@
 				downloadAsJson(response, "TfsFlowRawData");
 			};
 			document.getElementById("board").innerHTML = "Data collected from " + boardData.board;
+			document.getElementById("dataSize").innerHTML = "Data size = " +parseInt( boardData.size()/1024) +"KB";
 			presentBoardSnapshot(boardData.snapshots,boardData.flowData);
 		})
 	}

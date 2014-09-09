@@ -18,6 +18,7 @@ window.onload = function(){
           
           chrome.runtime.sendMessage({"type": "set-settings","settings": settings}, function(response) {
           	console.log(response);
+            location.reload();
           });
         };
       })(f);

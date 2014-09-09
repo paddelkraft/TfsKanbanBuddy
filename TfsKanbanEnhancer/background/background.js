@@ -16,30 +16,24 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     
     switch(request.type) {
         case SET_KANBAN_BOARD_MAPPING:
-            kanbanBoardColorMap = request.colorMap;
-            saveObjectToStorage( "colorMap" , kanbanBoardColorMap);
+            setKanbanBoardColorMap(request.colorMap); 
             sendResponse("Saved " );
-            console.log("Kanban color-map saved to local storage " + localStorage.getItem("colorMap"));
             break;
         case GET_KANBAN_BOARD_MAPPING:
             sendResponse(getKanbanBoardColorMap());
             console.log("color-map sent " + jsonEncode(getKanbanBoardColorMap()));
             break;
         case SET_TASK_BOARD_MAPPING:
-            taskBoardColorMap = request.colorMap;
-            saveObjectToStorage("taskBoardColorMap", taskBoardColorMap) ;
+            setTaskBoardColorMap(request.colorMap);
             sendResponse("Saved " );
-            console.log("task-color-map saved to local storage " + localStorage.getItem("taskBoardColorMap"));
             break;
         case GET_TASK_BOARD_MAPPING:
             sendResponse(getTaskBoardColorMap());
             console.log("task-color-map sent " + jsonEncode(getTaskBoardColorMap()));
             break;
         case "set-links":
-            links = request.links;
-            saveObjectToStorage("links", links) ;
+            setBoardLinks(request.links);
             sendResponse("Saved " );
-            console.log("Links saved to local storage " + localStorage.getItem("links"));
             break;
         case "get-links":
             var boardLinks = getBoardLinks();
@@ -69,6 +63,18 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             sendResponse(settings);
             console.log("settings sent " + jsonEncode(settings));
             break;
+        case "set-settings":
+            var settings = request.settings;
+            if(settings.boardLinks){
+                setBoardLinks(settings.boardLinks);
+            }
+            if(settings.taskBoardColorMap){
+                setTaskBoardColorMap(settings.taskBoardColorMap);
+            }
+            if(settings.kanbanBoardColorMap){
+                setKanbanBoardColorMap(settings.kanbanBoardColorMap);
+            }
+            break;
         case "save-snapshot":
             var snapshot = request.snapshot;
             var key = "snapshots_" + snapshot.board;
@@ -80,7 +86,6 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             //console.log(getStringFromStorage(key));
             break;
         case "show-flow-data":
-            saveStringToStorage("flowBoard", request.board);//Todo show flow data in new tab
             console.log("flowdata for"  + request.board + " requested");
             var newURL = "pages/flowData.html?"+encodeURIComponent(request.board);
             chrome.tabs.create({ url: newURL });
@@ -90,11 +95,6 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
         case "get-flow-data":
             var key = "snapshots_" + request.board;
             console.log("get-flow-data for board "+ request.board);
-            if(!request.board){
-                key = "snapshots_" + getStringFromStorage("flowBoard");    
-            }
-            
-            console.log("getflowData with key " +key)
             var response = getObjectFromStorage(key);
             if(!response){
                 console.log("No flowdata available");
@@ -103,6 +103,11 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
                console.log("Flowdata sent to flowdata.html") 
             }
             
+            break;
+        case "delete-flow-data":
+            console.log("delete-flow-data for " + request.board );
+            var key = "snapshots_" + request.board;
+            saveObjectToStorage(key,{});
             break;
     }
     return true;
@@ -117,6 +122,11 @@ function getBoardLinks(){
     return links;
 }
 
+function setBoardLinks(links){
+    saveObjectToStorage("links", links) ;
+    console.log("Links saved to local storage " + localStorage.getItem("links"));
+}
+
 function getTaskBoardColorMap(){
     if(taskBoardColorMap == null){
                 taskBoardColorMap = getObjectFromStorage("taskBoardColorMap") ;
@@ -125,10 +135,20 @@ function getTaskBoardColorMap(){
     return taskBoardColorMap
 }
 
+function setTaskBoardColorMap(taskBoardColorMap){
+    saveObjectToStorage("taskBoardColorMap", taskBoardColorMap) ;
+    console.log("task-color-map saved to local storage " + localStorage.getItem("taskBoardColorMap"));
+}
+
 function getKanbanBoardColorMap(){
     if(kanbanBoardColorMap == null){
         kanbanBoardColorMap = getObjectFromStorage("colorMap");//jsonDecode(localStorage.getItem("colorMap")) ;
         console.log("ColorMap read from local storage");
     }
     return kanbanBoardColorMap;
+}
+
+function setKanbanBoardColorMap(kanbanBoardColorMap){
+    saveObjectToStorage( "colorMap" , kanbanBoardColorMap);
+    console.log("Kanban color-map saved to local storage " + localStorage.getItem("colorMap"));
 }

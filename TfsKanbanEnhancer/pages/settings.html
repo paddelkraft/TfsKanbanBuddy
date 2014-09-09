@@ -2,6 +2,8 @@
 <head>
 <title>TFS Kanban Buddy settings</title>
 <script type="text/javascript" src="../utils_js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="../utils_js/filesaver.js"></script>
+
 <script type="text/javascript" src="../utils_js/util.js"></script>
 <script type="text/javascript" src="color-mapping.js"></script>
 <script type="text/javascript" src="links.js"></script>
@@ -128,6 +130,13 @@
     <hr>
     <button id="saveLinks">Save links</button>
   </div>
+  <div class="row500">
+    <hr>
+    Import settings from file (BETA)
+    <input type="file" id="importSettings" name="files[]" />
+    <button id="exportSettings">Export settings to file </button>(BETA)
+  </div>
 </div>
+
 </body>
 </html>

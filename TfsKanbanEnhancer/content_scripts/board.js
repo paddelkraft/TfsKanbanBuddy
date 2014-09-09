@@ -152,9 +152,6 @@ function getColumns(){
                 column.wipLimit = parseInt(column.header.getElementsByClassName("limit")[0].textContent.replace("/",""));
                 //console.log("wipLimit ="+column.wipLimit);
             }
-
-
-            
             
            columns.push(column);
         }
@@ -206,8 +203,8 @@ function setColumnColor( color){
         var caseId = "";// Set relation
         var tileData = $itemElm.text().split(" ");
         caseId = getRelationId(tileData);
-        $itemElm.attr('data-case-id', caseId);
-            
+        $itemElm.attr('data-case-id', caseId);   
+        
     }
     
     function getRelationId(tileData){
@@ -236,9 +233,11 @@ function setColumnColor( color){
         $('[data-case-id]')
         .mouseenter(function (evt) {
             var caseId = $(evt.target).attr('data-case-id') || $(evt.target).closest('[data-case-id]').attr('data-case-id');
-            console.log('Mouse enter... case #:' + caseId)
+            if(caseId != ""){
+              console.log('Mouse enter... case #:' + caseId)
+              $("[data-case-id!='" + caseId + "']").addClass('pale')  
+            }
             
-            $("[data-case-id!='" + caseId + "']").addClass('pale')
         })
         .mouseleave(function (evt) {
             $("[data-case-id]").removeClass('pale')

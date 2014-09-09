@@ -179,6 +179,15 @@
 			document.getElementById("rawDataJson").onclick = function(){ 
 				downloadAsJson(response, "TfsFlowRawData");
 			};
+			document.getElementById("delete").onclick = function(){
+				var answer = window.confirm("You are about to delete all flow data collected for "+ message.board + " this data is not recoverable");
+				if(answer){
+					chrome.runtime.sendMessage({type : "delete-flow-data",
+												board : message.board}
+											  );
+					location.reload();
+				}
+			};
 			document.getElementById("board").innerHTML = "Data collected from " + boardData.board;
 			document.getElementById("dataSize").innerHTML = "Data size = " +parseInt( boardData.size()/1024) +"KB";
 			presentBoardSnapshot(boardData.snapshots,boardData.flowData);

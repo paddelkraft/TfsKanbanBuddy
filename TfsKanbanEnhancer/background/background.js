@@ -7,9 +7,9 @@ var GET_KANBAN_BOARD_MAPPING = "get-color-map";
 
 
 
-var kanbanBoardColorMap = null;
-var taskBoardColorMap = null;
-var links = null;
+//var kanbanBoardColorMap = null;
+//var taskBoardColorMap = null;
+//var links = null;
 var url = null;
 
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
@@ -74,6 +74,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             if(settings.kanbanBoardColorMap){
                 setKanbanBoardColorMap(settings.kanbanBoardColorMap);
             }
+            sendResponse("Settings saved");
             break;
         case "save-snapshot":
             var snapshot = request.snapshot;
@@ -115,10 +116,8 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
 
 function getBoardLinks(){
-    if(links == null){
-        links = getObjectFromStorage("links") ;
-        console.log("links read from local storage");
-    }
+    var links = getObjectFromStorage("links") ;
+    console.log("links read from local storage");
     return links;
 }
 
@@ -128,10 +127,8 @@ function setBoardLinks(links){
 }
 
 function getTaskBoardColorMap(){
-    if(taskBoardColorMap == null){
-                taskBoardColorMap = getObjectFromStorage("taskBoardColorMap") ;
-                console.log("taskColorMap read from local storage");
-    }
+    var taskBoardColorMap = getObjectFromStorage("taskBoardColorMap") ;
+    console.log("taskColorMap read from local storage");
     return taskBoardColorMap
 }
 
@@ -141,10 +138,8 @@ function setTaskBoardColorMap(taskBoardColorMap){
 }
 
 function getKanbanBoardColorMap(){
-    if(kanbanBoardColorMap == null){
-        kanbanBoardColorMap = getObjectFromStorage("colorMap");//jsonDecode(localStorage.getItem("colorMap")) ;
-        console.log("ColorMap read from local storage");
-    }
+    var kanbanBoardColorMap = getObjectFromStorage("colorMap");//jsonDecode(localStorage.getItem("colorMap")) ;
+    console.log("ColorMap read from local storage");
     return kanbanBoardColorMap;
 }
 

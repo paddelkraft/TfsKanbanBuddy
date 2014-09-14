@@ -1,5 +1,12 @@
 window.onload = function(){
-	initLinks();
+	function setSettings(settings){
+      chrome.runtime.sendMessage({"type": "set-settings","settings": settings}, function(response) {
+      console.log(response);
+      location.reload();
+    }); 
+  }
+
+  initLinks();
 	initColorMap();
 
 	function handleFileSelect(evt) {
@@ -13,13 +20,7 @@ window.onload = function(){
       // Closure to capture the file information.
       reader.onload = (function(theFile) {
         return function(e) {
-          var settings =  jsonDecode(e.target.result);
-          
-          
-          chrome.runtime.sendMessage({"type": "set-settings","settings": settings}, function(response) {
-          	console.log(response);
-            location.reload();
-          });
+          setSettings(jsonDecode(e.target.result));
         };
       })(f);
 
@@ -34,4 +35,15 @@ window.onload = function(){
           	downloadAsJson(response,"tfsKanbanBuddySettings");
         });
   	};
+
+  document.getElementById("importSettingsfromUrl").onclick = function(){
+      console.log("getSettings from "+ document.getElementById("importURL").value);
+      $.get(document.getElementById("importURL").value,function(data,status){
+      console.log("get");
+      if (data){
+        setSettings(jsonDecode(data));
+      }
+      
+    });
+  };
 };

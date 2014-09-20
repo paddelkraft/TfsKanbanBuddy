@@ -5,25 +5,19 @@ var GET_KANBAN_BOARD_MAPPING = "get-color-map";
   var SET_KANBAN_BOARD_MAPPING = "set-color-map";
   var SET_TASK_BOARD_MAPPING = "set-task-color-map";
 
-
-
-//var kanbanBoardColorMap = null;
-//var taskBoardColorMap = null;
-//var links = null;
-var url = null;
-
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-    
+    var data,settings,key;
     switch(request.type) {
-        case SET_KANBAN_BOARD_MAPPING:
-            setKanbanBoardColorMap(request.colorMap); 
+        case SET_KANBAN_BOARD_MAPPING://Color mapping for kanban board 
+            setKanbanBoardColorMap(request.colorMap);
             sendResponse("Saved " );
             break;
         case GET_KANBAN_BOARD_MAPPING:
             sendResponse(getKanbanBoardColorMap());
             console.log("color-map sent " + jsonEncode(getKanbanBoardColorMap()));
             break;
-        case SET_TASK_BOARD_MAPPING:
+        
+        case SET_TASK_BOARD_MAPPING://Color mapping for Task (scrum board)
             setTaskBoardColorMap(request.colorMap);
             sendResponse("Saved " );
             break;
@@ -31,7 +25,8 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             sendResponse(getTaskBoardColorMap());
             console.log("task-color-map sent " + jsonEncode(getTaskBoardColorMap()));
             break;
-        case "set-links":
+        
+        case "set-links"://Project links
             setBoardLinks(request.links);
             sendResponse("Saved " );
             break;
@@ -40,31 +35,44 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             sendResponse(boardLinks);
             console.log("links sent " + jsonEncode(boardLinks));
             break;
-        case "set-url":
-            url = request.url;
+            
+        case "set-url"://Project root url
+            var url = request.url;
             saveStringToStorage ("url", url) ;
             sendResponse ("Saved " );
             console.log("url saved to local storage " + localStorage.getItem("url"));
             break;
-        case "get-url":
-            if(url == null){
-                url = getStringFromStorage("url") ;
-                console.log("url read from local storage");
-            }
-            sendResponse(url);
-            console.log("url sent " + jsonEncode(url));
+        case "get-url"://Project root url
+            data = getStringFromStorage("url") ;
+            console.log("url read from local storage");
+            sendResponse(data);
+            console.log("url sent " + jsonEncode(data));
             break;
-        case "get-settings":
-            var settings = {
+        
+        case "set-import-url"://Settings Import Url
+            data = request.data;
+            saveObjectToStorage ("import-url", data) ;
+            sendResponse ("import url Saved " );
+            console.log("import url saved to local storage " + localStorage.getItem("import-url"));
+            break;
+        case "get-import-url"://Settings Import Url
+            data = getObjectFromStorage("import-url") ;
+            console.log("import url read from local storage");
+            sendResponse(data);
+            console.log("import url sent " + jsonEncode(data));
+            break;
+        
+        case "get-settings"://complete board config
+            settings = {
                 kanbanBoardColorMap : getKanbanBoardColorMap(),
                 taskBoardColorMap : getTaskBoardColorMap(),
                 boardLinks : getBoardLinks()
-            }
+            };
             sendResponse(settings);
             console.log("settings sent " + jsonEncode(settings));
             break;
-        case "set-settings":
-            var settings = request.settings;
+        case "set-settings"://complete board config
+            settings = request.settings;
             if(settings.boardLinks){
                 setBoardLinks(settings.boardLinks);
             }
@@ -76,9 +84,10 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             }
             sendResponse("Settings saved");
             break;
-        case "save-snapshot":
+        
+        case "save-snapshot"://Incoming data from kanban board
             var snapshot = request.snapshot;
-            var key = "snapshots_" + snapshot.board;
+            key = "snapshots_" + snapshot.board;
             var boardData = new BoardData( getObjectFromStorage(key));
             boardData.addSnapshot(snapshot);
             saveObjectToStorage(key, boardData);
@@ -86,28 +95,29 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             console.log("snapshot stored with key " + key);
             //console.log(getStringFromStorage(key));
             break;
-        case "show-flow-data":
+        
+        case "show-flow-data"://board triggering flowData page opening
             console.log("flowdata for"  + request.board + " requested");
             var newURL = "pages/flowData.html?"+encodeURIComponent(request.board);
             chrome.tabs.create({ url: newURL });
             sendResponse("OK");
-            console.log("show-flow-data handled flowdata.html opened")
+            console.log("show-flow-data handled flowdata.html opened");
             break;
-        case "get-flow-data":
-            var key = "snapshots_" + request.board;
+        case "get-flow-data"://flowdata page requesting data
+            key = "snapshots_" + request.board;
             console.log("get-flow-data for board "+ request.board);
             var response = getObjectFromStorage(key);
             if(!response){
                 console.log("No flowdata available");
             }else{
                sendResponse(new BoardData(response));
-               console.log("Flowdata sent to flowdata.html") 
+               console.log("Flowdata sent to flowdata.html") ;
             }
             
             break;
         case "delete-flow-data":
             console.log("delete-flow-data for " + request.board );
-            var key = "snapshots_" + request.board;
+            key = "snapshots_" + request.board;
             saveObjectToStorage(key,{});
             break;
     }
@@ -129,7 +139,7 @@ function setBoardLinks(links){
 function getTaskBoardColorMap(){
     var taskBoardColorMap = getObjectFromStorage("taskBoardColorMap") ;
     console.log("taskColorMap read from local storage");
-    return taskBoardColorMap
+    return taskBoardColorMap;
 }
 
 function setTaskBoardColorMap(taskBoardColorMap){
@@ -147,3 +157,17 @@ function setKanbanBoardColorMap(kanbanBoardColorMap){
     saveObjectToStorage( "colorMap" , kanbanBoardColorMap);
     console.log("Kanban color-map saved to local storage " + localStorage.getItem("colorMap"));
 }
+
+function autoImport(){
+  console.log("Autoimport");
+  var data = getObjectFromStorage("import-url") ;
+  console.log(jsonEncode(data));
+  if( data && data.url && data.automaticImport){
+    console.log("fetch settings from URL " + data.url);
+    $.get(data.url,function(content){
+       chrome.runtime.sendMessage({type : "set-settings", "settings" : jsonDecode(content) });
+    });
+  }
+}
+
+autoImport();

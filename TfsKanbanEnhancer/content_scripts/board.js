@@ -10,7 +10,7 @@
         "tileClass" : "board-tile",
         "relations" : true,
         "wip"       : true
-    }
+    };
 
     var taskBoard   = {
         "type"      : "taskBoard",
@@ -19,19 +19,21 @@
         "update"    : true,
         "relations" : false,
         "wip"       : false
-    }
+    };
 
     var customStylePale =
-        ".$tileClass.pale {background-color: transparent; border-color: #ddd; color: #ddd}" + 
-        ".$tileClass.yellow.pale {background-color: transparent; border-color: #ddd; color: #ddd}" + 
-        ".$tileClass.blue.pale {background-color: transparent; border-color: #ddd; color: #ddd}" + 
+        ".$tileClass.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+        ".$tileClass.yellow.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+        ".$tileClass.blue.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.orange.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.green.pale {background-color: transparent; border-color: #ddd; color: #ddd}" + 
+        ".$tileClass.green.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.pink.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.asure.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.purple.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.expediter.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.blocked.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+        ".$tileClass.lightgreen.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+        ".$tileClass.gray.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.standard.pale {background-color: transparent; border-color: #ddd; color: #ddd}"
     ;
     
@@ -39,12 +41,14 @@
         ".$tileClass.blue {background-color: #3276b1; border-color: #285e8e; color: white} " +
         ".$tileClass.yellow {background-color: yellow; border-color: #D7DF01; color: black} " +
         ".$tileClass.orange {background-color: #FF8000; border-color: #DF7401; color: black} " +
-        ".$tileClass.green {background-color: #00FF80; border-color: #01DF74; color: black} " +
+        ".$tileClass.green {background-color: #33A904; border-color: #1B5C01; color: white} " +
         ".$tileClass.pink {background-color: #F781F3; border-color: #FA58F4; color: black} " +
         ".$tileClass.asure {background-color: #00FFFF; border-color: #01DFD7; color: black} " +
         ".$tileClass.purple {background-color: #9A2EFE; border-color: #A901DB; color: white} " +
         ".$tileClass.expediter {background-color: black; border-color: #DDDDDD; color: white} " +
         ".$tileClass.blocked {background-color: #d2322d; border-color: #ac2925; color: white} " +
+        ".$tileClass.lightgreen {background-color: #C3FCD4; border-color: #00FF80; color: black} " +
+        ".$tileClass.gray {background-color: #A1A19F; border-color:black; color: white} " +
         ".$tileClass.standard {border-left-color: rgb(0, 156, 204); background-color: rgb(214, 236, 242) color = black}"
     ;
     
@@ -73,13 +77,13 @@
                 $element.removeClass(board.removeClass);
             });
         }
+ 
         if (board.wip) {
             checkWip();
-        };
-        
-
+        }
+ 
         if(board.update){
-            setTimeout(function(){improveBoard(colorMap,board)}, 5000);
+            setTimeout(function(){improveBoard(colorMap,board);}, 5000);
         }
     }
 
@@ -120,7 +124,7 @@ function checkWip(){
                     //console.log("on wiplimit");
                     thisColumn.setColumnColor("#FFFFFF");
                     if(useNext){
-                        nextColumn.setColumnColor("#FFFFFF");;
+                        nextColumn.setColumnColor("#FFFFFF");
                     }
                 }
             }
@@ -136,8 +140,8 @@ function getColumns(){
     var columnContainer = document.getElementsByClassName("content-container")[0];
     var columnContainers = columnContainer.getElementsByClassName("member-content");
     var columns =[];
-    for (i in headers) {
-        if(headers[i].textContent != undefined){
+    for (var i in headers) {
+        if(headers[i].textContent !== undefined){
            // console.log(headers[i].textContent);
             column = {};
             column.title = headers[i].getAttribute("title");
@@ -147,8 +151,7 @@ function getColumns(){
             column.setCurrentWip = setCurrentWip;
             column.getCurrentWip = getCurrentWip;
             //set wipLimit
-            if(column.header.getElementsByClassName("limit")[0])
-            {
+            if(column.header.getElementsByClassName("limit")[0]){
                 column.wipLimit = parseInt(column.header.getElementsByClassName("limit")[0].textContent.replace("/",""));
                 //console.log("wipLimit ="+column.wipLimit);
             }
@@ -203,14 +206,14 @@ function setColumnColor( color){
         var caseId = "";// Set relation
         var tileData = $itemElm.text().split(" ");
         caseId = getRelationId(tileData);
-        $itemElm.attr('data-case-id', caseId);   
+        $itemElm.attr('data-case-id', caseId);
         
     }
     
     function getRelationId(tileData){
-        var index
+        var index;
         for (index = 0; index < tileData.length; index ++) {
-            if(tileData[index].indexOf("#")==0){
+            if(tileData[index].indexOf("#")===0){
                 return tileData[index];
             }
         }
@@ -233,14 +236,14 @@ function setColumnColor( color){
         $('[data-case-id]')
         .mouseenter(function (evt) {
             var caseId = $(evt.target).attr('data-case-id') || $(evt.target).closest('[data-case-id]').attr('data-case-id');
-            if(caseId != ""){
-              console.log('Mouse enter... case #:' + caseId)
-              $("[data-case-id!='" + caseId + "']").addClass('pale')  
+            if(caseId !== ""){
+              console.log('Mouse enter... case #:' + caseId);
+              $("[data-case-id!='" + caseId + "']").addClass('pale');
             }
             
         })
         .mouseleave(function (evt) {
-            $("[data-case-id]").removeClass('pale')
+            $("[data-case-id]").removeClass('pale');
         });
     }
     
@@ -296,7 +299,7 @@ function setColumnColor( color){
     }
     
     $(function () {
-        console.log("Userscript Starting")
+        console.log("Userscript Starting");
         var type = getMessageType();
         
         chrome.runtime.sendMessage({type: type}, function(response) {
@@ -313,8 +316,8 @@ function setColumnColor( color){
                 setCaseHighLight();
             }
             
-            addGlobalStyle( setTileClass(customStylePale, board) 
-                          + setTileClass(customStyleColor, board));
+            addGlobalStyle( setTileClass(customStylePale, board) +
+                            setTileClass(customStyleColor, board));
             
             
             $(window)

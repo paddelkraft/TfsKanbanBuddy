@@ -6,8 +6,21 @@ window.onload = function(){
     }); 
   }
 
+  function getImportUrl(){
+    chrome.runtime.sendMessage({"type": "get-import-url"}, function(response) {
+      console.log("Import url =" + response);
+      if(response.url){
+        $("#importURL").val(response.url);
+        $("#automaticImport").prop('checked',response.automaticImport);
+      }
+      
+    });
+     
+  }
+
   initLinks();
 	initColorMap();
+  getImportUrl();
 
 	function handleFileSelect(evt) {
     var files = evt.target.files; // FileList object
@@ -29,21 +42,28 @@ window.onload = function(){
     }
   }
 
-  document.getElementById('importSettings').addEventListener('change', handleFileSelect, false);
-  document.getElementById('exportSettings').onclick = function (){
+  $('#importSettings').change(handleFileSelect);
+  $('#exportSettings').click ( function (){
   		chrome.runtime.sendMessage({type: "get-settings"}, function(response) {
           	downloadAsJson(response,"tfsKanbanBuddySettings");
         });
-  	};
+  	}
+  );
 
-  document.getElementById("importSettingsfromUrl").onclick = function(){
-      console.log("getSettings from "+ document.getElementById("importURL").value);
-      $.get(document.getElementById("importURL").value,function(data,status){
+  $("#importSettingsfromUrl").click( function(){
+      var importURL = $("#importURL").val();
+      if(importURL == "") return;
+      console.log("getSettings from "+ importURL);
+      $.get(importURL,function(data,status){
       console.log("get");
       if (data){
         setSettings(jsonDecode(data));
+
+        chrome.runtime.sendMessage({type : "set-import-url", data :{ "url" : importURL, automaticImport : $("#automaticImport").prop('checked')}}, function(response){
+          console.log(response);
+        });
       }
       
     });
-  };
+  });
 };

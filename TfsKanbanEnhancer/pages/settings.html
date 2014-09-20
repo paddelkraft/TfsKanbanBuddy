@@ -1,17 +1,16 @@
 <html>
 <head>
-<title>TFS Kanban Buddy settings</title>
-<script type="text/javascript" src="../utils_js/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="../utils_js/filesaver.js"></script>
+    <title>TFS Kanban Buddy settings</title>
+    <script type="text/javascript" src="../utils_js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="../utils_js/filesaver.js"></script>
 
-<script type="text/javascript" src="../utils_js/util.js"></script>
-<script type="text/javascript" src="color-mapping.js"></script>
-<script type="text/javascript" src="links.js"></script>
-<script type="text/javascript" src="settings.js"></script>
+    <script type="text/javascript" src="../utils_js/util.js"></script>
+    <script type="text/javascript" src="color-mapping.js"></script>
+    <script type="text/javascript" src="links.js"></script>
+    <script type="text/javascript" src="settings.js"></script>
 
-<link rel="stylesheet" type="text/css" href="format.css"> 
+    <link rel="stylesheet" type="text/css" href="format.css"> 
 
-</style>
 </head>
 <body>
 <div id="colorMapping" style="width:500px">
@@ -104,6 +103,22 @@
     <input id="purple" name="purple" class="color-input" type="text" maxlength="255" value="">
   </div>
 </div>
+<div class="row" >
+  <div class="left">
+    Light green
+  </div>  
+  <div class="left">
+    <input id="lightgreen" name="lightgreen" class="color-input" type="text" maxlength="255" value="">
+  </div>
+</div>
+<div class="row" >
+  <div class="left">
+    Gray
+  </div>  
+  <div class="left">
+    <input id="gray" name="gray" class="color-input" type="text" maxlength="255" value="">
+  </div>
+</div>
 <div class="row500" >
   <div class="left">
     <hr>
@@ -138,12 +153,14 @@
   </div>
   <div class="row500">
     <hr>
-    Import settings from url (BETA)
-    <div class="left">
-      <input id="importURL" name="purple" class="color-input" type="text" maxlength="255" value="">
-    </div>
-    <button id="importSettingsfromUrl">Import </button>
+    Import settings from url (BETA)<br>
+    <input id="importURL" name="purple" class="link" type="text" maxlength="255" value="">
+    <button id="importSettingsfromUrl">Import </button><br>
+    Import settings automaticly <input id="automaticImport" type="checkbox">
+    
+
   </div>
+
 </div>
 
 </body>

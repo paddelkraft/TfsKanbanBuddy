@@ -87,6 +87,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
         
         case "save-snapshot"://Incoming data from kanban board
             var snapshot = request.snapshot;
+            console.log(jsonEncode(request.snapshot));
             key = "snapshots_" + snapshot.board;
             var boardData = new BoardData( getObjectFromStorage(key));
             boardData.addSnapshot(snapshot);
@@ -168,6 +169,7 @@ function autoImport(){
        chrome.runtime.sendMessage({type : "set-settings", "settings" : jsonDecode(content) });
     });
   }
+  setTimeout(autoImport, 3600000);
 }
 
 autoImport();

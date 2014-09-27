@@ -85,6 +85,9 @@
         if(board.update){
             setTimeout(function(){improveBoard(colorMap,board);}, 5000);
         }
+        reloadBoardTimeout(3600000);
+
+
     }
 
 function checkWip(){
@@ -296,6 +299,13 @@ function setColumnColor( color){
 
     function replaceAll(string, find, replace) {
         return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+    }
+
+    function reloadBoardTimeout(timeout){
+        if(!timeout){
+          var timeout = 3600000; //Reload every hour 
+        }
+        setTimeout (location.reload,timeout);
     }
     
     $(function () {

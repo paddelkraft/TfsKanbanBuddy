@@ -6,6 +6,12 @@ window.onload = function(){
     }); 
   }
 
+  function exportStttingsAsJson(){
+      chrome.runtime.sendMessage({type: "get-settings"}, function(response) {
+            downloadAsJson(response,"tfsKanbanBuddySettings");
+        });
+    }
+
   function getImportUrl(){
     chrome.runtime.sendMessage({"type": "get-import-url"}, function(response) {
       console.log("Import url =" + response);
@@ -18,9 +24,7 @@ window.onload = function(){
      
   }
 
-  initLinks();
-	initColorMap();
-  getImportUrl();
+  
 
 	function handleFileSelect(evt) {
     var files = evt.target.files; // FileList object
@@ -42,28 +46,36 @@ window.onload = function(){
     }
   }
 
-  $('#importSettings').change(handleFileSelect);
-  $('#exportSettings').click ( function (){
-  		chrome.runtime.sendMessage({type: "get-settings"}, function(response) {
-          	downloadAsJson(response,"tfsKanbanBuddySettings");
-        });
-  	}
-  );
+  
 
-  $("#importSettingsfromUrl").click( function(){
+  function importSettingsFromUrl(){
       var importURL = $("#importURL").val();
       if(importURL == "") return;
       console.log("getSettings from "+ importURL);
       $.get(importURL,function(data,status){
-      console.log("get");
       if (data){
         setSettings(jsonDecode(data));
-
-        chrome.runtime.sendMessage({type : "set-import-url", data :{ "url" : importURL, automaticImport : $("#automaticImport").prop('checked')}}, function(response){
-          console.log(response);
-        });
+        chrome.runtime.sendMessage( {
+                                      type : "set-import-url",
+                                      data :{
+                                              "url"           : importURL, 
+                                              automaticImport : $("#automaticImport").prop('checked')
+                                            }
+                                    }
+                                  , function(response){
+                                      console.log(response);
+                                    }
+                                  );
       }
       
     });
-  });
+  }
+
+  //initLinks();
+  initColorMap();
+  getImportUrl();
+
+  $('#importSettings').change(handleFileSelect);
+  $('#exportSettings').click (exportStttingsAsJson);
+  $("#importSettingsfromUrl").click( importSettingsFromUrl );
 };

@@ -122,6 +122,11 @@ function FlowData(flowData){
         return this[id].lanes[lane].enterMilliseconds;
     };
 
+    this.getEnterBoardMilliseconds = function (id,lane){
+        //TODO New implementation
+		return this[id].lanes[lane].enterMilliseconds;
+    };
+
      this.addSnapshot = function (snapshot){
         log("add snapdhot " + snapshot.time);
         var index, laneIndex ;

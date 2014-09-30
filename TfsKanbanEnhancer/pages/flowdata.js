@@ -55,7 +55,7 @@
 		return flowReport;
 	}
 
-	function buildSnapshot(snapshot, flowData){
+	function oldbuildSnapshot(snapshot, flowData){
 		
 		var snapshotDiv = document.createElement("div");
 
@@ -86,13 +86,13 @@
 	}
 
     //Refactored version of buildSnapShot
-	function newBuildSnapshot(snapshot, flowData){
+	function buildSnapshot(snapshot, flowData){
 		
 		var snapshotDiv = document.createElement("div");
 
 			for(laneIndex in snapshot.lanes){
 				
-				var laneDiv = buildSnapshotColumn(snapshot,flowdata,laneIndex)
+				var laneDiv = buildSnapshotColumn(snapshot,flowData,laneIndex)
 				snapshotDiv.appendChild(laneDiv);
 				
 			} 
@@ -113,7 +113,7 @@
 				laneGrid.push(["Id","title","days in lane","days on board"]);
 				for(var i = 0 ; i < lane.tickets.length ; i++ ){
 					var ticket = lane.tickets[i];
-					laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title, ,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id,lane.name)]);
+					laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id,lane.name)]);
 				}
 				if (laneGrid.length == 1){
 					
@@ -131,9 +131,27 @@
 		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
     }
 
-    function daysOnBoard (flowData,ticketId,laneName) {
-		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
+    function daysOnBoard (flowData,ticketId,laneName) {	
+		return highlightTime(daysSince(getEnterBoardMilliseconds(flowData,ticketId)));
     }
+	
+	function getEnterBoardMilliseconds (flowData,ticketId) {
+		var enterMilliseconds = new Date();
+		
+		for (var id in flowData){
+			var flowTicket = flowData[id];
+			if(flowTicket.id = ticketId) {
+				for(var laneName in flowTicket.lanes){
+					var lane = flowTicket.lanes[laneName];
+					if(lane.enter<enterMilliseconds){
+						enterMilliseconds = lane.enter
+					}
+				} 
+			}
+		}		
+		return enterMilliseconds;
+	}
+
 
 	function highlightTime(days){
 		if(days<2){

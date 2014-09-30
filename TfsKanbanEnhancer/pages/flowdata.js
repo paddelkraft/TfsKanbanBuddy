@@ -68,12 +68,10 @@
 				laneHeader.textContent = lane.name;
 				laneDiv.appendChild(laneHeader);
 				var laneGrid = [];
-				//Todo Add Days on board data
 				laneGrid.push(["Id","title","days in lane","days on board"]);
 				for(var i = 0 ; i < lane.tickets.length ; i++ ){
 					var ticket = lane.tickets[i];
-					//laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title, ,highlightTime(daysSince(flowData.getEnterMilliseconds(ticket.id,lane.name)))]);
-					laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title, ,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id,lane.name)]);
+					laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id,lane.name)]);
 				}
 				if (laneGrid.length == 1){
 					
@@ -129,12 +127,12 @@
 	}
 
 
-    function daysInColumn (flowdata,ticket,laneName) {
-		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticket.id,laneName)));
+    function daysInColumn (flowData,ticketId,laneName) {
+		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
     }
 
-    function daysOnBoard (flowdata,ticket,laneName) {
-		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticket.id,laneName)));
+    function daysOnBoard (flowData,ticketId,laneName) {
+		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
     }
 
 	function highlightTime(days){

@@ -50,24 +50,20 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             break;
         
         case "set-import-url"://Settings Import Url
-            data = request.data;
+            data = request.importData;
             saveObjectToStorage ("import-url", data) ;
             sendResponse ("import url Saved " );
             console.log("import url saved to local storage " + localStorage.getItem("import-url"));
             break;
-        case "get-import-url"://Settings Import Url
-            data = getObjectFromStorage("import-url") ;
-            console.log("import url read from local storage");
-            sendResponse(data);
-            console.log("import url sent " + jsonEncode(data));
-            break;
-        
         case "get-settings"://complete board config
             settings = {
                 kanbanBoardColorMap : getKanbanBoardColorMap(),
                 taskBoardColorMap : getTaskBoardColorMap(),
                 boardLinks : getBoardLinks()
             };
+            if(request.importInfo){
+                settings.importData = getObjectFromStorage("import-url") ;
+            }
             sendResponse(settings);
             console.log("settings sent " + jsonEncode(settings));
             break;

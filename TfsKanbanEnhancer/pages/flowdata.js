@@ -174,7 +174,7 @@
     	var snapshot = snapshots[snapshots.length-1];
     	var snapshotPresentation = buildSnapshot(snapshot,flowData);
     	console.log("Present Board snapshot");
-    	setColumnWidths(snapshotPresentation,["80px","","150px"]);
+    	setColumnWidths(snapshotPresentation,["80px","","150px","150px"]);
     	setTableContainerContent(snapshotPresentation);
     	document.getElementById("csv").onclick = function(){alert("No csv downoload of snapshot")};
 		document.getElementById("json").addEventListener("click", function (a){

@@ -36,6 +36,9 @@
 
     function getObjectFromStorage(key){
         var content = localStorage.getItem(key);
+        if(content === "" || content == null){
+          content = "{}";
+        }
         return jsonDecode(content);
         
     }
@@ -55,10 +58,10 @@
             time = new Date();
         }
         
-        var timeStamp = "" + time.getFullYear() + "-" + twoDigits(time.getMonth() +1) 
-                                                + "-" + twoDigits(time.getDate()) 
-                                                + "-" + twoDigits(time.getHours())
-                                                + ":" + twoDigits(time.getMinutes());
+        var timeStamp = "" + time.getFullYear() + "-" + twoDigits(time.getMonth() +1) +
+                                                  "-" + twoDigits(time.getDate()) +
+                                                  "-" + twoDigits(time.getHours()) +
+                                                  ":" + twoDigits(time.getMinutes());
         return timeStamp;
     }
 

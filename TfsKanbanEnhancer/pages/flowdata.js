@@ -1,5 +1,4 @@
 
-	
 
 	function bulidFlowDataGrid(flowData , lanes){
 		var columnsInRow = 2*lanes.length + 2;
@@ -75,8 +74,7 @@
 		laneGrid.push(["Id","title","days in lane","days on board"]);
 		for(var i = 0 ; i < lane.tickets.length ; i++ ){
 			var ticket = lane.tickets[i];
-			console.log("=====: "+ticket.title+"=============================================");
-			laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id)]);
+			laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id,lane.name)]);
 		}
 		if (laneGrid.length == 1){				
 			laneGrid = [["Lane is empty"]];
@@ -92,30 +90,22 @@
 		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
     }
 
-    function daysOnBoard (flowData,ticketId) {	
+    function daysOnBoard (flowData,ticketId,laneName) {	
 		return highlightTime(daysSince(getEnterBoardMilliseconds(flowData,ticketId)));
     }
 	
 	function getEnterBoardMilliseconds (flowData,ticketId) {
 		var enterMilliseconds = new Date();
+		
 		for (var id in flowData){
-			console.log("id: "+id)
 			var flowTicket = flowData[id];
 			if(flowTicket.id = ticketId) {
 				for(var laneName in flowTicket.lanes){
-					//vad händer om detta är blankt?
-					//var laneenterms = flowData.getEnterMilliseconds(id,laneName); //ticketId eller id?
-					console.log("laneName: "+laneName);
-					//console.log("laneenterms: "+laneenterms);
-					//console.log("enterMilliseconds: "+enterMilliseconds);
-					if(laneenterms < enterMilliseconds){
-						enterMilliseconds = laneenterms;
-						console.log("updated - enterMilliseconds: "+enterMilliseconds);
+					var lane = flowTicket.lanes[laneName];
+					if(lane.enter<enterMilliseconds){
+						enterMilliseconds = lane.enter
 					}
-					console.log("-----");
 				} 
-			} else {
-				console.log("Cancel")
 			}
 		}		
 		return enterMilliseconds;

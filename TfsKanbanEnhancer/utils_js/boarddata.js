@@ -124,7 +124,7 @@ function FlowData(flowData){
 
     this.getEnterBoardMilliseconds = function (id,lane){
         //TODO New implementation, current implementation in flowdata
-		return this[id].lanes[lane].enterMilliseconds;
+        return this[id].lanes[lane].enterMilliseconds;
     };
 
      this.addSnapshot = function (snapshot){

@@ -96,24 +96,13 @@
 	
 	function getEnterBoardMilliseconds (flowData,ticketId) {
 		var enterMilliseconds = new Date();
-		
-		//for (var id in flowData){
-			//var flowTicket = flowData[id];
-			var flowTicket = flowData[ticketId];
-			console.log("Ticket:"+flowTicket.title+"-------------------------------------------------")
-			//if(flowTicket.id = ticketId) {
-				for(var laneName in flowTicket.lanes){
-					console.log("Lane:" + laneName)
-					var lane = flowTicket.lanes[laneName];
-					console.log("Enter: "+lane.enter)
-					console.log("Milliseconds: "+lane.enterMilliseconds)
-					if(lane.enterMilliseconds<enterMilliseconds){
-						enterMilliseconds = lane.enterMilliseconds
-					}
-				} 
-				//}
-		//}		
-		console.log("Enter Board:"+enterMilliseconds)
+		var flowTicket = flowData[ticketId];
+		for(var laneName in flowTicket.lanes){
+			var lane = flowTicket.lanes[laneName];
+			if(lane.enterMilliseconds<enterMilliseconds){
+				enterMilliseconds = lane.enterMilliseconds
+			}
+		} 
 		return enterMilliseconds;
 	}
 

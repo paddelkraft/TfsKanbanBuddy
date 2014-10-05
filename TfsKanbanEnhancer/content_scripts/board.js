@@ -5,7 +5,6 @@
     var FILTER_IDENTIFIER ="|";
  
     var is_focused = true;
-    var filters = {};
 
     var kanbanBoard = {
         "type"      : "kanbanBoard",
@@ -63,23 +62,18 @@
             return;
         }
         
-        getTiles(board)
-        .each(function () {
-            var $itemElm = $(this);
-            var filter = "";
-            setTileColor($itemElm,colorMap);
-            if(board.relations){
-                addRelationAttribute($itemElm);
-                filter = addFilerAttribute($itemElm);
-                if(filter !== ""){
-                    filters[filterId] = null;
-                }
-            }
-        });
+        var $tiles = getTiles(board);
         
-        if (filters !=={}) {
-           addFilterDropdown(filters); 
+        setTileColors($tiles,colorMap);
+        if (board.relations){
+            setRelationAttributes($tiles);
+            var filters = setFilrerAttributes($tiles);
+            if (filters !=={}) {
+                addFilterDropdown(filters);
+            }
         }
+        
+        
         
 
         if(board.removeClass != "undefined"){
@@ -206,27 +200,36 @@ function setColumnColor( color){
 
     function setTileColor($itemElm,colorMap){
         var itemClassification = "";
-            var tileData = $itemElm.text().split(" ");
-            itemClassification = tileData[0];
-            
-            
-            // set woorktype
-            if(colorMap[itemClassification]!="undefined"){
-                setClass($itemElm,colorMap[itemClassification]);
-            } else{
-                setClass($itemElm, "standard");
-            }
-            
-            
-            
+        var tileData = $itemElm.text().split(" ");
+        itemClassification = tileData[0];
+        // set woorktype
+        if(colorMap[itemClassification]!="undefined"){
+            setClass($itemElm,colorMap[itemClassification]);
+        } else{
+            setClass($itemElm, "standard");
+        }
     }
 
-    function addRelationAttribute($itemElm){
+    function setTileColors($tiles, colorMap){
+        $tiles.each(function () {
+            var $itemElm = $(this);
+            setTileColor($itemElm,colorMap);
+        });
+    }
+
+    function setRelationAttribute($itemElm){
         var caseId = "";// Set relation
         var tileData = $itemElm.text().split(" ");
         caseId = getRelationId(tileData);
         $itemElm.attr('data-case-id', caseId);
         
+    }
+
+    function setRelationAttributes($tiles){
+        $tiles.each(function () {
+            var $itemElm = $(this);
+            setRelationAttribute($itemElm);
+        });
     }
     
     function getRelationId(tileData){
@@ -239,7 +242,7 @@ function setColumnColor( color){
         return "";
     }
     
-    function addFilerAttribute($itemElm){
+    function setFilerAttribute($itemElm){
         var caseId = "";// Set relation
         var tileData = $itemElm.text().split(" ");
         filterId = getFilterId(tileData);
@@ -247,7 +250,20 @@ function setColumnColor( color){
         return filterId;
         
     }
-    
+
+    function setFilrerAttributes($tiles){
+        var filters = {};
+        $tiles.each(function () {
+            var $itemElm = $(this);
+            var filter = "";
+                filter = setFilerAttribute($itemElm);
+                if(filter !== ""){
+                    filters[filterId] = null;
+                }
+        });
+        return filters;
+    }
+
     function getFilterId(tileData){
         if(tileData[tileData.length-1].indexOf(FILTER_IDENTIFIER)===0){
             return tileData[tileData.length-1];
@@ -277,6 +293,8 @@ function setColumnColor( color){
         select.innerHTML = html;
         $('.hub-title').append(select);
     }
+
+
 
     
     function setClass($elm, className) {

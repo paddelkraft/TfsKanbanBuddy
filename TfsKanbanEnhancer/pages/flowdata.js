@@ -74,7 +74,7 @@
 		laneGrid.push(["Id","title","days in lane","days on board"]);
 		for(var i = 0 ; i < lane.tickets.length ; i++ ){
 			var ticket = lane.tickets[i];
-			laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id,lane.name)]);
+			laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id)]);
 		}
 		if (laneGrid.length == 1){				
 			laneGrid = [["Lane is empty"]];
@@ -90,24 +90,19 @@
 		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
     }
 
-    function daysOnBoard (flowData,ticketId,laneName) {	
+    function daysOnBoard (flowData,ticketId) {	
 		return highlightTime(daysSince(getEnterBoardMilliseconds(flowData,ticketId)));
     }
 	
 	function getEnterBoardMilliseconds (flowData,ticketId) {
 		var enterMilliseconds = new Date();
-		
-		for (var id in flowData){
-			var flowTicket = flowData[id];
-			if(flowTicket.id = ticketId) {
-				for(var laneName in flowTicket.lanes){
-					var lane = flowTicket.lanes[laneName];
-					if(lane.enter<enterMilliseconds){
-						enterMilliseconds = lane.enter
-					}
-				} 
+		var flowTicket = flowData[ticketId];
+		for(var laneName in flowTicket.lanes){
+			var lane = flowTicket.lanes[laneName];
+			if(lane.enterMilliseconds<enterMilliseconds){
+				enterMilliseconds = lane.enterMilliseconds
 			}
-		}		
+		} 
 		return enterMilliseconds;
 	}
 
@@ -179,7 +174,7 @@
     	var snapshot = snapshots[snapshots.length-1];
     	var snapshotPresentation = buildSnapshot(snapshot,flowData);
     	console.log("Present Board snapshot");
-    	setColumnWidths(snapshotPresentation,["80px","","150px"]);
+    	setColumnWidths(snapshotPresentation,["80px","","150px","150px"]);
     	setTableContainerContent(snapshotPresentation);
     	document.getElementById("csv").onclick = function(){alert("No csv downoload of snapshot")};
 		document.getElementById("json").addEventListener("click", function (a){

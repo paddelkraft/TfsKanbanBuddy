@@ -88,36 +88,46 @@
 
 
     function daysInColumn (flowData,ticketId,laneName) {
+		console.log("daysInColumn-----------------------------------------------------")
 		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
     }
 
     function daysOnBoard (flowData,ticketId,laneName) {	
+		console.log("daysOnBoard-----------------------------------------------------")
 		return highlightTime(daysSince(getEnterBoardMilliseconds(flowData,ticketId)));
     }
 	
 	function getEnterBoardMilliseconds (flowData,ticketId) {
 		var enterMilliseconds = new Date();
-		
+		console.log("getEnterBoardMilliseconds---")
 		for (var id in flowData){
 			var flowTicket = flowData[id];
 			if(flowTicket.id = ticketId) {
+				console.log("Ticket ID: "+ticketId);
 				for(var laneName in flowTicket.lanes){
 					var lane = flowTicket.lanes[laneName];
-					if(lane.enter<enterMilliseconds){
-						enterMilliseconds = lane.enter
+					var laneenterms = flowData.getEnterMilliseconds(id,laneName);
+					console.log(laneName+" - Time: "+lane.enter);
+					console.log("laneenterms: "+laneenterms)
+					if(laneenterms < enterMilliseconds){
+						enterMilliseconds = laneenterms;
+						console.log("Board enter candidate: "+enterMilliseconds)
 					}
 				} 
 			}
 		}		
+		console.log("--> enterMilliseconds: "+enterMilliseconds);
 		return enterMilliseconds;
 	}
 
 	function highlightTime(days){
+		/*
 		if(days<2){
 			return "new";
 		} else if(days>14){
 			return days+" (old)";
 		}
+		*/
 		return days;
 	}
 	

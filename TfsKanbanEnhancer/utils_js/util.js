@@ -24,9 +24,17 @@
     }
 
   function daysSince(date){
-    var day = 86400000;
+    var day = 86400000 //24*60*60*1000;
     var now = new Date();
-    return Math.floor((now-date)/day);
+	console.log("daysSince")
+	console.log("day: "+day)
+	console.log("date: " + date)
+	console.log("now: "+now/1)
+	console.log(now-date)
+	console.log(Math.floor((now-date)/day));
+	var result = Math.floor((now-date)/day);
+	console.log("Result:"+result )
+    return result
   }
 
     function saveObjectToStorage(key, toSave){

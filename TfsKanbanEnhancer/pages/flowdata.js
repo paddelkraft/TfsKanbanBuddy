@@ -75,7 +75,8 @@
 		laneGrid.push(["Id","title","days in lane","days on board"]);
 		for(var i = 0 ; i < lane.tickets.length ; i++ ){
 			var ticket = lane.tickets[i];
-			laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id,lane.name)]);
+			console.log("=====: "+ticket.title+"=============================================");
+			laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id)]);
 		}
 		if (laneGrid.length == 1){				
 			laneGrid = [["Lane is empty"]];
@@ -88,46 +89,44 @@
 
 
     function daysInColumn (flowData,ticketId,laneName) {
-		console.log("daysInColumn-----------------------------------------------------")
 		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
     }
 
-    function daysOnBoard (flowData,ticketId,laneName) {	
-		console.log("daysOnBoard-----------------------------------------------------")
+    function daysOnBoard (flowData,ticketId) {	
 		return highlightTime(daysSince(getEnterBoardMilliseconds(flowData,ticketId)));
     }
 	
 	function getEnterBoardMilliseconds (flowData,ticketId) {
 		var enterMilliseconds = new Date();
-		console.log("getEnterBoardMilliseconds---")
 		for (var id in flowData){
+			console.log("id: "+id)
 			var flowTicket = flowData[id];
 			if(flowTicket.id = ticketId) {
-				console.log("Ticket ID: "+ticketId);
 				for(var laneName in flowTicket.lanes){
-					var lane = flowTicket.lanes[laneName];
-					var laneenterms = flowData.getEnterMilliseconds(id,laneName);
-					console.log(laneName+" - Time: "+lane.enter);
-					console.log("laneenterms: "+laneenterms)
+					//vad händer om detta är blankt?
+					//var laneenterms = flowData.getEnterMilliseconds(id,laneName); //ticketId eller id?
+					console.log("laneName: "+laneName);
+					//console.log("laneenterms: "+laneenterms);
+					//console.log("enterMilliseconds: "+enterMilliseconds);
 					if(laneenterms < enterMilliseconds){
 						enterMilliseconds = laneenterms;
-						console.log("Board enter candidate: "+enterMilliseconds)
+						console.log("updated - enterMilliseconds: "+enterMilliseconds);
 					}
+					console.log("-----");
 				} 
+			} else {
+				console.log("Cancel")
 			}
 		}		
-		console.log("--> enterMilliseconds: "+enterMilliseconds);
 		return enterMilliseconds;
 	}
 
 	function highlightTime(days){
-		/*
 		if(days<2){
 			return "new";
 		} else if(days>14){
 			return days+" (old)";
 		}
-		*/
 		return days;
 	}
 	

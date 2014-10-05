@@ -145,7 +145,7 @@ function setTaskBoardColorMap(taskBoardColorMap){
 }
 
 function getKanbanBoardColorMap(){
-    var kanbanBoardColorMap = getObjectFromStorage("colorMap");//jsonDecode(localStorage.getItem("colorMap")) ;
+    var kanbanBoardColorMap = getObjectFromStorage("colorMap");
     console.log("ColorMap read from local storage");
     return kanbanBoardColorMap;
 }

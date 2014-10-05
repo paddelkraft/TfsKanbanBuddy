@@ -390,12 +390,6 @@ function setColumnColor( color){
             .focus(function () { is_focused = true; })
             .blur(function () { is_focused = false; });
 
-            //setTimeout(function(){
-            //    applyFilter("|x",board);
-            //},10000);
-            //setTimeout(function(){
-            //    applyFilter(false,board);
-            //},20000);
         });
 
         

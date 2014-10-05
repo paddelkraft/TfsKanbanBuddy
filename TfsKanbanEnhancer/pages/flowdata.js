@@ -1,5 +1,4 @@
 
-	
 
 	function bulidFlowDataGrid(flowData , lanes){
 		var columnsInRow = 2*lanes.length + 2;
@@ -55,45 +54,71 @@
 		return flowReport;
 	}
 
-	function buildSnapshot(snapshot, flowData){
-		
-		var snapshotDiv = document.createElement("div");
 
-			for(laneIndex in snapshot.lanes){
-				var laneDiv =document.createElement("div");
-				snapshotDiv.appendChild(laneDiv);
-				
-				var lane = snapshot.lanes[laneIndex];
-				var laneHeader = document.createElement("h2");
-				laneHeader.textContent = lane.name;
-				laneDiv.appendChild(laneHeader);
-				var laneGrid = [];
-				laneGrid.push(["Id","title","days in lane"]);
-				for(var i = 0 ; i < lane.tickets.length ; i++ ){
-					var ticket = lane.tickets[i];
-					laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title, ,highlightTime(daysSince(flowData.getEnterMilliseconds(ticket.id,lane.name)))]);
-				}
-				if (laneGrid.length == 1){
-					
-					laneGrid = [["Lane is empty"]];
-				}
-				var dataTable = createDataTable(laneGrid);
-				dataTable.setAttribute("class","presentationTable");
-				laneDiv.appendChild(dataTable);
-			} 
-		
+	function buildSnapshot(snapshot, flowData){
+		var snapshotDiv = document.createElement("div");
+		for(laneIndex in snapshot.lanes){				
+			var laneDiv = buildSnapshotColumn(snapshot,flowData,laneIndex)
+			snapshotDiv.appendChild(laneDiv);
+		} 	
 		return snapshotDiv;
 	}
 
+	function buildSnapshotColumn(snapshot, flowData,laneIndex){
+		var laneDiv =document.createElement("div");
+		var lane = snapshot.lanes[laneIndex];
+		var laneHeader = document.createElement("h2");
+		laneHeader.textContent = lane.name;
+		laneDiv.appendChild(laneHeader);
+		var laneGrid = [];
+		laneGrid.push(["Id","title","days in lane","days on board"]);
+		for(var i = 0 ; i < lane.tickets.length ; i++ ){
+			var ticket = lane.tickets[i];
+			laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id,lane.name)]);
+		}
+		if (laneGrid.length == 1){				
+			laneGrid = [["Lane is empty"]];
+		}
+		var dataTable = createDataTable(laneGrid);
+		dataTable.setAttribute("class","presentationTable");
+		laneDiv.appendChild(dataTable);
+		return laneDiv;
+	}
+
+
+    function daysInColumn (flowData,ticketId,laneName) {
+		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
+    }
+
+    function daysOnBoard (flowData,ticketId,laneName) {	
+		return highlightTime(daysSince(getEnterBoardMilliseconds(flowData,ticketId)));
+    }
+	
+	function getEnterBoardMilliseconds (flowData,ticketId) {
+		var enterMilliseconds = new Date();
+		
+		for (var id in flowData){
+			var flowTicket = flowData[id];
+			if(flowTicket.id = ticketId) {
+				for(var laneName in flowTicket.lanes){
+					var lane = flowTicket.lanes[laneName];
+					if(lane.enter<enterMilliseconds){
+						enterMilliseconds = lane.enter
+					}
+				} 
+			}
+		}		
+		return enterMilliseconds;
+	}
 
 	function highlightTime(days){
 		if(days<2){
 			return "new";
+		} else if(days>14){
+			return days+" (old)";
 		}
-
 		return days;
 	}
-
 	
 	function getLaneIndexes(lanes){
 		var indexes = {};

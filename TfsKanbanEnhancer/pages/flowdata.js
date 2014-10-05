@@ -74,7 +74,7 @@
 		laneGrid.push(["Id","title","days in lane","days on board"]);
 		for(var i = 0 ; i < lane.tickets.length ; i++ ){
 			var ticket = lane.tickets[i];
-			laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id,lane.name)]);
+			laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id)]);
 		}
 		if (laneGrid.length == 1){				
 			laneGrid = [["Lane is empty"]];
@@ -90,24 +90,30 @@
 		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
     }
 
-    function daysOnBoard (flowData,ticketId,laneName) {	
+    function daysOnBoard (flowData,ticketId) {	
 		return highlightTime(daysSince(getEnterBoardMilliseconds(flowData,ticketId)));
     }
 	
 	function getEnterBoardMilliseconds (flowData,ticketId) {
 		var enterMilliseconds = new Date();
 		
-		for (var id in flowData){
-			var flowTicket = flowData[id];
-			if(flowTicket.id = ticketId) {
+		//for (var id in flowData){
+			//var flowTicket = flowData[id];
+			var flowTicket = flowData[ticketId];
+			console.log("Ticket:"+flowTicket.title+"-------------------------------------------------")
+			//if(flowTicket.id = ticketId) {
 				for(var laneName in flowTicket.lanes){
+					console.log("Lane:" + laneName)
 					var lane = flowTicket.lanes[laneName];
-					if(lane.enter<enterMilliseconds){
-						enterMilliseconds = lane.enter
+					console.log("Enter: "+lane.enter)
+					console.log("Milliseconds: "+lane.enterMilliseconds)
+					if(lane.enterMilliseconds<enterMilliseconds){
+						enterMilliseconds = lane.enterMilliseconds
 					}
 				} 
-			}
-		}		
+				//}
+		//}		
+		console.log("Enter Board:"+enterMilliseconds)
 		return enterMilliseconds;
 	}
 

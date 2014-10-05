@@ -2,8 +2,10 @@
     
     var GET_KANBAN_BOARD_MAPPING = "get-color-map";
     var GET_TASK_BOARD_MAPPING = "get-task-color-map";
+    var FILTER_IDENTIFIER ="|";
  
     var is_focused = true;
+    var filters = {};
 
     var kanbanBoard = {
         "type"      : "kanbanBoard",
@@ -64,12 +66,22 @@
         getTiles(board)
         .each(function () {
             var $itemElm = $(this);
+            var filter = "";
             setTileColor($itemElm,colorMap);
             if(board.relations){
-                addRelationAttrubute($itemElm);
+                addRelationAttribute($itemElm);
+                filter = addFilerAttribute($itemElm);
+                if(filter !== ""){
+                    filters[filterId] = null;
+                }
             }
         });
         
+        if (filters !=={}) {
+           addFilterDropdown(filters); 
+        }
+        
+
         if(board.removeClass != "undefined"){
             //console.log("Removing class " + board.removeClass);
             $("."+board.removeClass).each(function(){
@@ -77,7 +89,11 @@
                 $element.removeClass(board.removeClass);
             });
         }
- 
+        
+        $("#filter-select").change(function(){
+            applyFilter($("#filter-select").val(),board);
+        })
+        
         if (board.wip) {
             checkWip();
         }
@@ -205,7 +221,7 @@ function setColumnColor( color){
             
     }
 
-    function addRelationAttrubute($itemElm){
+    function addRelationAttribute($itemElm){
         var caseId = "";// Set relation
         var tileData = $itemElm.text().split(" ");
         caseId = getRelationId(tileData);
@@ -222,6 +238,46 @@ function setColumnColor( color){
         }
         return "";
     }
+    
+    function addFilerAttribute($itemElm){
+        var caseId = "";// Set relation
+        var tileData = $itemElm.text().split(" ");
+        filterId = getFilterId(tileData);
+        $itemElm.attr('filter', filterId);
+        return filterId;
+        
+    }
+    
+    function getFilterId(tileData){
+        if(tileData[tileData.length-1].indexOf(FILTER_IDENTIFIER)===0){
+            return tileData[tileData.length-1];
+        }
+        return "";
+    }
+
+    function applyFilter(filter, board){
+        getTiles(board)
+        .each(function () {
+            var $itemElm = $(this);
+            if (filter!=='show all' && filter != $itemElm.attr("filter")){
+                $itemElm.attr("style","display:none;");
+            }else{
+                $itemElm.attr("style","");
+            }
+        });
+    }
+
+    function addFilterDropdown(filters) {
+        var select = document.createElement('select');
+        select.setAttribute("id","filter-select");
+        var html = "<option value='show all'>Show all </option><option value=''>Unfiltered</option>";
+        for(var filter in filters){
+            html += "<option value='"+ filter + "'>"+filter.replace(FILTER_IDENTIFIER,"") + "</option>";   
+        }
+        select.innerHTML = html;
+        $('.hub-title').append(select);
+    }
+
     
     function setClass($elm, className) {
         
@@ -333,7 +389,16 @@ function setColumnColor( color){
             $(window)
             .focus(function () { is_focused = true; })
             .blur(function () { is_focused = false; });
+
+            //setTimeout(function(){
+            //    applyFilter("|x",board);
+            //},10000);
+            //setTimeout(function(){
+            //    applyFilter(false,board);
+            //},20000);
         });
+
+        
         
     });
     

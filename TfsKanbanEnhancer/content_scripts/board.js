@@ -22,6 +22,8 @@
         "wip"       : false
     };
 
+    var customCardSize = ".largeCard {width: 150px !important;height: 95px !important;}";
+
     var customStylePale =
         ".$tileClass.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.yellow.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
@@ -66,9 +68,10 @@
         
         setTileColors($tiles,colorMap);
         if (board.relations){
+            setLargeCards($tiles);
             setRelationAttributes($tiles);
             var filters = setFilrerAttributes($tiles);
-            if (filters !=={}) {
+            if (! jQuery.isEmptyObject(filters)) {
                 addFilterDropdown(filters);
             }
         }
@@ -208,6 +211,7 @@ function setColumnColor( color){
         } else{
             setClass($itemElm, "standard");
         }
+        
     }
 
     function setTileColors($tiles, colorMap){
@@ -215,6 +219,17 @@ function setColumnColor( color){
             var $itemElm = $(this);
             setTileColor($itemElm,colorMap);
         });
+    }
+
+    function setLargeCards($tiles){
+        $tiles.each(function () {
+            var $itemElm = $(this);
+            setLargeCard($itemElm);
+        });
+    }
+
+    function setLargeCard($itemElm){
+        setClass($itemElm,"largeCard");
     }
 
     function setRelationAttribute($itemElm){
@@ -257,10 +272,11 @@ function setColumnColor( color){
             var $itemElm = $(this);
             var filter = "";
                 filter = setFilerAttribute($itemElm);
-                if(filter !== ""){
+                if(filter != ""){
                     filters[filterId] = null;
                 }
         });
+        console.log("Filters found on board = " + jsonEncode(filters));
         return filters;
     }
 
@@ -363,7 +379,7 @@ function setColumnColor( color){
     
     function setTileClass(css, board){
         var result = replaceAll(css ,"$tileClass", board.tileClass);
-        console.log("CSS" + result);
+        console.log("CSS " + result);
         return result;
     }
 
@@ -383,7 +399,7 @@ function setColumnColor( color){
     }
     
     $(function () {
-        console.log("Userscript Starting");
+        console.log("content-script board.js Starting");
         var type = getMessageType();
         
         chrome.runtime.sendMessage({type: type}, function(response) {
@@ -400,8 +416,12 @@ function setColumnColor( color){
                 setCaseHighLight();
             }
             
-            addGlobalStyle( setTileClass(customStylePale, board) +
-                            setTileClass(customStyleColor, board));
+            addGlobalStyle( 
+                setTileClass(customCardSize+customStylePale +
+                    customStyleColor, 
+                    board
+                )
+            );
             
             
             $(window)

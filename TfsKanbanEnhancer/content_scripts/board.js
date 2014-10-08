@@ -259,7 +259,7 @@ function setColumnColor( color){
     
     function setFilerAttribute($itemElm){
         var caseId = "";// Set relation
-        var tileData = $itemElm.text().split(" ");
+        var tileData = $itemElm.find(".title").text().split(" ");
         filterId = getFilterId(tileData);
         $itemElm.attr('filter', filterId);
         return filterId;

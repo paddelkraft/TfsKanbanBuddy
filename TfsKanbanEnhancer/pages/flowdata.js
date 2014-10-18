@@ -85,7 +85,6 @@
 		return laneDiv;
 	}
 
-
     function daysInColumn (flowData,ticketId,laneName) {
 		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
     }
@@ -93,20 +92,6 @@
     function daysOnBoard (flowData,ticketId) {	
 		return highlightTime(daysSince(flowData.getEnterBoardMilliseconds(flowData,ticketId)));
     }
-	
-	/*
-	function getEnterBoardMilliseconds (flowData,ticketId) {
-		var enterMilliseconds = new Date();
-		var flowTicket = flowData[ticketId];
-		for(var laneName in flowTicket.lanes){
-			var lane = flowTicket.lanes[laneName];
-			if(lane.enterMilliseconds<enterMilliseconds){
-				enterMilliseconds = lane.enterMilliseconds
-			}
-		} 
-		return enterMilliseconds;
-	}
-	*/
 
 	function highlightTime(days){
 		if(days<2){

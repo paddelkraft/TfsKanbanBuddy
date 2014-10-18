@@ -91,9 +91,10 @@
     }
 
     function daysOnBoard (flowData,ticketId) {	
-		return highlightTime(daysSince(getEnterBoardMilliseconds(flowData,ticketId)));
+		return highlightTime(daysSince(flowData.getEnterBoardMilliseconds(flowData,ticketId)));
     }
 	
+	/*
 	function getEnterBoardMilliseconds (flowData,ticketId) {
 		var enterMilliseconds = new Date();
 		var flowTicket = flowData[ticketId];
@@ -105,6 +106,7 @@
 		} 
 		return enterMilliseconds;
 	}
+	*/
 
 	function highlightTime(days){
 		if(days<2){

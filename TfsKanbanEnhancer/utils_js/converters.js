@@ -67,3 +67,37 @@ function convertSettingsColorMapToStorageColorMap(settingsPageColorMap){
 	return storageColorMap;
 }
 
+
+function convertSettingsPageColorMapToNewFormat(settingsPageColorMap) {
+
+	var newSettingsPageColorMap= [];
+	var color="";
+	var description="";
+	
+	for(var i in settingsPageColorMap){
+		//console.log("color: " + settingsPageColorMap[i].color + " prefix: "+ settingsPageColorMap[i].prefix);
+		
+		color=settingsPageColorMap[i].color;
+				
+		if (color=="expediter" || color=="blocked") {
+			description=color;
+			if (color==="blocked") {
+				color="red";
+			} else {
+				color="black";
+			} 
+		} else {
+			description="";
+		}
+	
+		newSettingsPageColorMap.push({
+			"color"       : color,
+			"prefix"      : settingsPageColorMap[i].prefix,
+			"description" : description
+		});
+		//console.log("color: " + newSettingsPageColorMap[i].color + " prefix: "+ newSettingsPageColorMap[i].prefix+ " description: "+ newSettingsPageColorMap[i].description);
+		
+	}
+	
+	return newSettingsPageColorMap;
+}

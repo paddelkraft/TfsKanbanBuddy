@@ -122,12 +122,7 @@ function FlowData(flowData){
         return this[id].lanes[lane].enterMilliseconds;
     };
 
-    this.getEnterBoardMilliseconds = function (flowData,ticketId) {
-        //TODO New implementation, current implementation in flowdata
-        //return this[id].lanes[lane].enterMilliseconds;
-		
-		//function getEnterBoardMilliseconds (flowData,ticketId) {
-			
+    this.getEnterBoardMilliseconds = function (flowData,ticketId) {			
 		var enterMilliseconds = new Date();
 		var flowTicket = flowData[ticketId];
 		for(var laneName in flowTicket.lanes){

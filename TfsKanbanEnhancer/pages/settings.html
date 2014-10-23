@@ -11,98 +11,98 @@
 
 </head>
 <body>
-<div id="colorMapping" style="width:500px">
-  
 
-  
-  
-  <div ng-app="settings" ng-controller="settingsController" id="links" style="width:500px" >
-    <div class="row">
-    <div class="header"><h2>Kanban board color Map</h2></div>
-    </div>
+<div ng-app="settings" ng-controller="settingsController" id="links">
+	
+	<div id="kanbanboardsettings" class="settingssection">
+		<div class="table">
+			<div class="header"><h2>Kanban Board Color Map</h2></div>
+			<div class="row" ng-repeat="maping in kanbanBoardColorMap">
+				<div class="column">{{maping.color}}</div>
+				<div class="column">
+					<input class="color-input" type="text" maxlength="255" ng-model="maping.prefix" ng-disabled="automaticImport">
+				</div>
+				<div class="column">{{maping.color}}</div>
+			</div>
+		</div>
+	
+    	<div class="row" >
+			<button  id="saveKanbanMapping" ng-click="saveSettings()" ng-disabled="automaticImport">Save mapping</button>
+    	</div>
+		<hr>
+	</div>
+
+	<div id="taskboardsettings" class="settingssection">
+		<div class="table">
+			<div class="header"><h2>Task Board Color Map</h2></div>			
+			<div class="row" ng-repeat="tbMaping in taskBoardColorMap">
+				<div class="column">{{tbMaping.color}}</div>
+				<div class="column">
+					<input class="color-input" type="text" maxlength="255" ng-model="tbMaping.prefix" ng-disabled="automaticImport">
+				</div>
+				<div class="column">{{tbMaping.color}}</div>
+			</div>
+		</div>
+		
+		<div class="row">
+			<button id="saveTaskMapping" ng-click="saveSettings()" ng-disabled="automaticImport">Save mapping</button>
+		</div>
+		<hr>
+	</div>
+
+
+	<div id="linkssettings" class="settingssection">
+		<div class="table">
+			<div class="header"><h2>Links</h2></div>
+			<div class="row">
+				<div class="column">Caption</div>
+				<div class="column">Link</div>
+			</div>
+			<div class="row" ng-repeat="x in links">
+            	<div class="column">
+            		<input type="text" ng-model="x.caption" ng-disabled="automaticImport"> 
+            	</div>
+            	<div class="doublecolumn">
+              		<input type="text" class="link"  ng-model="x.url" ng-disabled="automaticImport">
+            	</div>
+      		</div>
+		</div>
+		
+    	<div class="row">
+        	<button id="saveLinks" ng-click="saveSettings()" ng-disabled="automaticImport">Save links</button>
+      	</div>
+		<hr>
+	</div>
+   
     
-    <div class="row" ng-repeat="maping in kanbanBoardColorMap">
-      <div class="left">
-        {{maping.color}}
-      </div>
-      <div class="left">
-        <input class="color-input"  type="text" maxlength="255" ng-model="maping.prefix" ng-disabled="automaticImport" >
-      </div>
+    <div id="exportsettings" class="settingssection">
+    	<div class="header"><h2>Import/Export Settings to File (BETA)</h2></div>
+		<div class="row">
+    		<input type="file" id="importSettings" name="files[]" ng-disabled="automaticImport"/>
+		</div>
+		<div class="row">
+			<button id="exportSettings" ng-click="exportSettingsAsJson()" >Export settings to file </button>(BETA)
+		</div>
+		<hr>
     </div>
-    
-    <div class="row500" >
-      <div class="left">
-        <hr>
-        <button  id="saveKanbanMapping" ng-click="saveSettings()" ng-disabled="automaticImport">Save mapping</button>
-      </div>
+	
+    <div class="settingssection">
+    	<div class="header"><h2>Import settings from url (BETA)</h2></div>
+     	<div class="row">
+			<input id="importURL" class="link" type="text" maxlength="255" value="" ng-model="importUrl">	
+			<button id="importSettingsfromUrl" ng-click= "importFromUrl()">Import </button>
+      		<button id="importSettingsfromUrl" ng-click= "clearUrl()">Clear Import URL </button><br>
+		</div>
+		<div class="row">
+      		<input id="automaticImport" type="checkbox" ng-model="automaticImport" ng-change="saveImportData()">
+			Import settings automaticly
+		</div>
+		<hr>
     </div>
 
-    <div class="row">
-    <div class="header"><h2>Task board color Map</h2></div>
-    </div>
-    
-    <div class="row" ng-repeat="tbMaping in taskBoardColorMap">
-      <div class="left">
-        {{tbMaping.color}}
-      </div>
-      <div class="left">
-        <input class="color-input"  type="text" maxlength="255" ng-model="tbMaping.prefix" ng-disabled="automaticImport">
-      </div>
-    </div>
-    
-    <div class="row500" >
-      <div class="left">
-        <hr>
-        <button  id="saveTaskMapping" ng-click="saveSettings()" ng-disabled="automaticImport">Save mapping</button>
-      </div>
-    </div>
-
-    <div class="row500">
-      <hr>
-      <h2>Links</h2>
-    </div>
-    <div >
-      <div class="row500">
-        <div class="left">
-          Caption
-        </div>
-        <div class="right">
-          URL
-        </div>
-      </div>
-      
-      <div class="row500" ng-repeat="x in links">
-            <div class="left" >
-              <input type="text" ng-model="x.caption" ng-disabled="automaticImport"> 
-            </div>
-            <div class="right" >
-              <input type="text" class="link"  ng-model="x.url" ng-disabled="automaticImport">
-            </div>
-      </div>
-      <div class="row500">
-        <hr>
-        <button id="saveLinks" ng-click="saveSettings()" ng-disabled="automaticImport">Save links</button>
-      </div>
-    </div>
-    
-    <div class="row500">
-      <hr>
-      Import settings from file (BETA)
-      <input type="file" id="importSettings" name="files[]" ng-disabled="automaticImport"/>
-      <button id="exportSettings" ng-click="exportSettingsAsJson()" >Export settings to file </button>(BETA)
-    </div>
-    <div class="row500">
-      <hr>
-      Import settings from url (BETA)<br>
-      <input id="importURL" class="link" type="text" maxlength="255" value="" ng-model="importUrl">
-      <button id="importSettingsfromUrl" ng-click= "importFromUrl()">Import </button>
-      <button id="importSettingsfromUrl" ng-click= "clearUrl()">Clear Import URL </button><br>
-      Import settings automaticly <input id="automaticImport" type="checkbox" ng-model="automaticImport" ng-change="saveImportData()">
-    </div>
-
-  </div>
 </div>
-<script type="text/javascript" src="../utils_js/angular.min.js"></script>
+  
+	<script type="text/javascript" src="../utils_js/angular.min.js"></script>
     <script type="text/javascript" src="settings.js"></script>
 
 </body>

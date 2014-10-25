@@ -1,18 +1,19 @@
-(function () {
+function updateBoard(settings) {
+  
     
     var GET_KANBAN_BOARD_MAPPING = "get-color-map";
     var GET_TASK_BOARD_MAPPING = "get-task-color-map";
     var FILTER_IDENTIFIER ="|";
  
     var is_focused = true;
-
+ 
     var kanbanBoard = {
         "type"      : "kanbanBoard",
         "tileClass" : "board-tile",
         "relations" : true,
         "wip"       : true
     };
-
+ 
     var taskBoard   = {
         "type"      : "taskBoard",
         "tileClass" : "tbTileContent",
@@ -21,9 +22,9 @@
         "relations" : false,
         "wip"       : false
     };
-
+ 
     var customCardSize = ".largeCard {width: 150px !important;height: 95px !important;}";
-
+ 
     var customStylePale =
         ".$tileClass.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.yellow.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
@@ -55,18 +56,24 @@
         ".$tileClass.standard {border-left-color: rgb(0, 156, 204); background-color: rgb(214, 236, 242) color = black}"
     ;
     
+   
+    
     
     function improveBoard(colorMap, board) {
         //console.log("colorMap = " + jsonEncode(colorMap));
         //console.log("Board data " + jsonEncode(board) );
-        if (!is_focused || (getTiles(board).length < 1)) { //Todo fix so it works in taskboard getTiles()
-            setTimeout(function(){improveBoard(colorMap,board)}, 1000);
+        //alert("");
+        console.log("ImproveBoard " + jsonEncode(board));
+        if (getTiles(board).length < 1) {
+            setTimeout(function(){improveBoard(colorMap,board);}, 1000);
+            console.log("no cards on board yet");
             return;
         }
         
         var $tiles = getTiles(board);
-        
+        console.log($tiles.length + " tiles on board");
         setTileColors($tiles,colorMap);
+        //console.log("tile colors set");
         if (board.relations){
             setLargeCards($tiles);
             setRelationAttributes($tiles);
@@ -78,7 +85,7 @@
         
         
         
-
+ 
         if(board.removeClass != "undefined"){
             //console.log("Removing class " + board.removeClass);
             $("."+board.removeClass).each(function(){
@@ -90,7 +97,7 @@
         $("#filter-select").change(function(){
             applyFilter($("#filter-select").val(),board);
         })
-        
+
         if (board.wip) {
             checkWip();
         }
@@ -99,10 +106,10 @@
             setTimeout(function(){improveBoard(colorMap,board);}, 5000);
         }
         reloadBoardTimeout(3600000);
-
-
+ 
+ 
     }
-
+ 
 function checkWip(){
     var i;
     var columns = getColumns();
@@ -123,7 +130,7 @@ function checkWip(){
                     thisColumn.setCurrentWip(wip);
                     nextColumn.setCurrentWip("");
                 }
-
+ 
                 if(wip > wipLimit){
                     //console.log("wipLimit broken");
                     thisColumn .setColumnColor("#FBEFEF");
@@ -148,9 +155,9 @@ function checkWip(){
     }
     setTimeout(checkWip, 5000);
 }
-
+ 
 function getColumns(){
-
+ 
     var headerContainer = document.getElementsByClassName("header-container")[0];
     var headers = headerContainer.getElementsByClassName("member-header-content");
     var columnContainer = document.getElementsByClassName("content-container")[0];
@@ -175,21 +182,21 @@ function getColumns(){
            columns.push(column);
         }
     }
-
+ 
     return columns;
-
+ 
 }
-
+ 
 function setCurrentWip(currentWip){
     try{
         this.header.getElementsByClassName("current")[0].textContent = currentWip;
     }catch(e){}
 }
-
+ 
 function getCurrentWip(){
     return this.container.getElementsByClassName(kanbanBoard.tileClass).length;
 }
-
+ 
 function setColumnColor( color){
     var style = "background-color:"+color;
     //console.log("setColumnColor");
@@ -198,9 +205,9 @@ function setColumnColor( color){
     this.header.parentNode.setAttribute("style",style);
     //console.log(this.title + " style = " + this.container.getAttribute("style"));
 }
-
-
-
+ 
+ 
+ 
     function setTileColor($itemElm,colorMap){
         var itemClassification = "";
         var tileData = $itemElm.text().split(" ");
@@ -213,25 +220,25 @@ function setColumnColor( color){
         }
         
     }
-
+ 
     function setTileColors($tiles, colorMap){
         $tiles.each(function () {
             var $itemElm = $(this);
             setTileColor($itemElm,colorMap);
         });
     }
-
+ 
     function setLargeCards($tiles){
         $tiles.each(function () {
             var $itemElm = $(this);
             setLargeCard($itemElm);
         });
     }
-
+ 
     function setLargeCard($itemElm){
         setClass($itemElm,"largeCard");
     }
-
+ 
     function setRelationAttribute($itemElm){
         var caseId = "";// Set relation
         var tileData = $itemElm.text().split(" ");
@@ -239,7 +246,7 @@ function setColumnColor( color){
         $itemElm.attr('data-case-id', caseId);
         
     }
-
+ 
     function setRelationAttributes($tiles){
         $tiles.each(function () {
             var $itemElm = $(this);
@@ -265,28 +272,28 @@ function setColumnColor( color){
         return filterId;
         
     }
-
+ 
     function setFilrerAttributes($tiles){
         var filters = {};
         $tiles.each(function () {
             var $itemElm = $(this);
             var filter = "";
                 filter = setFilerAttribute($itemElm);
-                if(filter != ""){
+                if(filter !== ""){
                     filters[filterId] = null;
                 }
         });
         console.log("Filters found on board = " + jsonEncode(filters));
         return filters;
     }
-
+ 
     function getFilterId(tileData){
         if(tileData[tileData.length-1].indexOf(FILTER_IDENTIFIER)===0){
             return tileData[tileData.length-1];
         }
         return "";
     }
-
+ 
     function applyFilter(filter, board){
         getTiles(board)
         .each(function () {
@@ -298,20 +305,20 @@ function setColumnColor( color){
             }
         });
     }
-
+ 
     function addFilterDropdown(filters) {
         var select = document.createElement('select');
         select.setAttribute("id","filter-select");
         var html = "<option value='show all'>Show all </option><option value=''>Unfiltered</option>";
         for(var filter in filters){
-            html += "<option value='"+ filter + "'>"+filter.replace(FILTER_IDENTIFIER,"") + "</option>";   
+            html += "<option value='"+ filter + "'>"+filter.replace(FILTER_IDENTIFIER,"") + "</option>"; 
         }
         select.innerHTML = html;
         $('.hub-title').append(select);
     }
-
-
-
+ 
+ 
+ 
     
     function setClass($elm, className) {
         
@@ -354,7 +361,7 @@ function setColumnColor( color){
     function isKanbanBoard(){
         return document.URL.indexOf("/_backlogs/board")>-1;
     }
-
+ 
     function getMessageType(){
         var type = GET_TASK_BOARD_MAPPING;
         if(isKanbanBoard()){
@@ -362,7 +369,7 @@ function setColumnColor( color){
         }
         return type;
     }
-
+ 
     function getBoardType(){
         var board = taskBoard;
         if(isKanbanBoard()){
@@ -371,9 +378,12 @@ function setColumnColor( color){
         console.log("Board data " + jsonEncode(board) );
         return board;
     }
-
+ 
     function getTiles(board){
-        var tiles = $("."+board.tileClass);
+        var tiles;
+        console.log("getTiles " + board.tileClass);
+        tiles = $("."+board.tileClass);
+        console.log("Tiles found");
         return tiles;
     }
     
@@ -382,43 +392,68 @@ function setColumnColor( color){
         console.log("CSS " + result);
         return result;
     }
-
+ 
     function escapeRegExp(string) {
         return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
     }
-
+ 
     function replaceAll(string, find, replace) {
         return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
     }
-
+ 
     function reloadBoardTimeout(timeout){
         if(!timeout){
-          var timeout = 3600000; //Reload every hour 
+          timeout = 3600000; //Reload every hour 
         }
         setTimeout (location.reload,timeout);
     }
     
-    $(function () {
-        console.log("content-script board.js Starting");
-        var type = getMessageType();
+    
+    function getSettings(callback){
+      console.log("Settings " + jsonEncode(settings));
+      var colorMap = {};
+      
+      if(settings){
+          console.log("Settings.colormap");
+          var type = getMessageType();  
+          if (settings.kanbanBoardColorMap){
+            colorMap = settings.kanbanBoardColorMap;
+          }
+          
+          if(type === GET_TASK_BOARD_MAPPING){
+              colorMap = settings.taskBoardColorMap;
+          }
+      }
+      
+      callback(colorMap);
+       
+      
+    }
+    
+    
+    
+   
+     
+  
+    function userscript () {
         
-        chrome.runtime.sendMessage({type: type}, function(response) {
-            
+        console.log("content-script board.js Starting");
+        getSettings( function(response) {  
             var board = getBoardType();
             console.log("Board data " + jsonEncode(board) );
             console.log("colorMap " + jsonEncode(response));
             if(response){
                 improveBoard(response, board);
             }
-
+ 
             
             if(board.relations){
                 setCaseHighLight();
             }
             
-            addGlobalStyle( 
+            addGlobalStyle(
                 setTileClass(customCardSize+customStylePale +
-                    customStyleColor, 
+                    customStyleColor,
                     board
                 )
             );
@@ -427,11 +462,13 @@ function setColumnColor( color){
             $(window)
             .focus(function () { is_focused = true; })
             .blur(function () { is_focused = false; });
-
+ 
         });
-
+ 
         
         
-    });
+    }
     
-})();
+    setTimeout(userscript,0);
+    
+}

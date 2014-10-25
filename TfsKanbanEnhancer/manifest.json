@@ -57,7 +57,10 @@
         },
         {
             "matches": ["http://*/*/*", "https://*/*/*"],
-            "js": ["content_scripts/boardlinks.js"]
+            "js": [
+                    "content_scripts/TfsLinksInit.js",
+                    "content_scripts/boardlinks.js"
+                  ]
         }
     ]
 }

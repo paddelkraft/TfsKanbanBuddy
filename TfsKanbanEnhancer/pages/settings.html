@@ -14,46 +14,76 @@
 
 <div ng-app="settings" ng-controller="settingsController" id="links">
 	
-	<div id="kanbanboardsettings" class="settingssection">
+	<ul ng-init="tab = 1">
+		<li ng-class="{active:tab===1}"> 
+			<a href ng-click="tab = 1">Kanban Board Color Map</a>	
+		</li>
+		<li ng-class="{active:tab===2}"> 
+			<a href ng-click="tab = 2">Taskboard Color Map</a> 
+		</li>
+		<li ng-class="{active:tab===3}"> 
+			<a href ng-click="tab = 3">Links</a> 
+		</li>
+		<li ng-class="{active:tab===4}"> 
+			<a href ng-click="tab = 4">Import/Export Settings</a> 
+		</li>
+		<!--li ng-class="{active:tab===5}"> 
+			<a href ng-click="tab = 5">Import from URL</a> 
+		</li-->
+		<br><br><br>
+		<!--p ng-show="tab === 1"> I eat chocolates, alive! </p>
+		<p ng-show="tab === 2"> I drink pulpy orange juice, mango milk shake... </p>
+		<p ng-show="tab === 3"> yeah, I sleep at weekend. I am human... :D</p>
+	</ul-->		
+
+	
+	<div ng-show="tab === 1" id="kanbanboardsettings" class="settingssection">
 		<div class="table">
-			<div class="header"><h2>Kanban Board Color Map</h2></div>
+			<div class="header">Kanban Board Color Map</div>
 			<div class="row" ng-repeat="maping in kanbanBoardColorMap">
 				<div class="column">{{maping.color}}</div>
 				<div class="column">
 					<input class="color-input" type="text" maxlength="255" ng-model="maping.prefix" ng-disabled="automaticImport">
 				</div>
-				<div class="column">{{maping.color}}</div>
+				<div class="column">
+					<input class="color-input" type="text" maxlength="255" ng-model="maping.prefix" ng-disabled="automaticImport">
+				</div>
 			</div>
+			<br>
+			<div class="footer">TFS Kanban Buddy - Written by Magnus Siverbrant and Tom M&aringrdh</div>
+			
 		</div>
-	
+	    <br>
     	<div class="row" >
 			<button  id="saveKanbanMapping" ng-click="saveSettings()" ng-disabled="automaticImport">Save mapping</button>
     	</div>
-		<hr>
 	</div>
 
-	<div id="taskboardsettings" class="settingssection">
+	<div ng-show="tab === 2" id="taskboardsettings" class="settingssection">
 		<div class="table">
-			<div class="header"><h2>Task Board Color Map</h2></div>			
+			<div class="header">Task Board Color Map</div>			
 			<div class="row" ng-repeat="tbMaping in taskBoardColorMap">
 				<div class="column">{{tbMaping.color}}</div>
 				<div class="column">
 					<input class="color-input" type="text" maxlength="255" ng-model="tbMaping.prefix" ng-disabled="automaticImport">
 				</div>
-				<div class="column">{{tbMaping.color}}</div>
+				<div class="column">
+					<input class="color-input" type="text" maxlength="255" ng-model="tbMaping.prefix" ng-disabled="automaticImport">
+				</div>
 			</div>
+			<br>
+			<div class="footer">TFS Kanban Buddy - Written by Magnus Siverbrant and Tom M&aringrdh</div>
 		</div>
-		
+		<br>
 		<div class="row">
 			<button id="saveTaskMapping" ng-click="saveSettings()" ng-disabled="automaticImport">Save mapping</button>
 		</div>
-		<hr>
 	</div>
 
 
-	<div id="linkssettings" class="settingssection">
+	<div ng-show="tab === 3" id="linkssettings" class="settingssection">
 		<div class="table">
-			<div class="header"><h2>Links</h2></div>
+			<div class="header">Links</div>
 			<div class="row">
 				<div class="column">Caption</div>
 				<div class="column">Link</div>
@@ -66,29 +96,36 @@
               		<input type="text" class="link"  ng-model="x.url" ng-disabled="automaticImport">
             	</div>
       		</div>
+			<br>
+			<div class="footer">TFS Kanban Buddy - Written by Magnus Siverbrant and Tom M&aringrdh</div>
 		</div>
-		
+		<br>
     	<div class="row">
         	<button id="saveLinks" ng-click="saveSettings()" ng-disabled="automaticImport">Save links</button>
       	</div>
-		<hr>
 	</div>
    
-    
-    <div id="exportsettings" class="settingssection">
-    	<div class="header"><h2>Import/Export Settings to File (BETA)</h2></div>
+    <div ng-show="tab === 4" id="exportsettings" class="settingssection">
+    	<div class="header">Import/Export Settings to File</div>
+		<br>
 		<div class="row">
+			Import settings from file
     		<input type="file" id="importSettings" name="files[]" ng-disabled="automaticImport"/>
 		</div>
+		<!--div class="row">
+			<button id="importSettings" ng-click="importSettingsFromJson()">Import Settings</button>
+		</div-->		
+		<br>
 		<div class="row">
-			<button id="exportSettings" ng-click="exportSettingsAsJson()" >Export settings to file </button>(BETA)
+			<button id="exportSettings" ng-click="exportSettingsAsJson()">Export Settings</button>
 		</div>
-		<hr>
-    </div>
+		<br>
+		<!--/div>
 	
-    <div class="settingssection">
-    	<div class="header"><h2>Import settings from url (BETA)</h2></div>
-     	<div class="row">
+    <div ng-show="tab === 5" id="importurlsettings" class="settingssection"-->
+    	<div class="header">Import settings from url</div>
+     	<br>
+		<div class="row">
 			<input id="importURL" class="link" type="text" maxlength="255" value="" ng-model="importUrl">	
 			<button id="importSettingsfromUrl" ng-click= "importFromUrl()">Import </button>
       		<button id="importSettingsfromUrl" ng-click= "clearUrl()">Clear Import URL </button><br>
@@ -97,9 +134,11 @@
       		<input id="automaticImport" type="checkbox" ng-model="automaticImport" ng-change="saveImportData()">
 			Import settings automaticly
 		</div>
-		<hr>
+		<br>
+		<div class="footer">TFS Kanban Buddy - Written by Magnus Siverbrant and Tom M&aringrdh</div>
+		
     </div>
-
+</ul>
 </div>
   
 	<script type="text/javascript" src="../utils_js/angular.min.js"></script>

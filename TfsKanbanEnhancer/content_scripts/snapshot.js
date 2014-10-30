@@ -17,7 +17,7 @@
         return{
             id : element.getAttribute("data-item-id"),
             title : element.textContent,
-            url : genericItemUrl + element.getAttribute("data-item-id")
+            //url : genericItemUrl + element.getAttribute("data-item-id")
         };
     }
 
@@ -79,10 +79,10 @@
         var snapshot = {};
         var i;
         snapshot.time = timestamp();
-        snapshot.milliseconds = new Date().getTime(); 
-        //var genericItemUrl = getGenericItemUrl();
+        snapshot.milliseconds = new Date().getTime();
         var url =getProjectUrl();
         snapshot.board=url;
+        snapshot.genericItemUrl = genericItemUrl;
         var headerContainer = document.getElementsByClassName("header-container")[0];
         var headers = headerContainer.getElementsByClassName("member-header-content");
         var columnContainer = document.getElementsByClassName("content-container")[0];

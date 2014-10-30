@@ -9,14 +9,19 @@ function BoardData(data){
     this.ver="0.3.0";
     this.board = (data.board)?data.board:null;
     this.storageKey = "snapshots_" + this.board;
-    this.snapshots = (data.snapshots) ? data.snapshots : [];
-    this.flowData = (data.flowData) ? new FlowData(data.flowData) : new FlowData() ;
+    this.genericItemUrl = (data.genericItemUrl)? data.genericItemUrl:"";
+    this.snapshots = (data.snapshots) ? SnapshotsConstructor(data.snapshots) : [];
+    
+    this.flowData = (data.flowData) ? new FlowData(data.flowData,this.genericItemUrl) : new FlowData() ;
     
     //functions
 
    
     this.addSnapshot = function(snapshot){
+        snapshot = SnapshotConstructor(snapshot);
         this.flowData.addSnapshot(snapshot);
+        this.genericItemUrl = snapshot.genericItemUrl;
+        console.log("genericItemUrl " + this.genericItemUrl);
         if(!this.board){
             this.board = snapshot.board;
             this.storageKey = "snapshots_" + this.board;
@@ -25,7 +30,7 @@ function BoardData(data){
             this.snapshots[this.snapshots.length-1] = snapshot;
         } else {
             this.snapshots.push(snapshot);
-        } 
+        }
     };
 
     this.getLaneHeaders = function (){
@@ -96,6 +101,31 @@ function BoardData(data){
         return jsonEncode(this).length * 2;
     }
 
+
+    function SnapshotConstructor(snapshotDataObject){
+        snapshot = snapshotDataObject;
+        for (var lane in snapshot.lanes){
+            for(var ticket in snapshot.lanes[lane].tickets){
+                snapshot.lanes[lane].tickets[ticket].url = function(){
+                    return snapshot.genericItemUrl+this.id;
+                };
+
+                snapshot.lanes[lane].tickets[ticket].time = function(){
+                    return timestamp(this.milliseconds);
+                };
+            }
+        }
+        return snapshot;
+    }
+
+    function SnapshotsConstructor(snapshotsDataObject){
+        var snapshots = snapshotsDataObject;
+        for(var snapshot in snapshots){
+            
+            snapshots[snapshot] =  SnapshotConstructor(snapshots[snapshot]);
+        }
+        return snapshots;
+    }
     //construction
            
 
@@ -106,14 +136,26 @@ function BoardData(data){
             if(this.flowData == new FlowData()){
                 for (var index in this.snapshots){
                     this.flowData.addSnapshot(this.snapshots[index]);
-                 }   
+                 }; 
             } // end remove
 }//BoardData
 
 
 
+function FlowData(flowData, genericItemUrl){
+    
+    function flowItemConstructor(flowItemData, genericItemUrl){
+        var flowItem = flowItemData;
+        flowItem.url = function(){
+            return genericItemUrl + this.id;
+        };
+        for(var laneIndex in flowItem.lanes){
+            flowItem.lanes[laneIndex].enter = readableTime(flowItem.enterMilliseconds);
+            flowItem.lanes[laneIndex].exit = readableTime(flowItem.exitMilliseconds);
+        }
+        return flowItem;
+    }
 
-function FlowData(flowData){
     this.getEnterDate = function (id,lane){
         return this[id].lanes[lane].enter;
     };
@@ -142,28 +184,37 @@ function FlowData(flowData){
                 }
                 flowTicket = this[ticket.id];
                 flowTicket.title = ticket.title;
-                flowTicket.url = ticket.url
+                flowTicket.url = ticket.url;
                 flowTicket.id = ticket.id;
                 if(!flowTicket.lanes){
                     flowTicket.lanes = {};
                 }
                 if(!flowTicket.lanes[lane.name]){
                     flowTicket.lanes[lane.name]={};
-                    flowTicket.lanes[lane.name].enter = snapshot.time;
                     flowTicket.lanes[lane.name].enterMilliseconds = snapshot.milliseconds;
+                    flowTicket.lanes[lane.name].enter = readableTime(flowTicket.lanes[lane.name].enterMilliseconds);
+                    
                 }
 
-                flowTicket.lanes[lane.name].exit = snapshot.time;
                 flowTicket.lanes[lane.name].exitMilliseconds = snapshot.milliseconds;
+                flowTicket.lanes[lane.name].exit = readableTime(flowTicket.lanes[lane.name].exitMilliseconds);
+                
 
             }
         }
         
     };
 
+    function readableTime(milliseconds){
+        return function(){
+            return timestamp(milliseconds);
+        }
+    }
+
     if (flowData){
         for(var index in flowData){
-            this[index] = flowData[index];
+            
+            this[index] = flowItemConstructor(flowData[index],genericItemUrl);
         }
     }
 }

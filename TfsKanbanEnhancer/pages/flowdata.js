@@ -24,8 +24,8 @@
 			row[1] =  flowTicket.title;
 			for(var laneName in flowTicket.lanes){
 				var lane = flowTicket.lanes[laneName]
-				row[columnIndexes[laneName]] = lane.enter;
-				row[columnIndexes[laneName]+1] = lane.exit;
+				row[columnIndexes[laneName]] = lane.enter();
+				row[columnIndexes[laneName]+1] = lane.exit();
 				 
 			} 
 			grid.push(row);
@@ -42,10 +42,10 @@
 			var flowTicket = flowData[id];
 			if(flowTicket.id){
 				flowReport.push( [ flowTicket.id,flowTicket.title,"",""]);
-				flowReport.push( [ flowTicket.id,flowTicket.url , "",""]);
+				flowReport.push( [ flowTicket.id,flowTicket.url() , "",""]);
 				for(var laneName in flowTicket.lanes){
 					var lane = flowTicket.lanes[laneName];
-					flowReport.push( [ flowTicket.id, laneName, lane.enter, lane.exit] );
+					flowReport.push( [ flowTicket.id, laneName, lane.enter(), lane.exit()] );
 				} 
 				flowReport.push( ["","","",""] );
 			}
@@ -57,8 +57,8 @@
 
 	function buildSnapshot(snapshot, flowData){
 		var snapshotDiv = document.createElement("div");
-		for(laneIndex in snapshot.lanes){				
-			var laneDiv = buildSnapshotColumn(snapshot,flowData,laneIndex)
+		for(var laneIndex in snapshot.lanes){				
+			var laneDiv = buildSnapshotColumn(snapshot,flowData,laneIndex);
 			snapshotDiv.appendChild(laneDiv);
 		} 	
 		return snapshotDiv;
@@ -74,7 +74,7 @@
 		laneGrid.push(["Id","title","days in lane","days on board"]);
 		for(var i = 0 ; i < lane.tickets.length ; i++ ){
 			var ticket = lane.tickets[i];
-			laneGrid.push(["<a href='"+ ticket.url +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id)]);
+			laneGrid.push(["<a href='"+ ticket.url() +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id)]);
 		}
 		if (laneGrid.length == 1){				
 			laneGrid = [["Lane is empty"]];

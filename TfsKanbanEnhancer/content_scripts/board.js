@@ -336,14 +336,23 @@ function setColumnColor( color){
         $('[data-case-id]')
         .mouseenter(function (evt) {
             var caseId = $(evt.target).attr('data-case-id') || $(evt.target).closest('[data-case-id]').attr('data-case-id');
+            hovered = caseId;
+           
             if(caseId !== ""){
               console.log('Mouse enter... case #:' + caseId);
               $("[data-case-id!='" + caseId + "']").addClass('pale');
+              $("[data-case-id='" + caseId + "']").removeClass('pale');
             }
             
         })
         .mouseleave(function (evt) {
-            $("[data-case-id]").removeClass('pale');
+            hovered = "";
+            setTimeout(function(){
+                if (hovered === ""){
+                    $("[data-case-id]").removeClass('pale');
+                }
+            },200);
+            
         });
     }
     

@@ -170,8 +170,9 @@
 		});
     }
 
-    function presentBoardSnapshot(snapshots,flowData){
-    	var snapshot = snapshots[snapshots.length-1];
+    function presentBoardSnapshot(boardData){
+    	var snapshot = boardData.getLatestSnapshot();//snapshots[snapshots.length-1];
+    	var flowData = boardData.flowData;
     	var snapshotPresentation = buildSnapshot(snapshot,flowData);
     	console.log("Present Board snapshot");
     	setColumnWidths(snapshotPresentation,["80px","","150px","150px"]);
@@ -193,7 +194,7 @@
 		chrome.runtime.sendMessage(message, function(response){
 			var boardData = new BoardData(response);
 			var lanes = boardData.getLaneHeaders();
-			document.getElementById("snapshot").onclick= function(){presentBoardSnapshot(boardData.snapshots,boardData.flowData)};
+			document.getElementById("snapshot").onclick= function(){presentBoardSnapshot(boardData)};
 			document.getElementById("flowDataGrid").onclick = function(){presentFlowDataGrid(boardData.flowData,lanes);};
 			document.getElementById("flowReport").onclick = function(){presentFlowReport(boardData.flowData);};
 			document.getElementById("rawDataJson").onclick = function(){ 
@@ -210,7 +211,7 @@
 			};
 			document.getElementById("board").innerHTML = "Data collected from " + boardData.board;
 			document.getElementById("dataSize").innerHTML = "Data size = " +parseInt( boardData.size()/1024) +"KB";
-			presentBoardSnapshot(boardData.snapshots,boardData.flowData);
+			presentBoardSnapshot(boardData);
 		})
 	}
 

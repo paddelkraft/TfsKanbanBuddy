@@ -23,6 +23,10 @@
         }
     }
 
+    function cloneObjectData(obj){
+        return jsonDecode(jsonEncode(obj));
+    }
+
     function daysSince(date){
         var day = 86400000 //24*60*60*1000=86400000
         var now = new Date();

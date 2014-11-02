@@ -1,13 +1,14 @@
 describe("BoardData", function() {
   var boardData;
-  var song;
+  var boardDesign;
+  var snapshot;
 
   beforeEach(function() {
     boardData = new BoardData({});
     snapshot = {
-        "time": "2014-09-24-20:38",
         "milliseconds": 1411583924163,
         "board": "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection",
+        "genericItemUrl" : "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=",
         "lanes": [
           {
             "name": "ToDo",
@@ -15,35 +16,33 @@ describe("BoardData", function() {
               {
                 "id": "4",
                 "title": "AT 1",
-                "url": "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=4"
               }
             ]
           },
           {
             "name": "Dev IP",
             "wip": {
-              "current": "2",
-              "limit": "5"
+              "limit": "5",
+              "current": 2
             },
             "tickets": [
               {
                 "id": "9",
                 "title": "ticket 1",
-                "url": "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=9"
               },
             ]
           },
           {
             "name": "Dev DONE",
             "wip": {
-              "current": "",
-              "limit": ""
+              "limit": "0",
+              "current": "0"
+              
             },
             "tickets": [
               {
                 "id": "3",
                 "title": "CR 1",
-                "url": "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=3"
               }
             ]
           },
@@ -55,14 +54,63 @@ describe("BoardData", function() {
           }
         ]
       };
-  });
 
-  it("should contain addedSnapshot", function() {
-    boardData.addSnapshot(snapshot);
-    expect(boardData.snapshots[0]).toEqual(snapshot);
+      boardDesign = [
+          {
+            "name": "ToDo",
+          },
+          {
+            "name": "Dev IP",
+            "wip": {
+              "limit": "5"
+            },
+          },
+          {
+            "name": "Dev DONE",
+            "wip": {
+              "limit": "0"
+            },
+          },
+          {
+            "name": "In production",
+          }
+        ];
   });
 
   
+
+
+
+  it("should contain addedSnapshot", function() {
+    boardData.addSnapshot(snapshot);
+    expect(jsonEncode(boardData.getLatestSnapshot())).toEqual(jsonEncode(snapshot));
+  });
+
+  it("should contain Board Design", function() {
+    boardData.addSnapshot(snapshot);
+    expect(boardData.boardDesignHistory.boardDesignRecords[0].getBoardDesignForSnapshot()).toEqual(boardDesign);
+  });
+
+  it("boardDesign shoud have correct firstSeen and lastSeen times", function() {
+    boardData.addSnapshot(snapshot);
+    snapshot.milliseconds = snapshot.milliseconds + 10;
+    boardData.addSnapshot(snapshot);
+    var boardDesign = boardData.boardDesignHistory.boardDesignRecords[0];
+    expect(boardDesign.firstSeen).toEqual(snapshot.milliseconds-10);
+    expect(boardDesign.lastSeen).toEqual(snapshot.milliseconds);
+  });
+
+  it("should contain new Board Design", function() {
+    boardData.addSnapshot(snapshot);
+    snapshot.milliseconds = snapshot.milliseconds + 10;
+    snapshot.lanes[0].name = "Att Göra";
+    boardDesign[0].name = "Att Göra";
+    boardData.addSnapshot(snapshot);
+    var newBoardDesign = boardData.boardDesignHistory.boardDesignRecords[1].getBoardDesignForSnapshot();
+    expect(newBoardDesign).toEqual(boardDesign);
+  });
+
+
 
   it("flow Data ticket should have correct enter and exit time", function() {
     boardData.addSnapshot(snapshot);
@@ -74,6 +122,35 @@ describe("BoardData", function() {
     expect(lane.enterMilliseconds).toEqual(snapshot.milliseconds-10);
     expect(lane.exitMilliseconds).toEqual(snapshot.milliseconds);
   });
+
+  it("boardDesign with earlier firstSeen should be first", function() {
+    boardData.addSnapshot(snapshot);
+    var mergeData = new BoardData();
+    snapshot.milliseconds = snapshot.milliseconds - 10;
+    snapshot.lanes[0].name = "Att Göra";
+    boardDesign[0].name = "Att Göra";
+    mergeData.addSnapshot(snapshot);
+    boardData.merge(mergeData);
+    console.log(jsonEncode(boardData));
+    var mergedBoardDesign = boardData.boardDesignHistory.boardDesignRecords[0].getBoardDesignForSnapshot();
+    expect(mergedBoardDesign).toEqual(boardDesign);
+  });
+
+  it("flow Data ticket should have correct enter and exit time after merge", function() {
+    boardData.addSnapshot(snapshot);
+    var mergeData = new BoardData();
+    snapshot.milliseconds = snapshot.milliseconds - 10;
+    snapshot.lanes[0].name = "Att Göra";
+    boardDesign[0].name = "Att Göra";
+    mergeData.addSnapshot(snapshot);
+    boardData.merge(mergeData);
+    var ticket = boardData.flowData["3"];
+    var lane = ticket.lanes["Dev DONE"];
+    expect(lane.enterMilliseconds).toEqual(snapshot.milliseconds);
+    expect(lane.exitMilliseconds).toEqual(snapshot.milliseconds+10);
+  });
+
+
 
 });
 

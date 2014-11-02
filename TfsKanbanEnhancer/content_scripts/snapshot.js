@@ -78,7 +78,7 @@
     function getBoardSnapshot(){
         var snapshot = {};
         var i;
-        snapshot.time = timestamp();
+        //snapshot.time = timestamp();
         snapshot.milliseconds = new Date().getTime();
         var url =getProjectUrl();
         snapshot.board=url;
@@ -96,11 +96,14 @@
                 
                 if(headers[i].getElementsByClassName("current")[0]){
                     lane.wip = {};
-                    lane.wip.current = headers[i].getElementsByClassName("current")[0].textContent;
+                    var current = headers[i].getElementsByClassName("current")[0].textContent;
+                    lane.wip.current = (current==="")"0":current;
+
                 }
                 if(headers[i].getElementsByClassName("limit")[0])
                 {
-                    lane.wip.limit = headers[i].getElementsByClassName("limit")[0].textContent.replace("/","");
+                    var limit = headers[i].getElementsByClassName("limit")[0].textContent.replace("/","");
+                    lane.wip.limit = (limit==="")"",limit ;
                 }
                 var tickets = columns[i].getElementsByClassName("board-tile");
                 lane.tickets = []

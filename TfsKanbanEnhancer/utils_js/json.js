@@ -22,3 +22,7 @@
             
         }
     }
+
+    function cloneObjectData(obj){
+        return jsonDecode(jsonEncode(obj))
+    }

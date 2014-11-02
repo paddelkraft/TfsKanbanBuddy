@@ -103,7 +103,7 @@
                 if(headers[i].getElementsByClassName("limit")[0])
                 {
                     var limit = headers[i].getElementsByClassName("limit")[0].textContent.replace("/","");
-                    lane.wip.limit = (limit==="")"",limit ;
+                    lane.wip.limit = (limit==="")?"0",limit ;
                 }
                 var tickets = columns[i].getElementsByClassName("board-tile");
                 lane.tickets = []

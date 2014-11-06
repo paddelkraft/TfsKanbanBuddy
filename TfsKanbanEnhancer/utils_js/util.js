@@ -69,18 +69,19 @@
         return timeStamp;
     }
 
-    function isSameDay(timestamp1 , timestamp2){
-      return (timestamp1.substring(0,11) == timestamp1.substring(0,11) )
-    }
-
     function twoDigits(input){
         var output = "0"+input;
         return output.substring(output.length -2 ,output.length)
     }
 
-    function downloadAsJson(data, filePrefix, element){
+    function downloadAsJson(data, filePrefix){
         var blob = new Blob([jsonEncode(data)], {type: "data:application/json;charset=utf-8"});
         saveAs(blob, filePrefix + timestamp()+".json");
+    }
+
+    function downloadAsCSV(data, filePrefix){
+        var blob = new Blob([data], {type: "data:application/csv;charset=utf-8"});
+        saveAs(blob, filePrefix + timestamp()+".csv");
     }
 
     
@@ -131,6 +132,21 @@
               $("#tabletocsv-modal").remove();
             });
           }, false);
+    }
+
+    function jsonGridToCSV(grid){
+      var i;
+      var j;
+      var csv = "";
+      var row = "";
+      for (i =0; i < grid.length; i++) {
+        row = "";
+        for (j=0;  j<grid[i].length ; j++) {
+            row = row +'"'+grid[i][j]+((grid[i].length-1 === j)?'"':'",');
+        }
+        csv = csv+row+((grid[i].length-1 === i)?'':'\r\n');
+      }
+      return csv;
     }
 
     function createDataTable(tableData) {

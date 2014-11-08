@@ -1,6 +1,8 @@
+
+
+
 .presentationTable {
 	margin:0px;padding:0px;
-	width:1000px;
 	box-shadow: 10px 10px 5px #888888;
 	border:1px solid #000000;
 	
@@ -21,8 +23,7 @@
 	border-top-left-radius:0px;
 }.presentationTable table{
     border-collapse: collapse;
-        border-spacing: 0;
-	width:100%;
+     border-spacing: 0;
 	height:100%;
 	margin:0px;padding:0px;
 }.presentationTable tr:last-child td:last-child {
@@ -92,6 +93,13 @@
 }
 .presentationTable tr:first-child td:last-child{
 	border-width:0px 0px 1px 1px;
+}
+
+.flowReportTable{
+	width:1000px;
+} 
+.timestamp{
+	width:130px;
 }
 
 ;

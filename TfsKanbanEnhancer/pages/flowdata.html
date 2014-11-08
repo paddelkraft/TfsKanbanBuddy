@@ -3,29 +3,72 @@
 <title>TFS Kanban Buddy Flow data</title>
 <script type="text/javascript" src="../utils_js/jquery-2.1.1.min.js"></script>
 <script type="text/javascript" src="../utils_js/filesaver.js"></script>
-<script src="jquery.handsontable.full.js"></script>
 <script type="text/javascript" src="../utils_js/util.js"></script>
 <script type="text/javascript" src="../utils_js/boarddata.js"></script>
-<script type="text/javascript" src="flowdata.js"></script>
+
 <link rel="stylesheet" media="screen" href="jquery.handsontable.full.css">
 <link rel="stylesheet" media="screen" href="samples.css">
 <link rel="stylesheet" media="screen" href="presentationTable.css">
 
 </head>
 <body>
-  
-  <button id="snapshot">Show board snapshot</button>
-  <button id="flowDataGrid">Show flow data grid</button>
-  <button id="flowReport">Show flow report</button>
-  <button id="csv">Download report as Csv</button>
-  <button id="json">Download report as JSON</button>
-  <button id="rawDataJson">Download all data as JSON</button>
-  <button id="delete">Delete all data</button>
-  <div id="dataSize"></div>
+  <div ng-app="flowData" ng-controller="flowReportController">
+      <button ng-click="snapshotAction()"id="snapshot">Show board snapshot</button>
+      <button ng-click="flowDataGridAction()"id="flowDataGrid">Show flow data grid</button>
+      <button ng-click="flowReportAction()"id="flowReport">Show flow report</button>
+      <button ng-click="exportAsCsv()"id="csv">Download report as Csv</button>
+      <button ng-click="exportAsJson()" id="json">Download report as JSON</button>
+      <button ng-click="exportRawData()"id="rawDataJson">Download all data as JSON</button>
+      <button id="delete">Delete all data</button>
+      <div id="dataSize">{{dataSize}}</div>
+      <div id="board">Data collected from {{board}}</div>
 
- <div id="board"> </div>
- <div id="report"> </div>
-  <div id="tableContainer">
-  </div>
+     <div id="snapshot" ng-show="showSnapshot"> 
+        <div ng-repeat="lane in snapshot.lanes">
+          <h2>{{lane.name}}</h2>
+          <h3 ng-if="lane.tickets.length===0">Lane is empty</h3>
+          <table ng-if="lane.tickets.length!==0" class="presentationTable flowReportTable">
+            <tbody>
+              <tr><td>Id</td><td>Title</td><td "width:150px;">Days in lane</td><td "width:150px;">Days on board</td></tr>
+              <tr ng-repeat="ticket in lane.tickets">
+                <td >{{ ticket.id }}</td>
+                <td ><a href="{{ticket.url()}}">{{ ticket.title }}</a></td>
+                <td class="timestamp">{{ ticket.daysInColumn }}</td>
+                <td class="timestamp">{{ ticket.daysOnBoard }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+     </div>
+     
+     <div id="report" ng-show="showFlowReport"> 
+        <table class="presentationTable flowReportTable">
+          <tbody>
+            <tr><td>Id</td><td>Title</td><td>Lane</td><td class="timestamp">First seen</td><td class="timestamp">Last seen</td></tr>
+            <tr ng-repeat="row in flowReport">
+              <td >{{ row[0] }}</td>
+              <td ><a href="{{row[2]}}">{{ row[1] }}</a></td>
+              <td >{{ row[3] }}</td>
+              <td >{{ row[4] }}</td>
+              <td >{{ row[5] }}</td>
+
+            </tr>
+          </tbody>
+        </table>
+     </div>
+     <div ng-show="showFlowDataGrid"> 
+        <table class="presentationTable " style="width:{{600+flowDataGrid[0].length*130}}px;">
+          <tbody>
+            <tr ng-repeat="row in flowDataGrid">
+              <td ng-repeat="cell in row track by $index"  class="{{($index>1)?'timestamp':''}}">{{ cell }}</td>
+            </tr>
+          </tbody>
+        </table>
+     </div>
+</div>
+
+<script type="text/javascript" src="../utils_js/angular.min.js"></script>
+<script type="text/javascript" src="flowdata.js"></script>
+
 </body>
 </html>

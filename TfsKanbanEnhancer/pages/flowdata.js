@@ -33,7 +33,7 @@
 			row[0]=  flowTicket.id;
 			row[1] =  flowTicket.title;
 			for(laneName in flowTicket.lanes){
-				lane = flowTicket.lanes[laneName]
+				lane = flowTicket.lanes[laneName];
 				row[columnIndexes[laneName]] = lane.enter();
 				row[columnIndexes[laneName]+1] = lane.exit();
 			}
@@ -83,39 +83,29 @@
 	}
 
 
-	function buildSnapshot(snapshot, flowData){
+	function buildSnapshot(boardData){
 		var snapshotDiv = document.createElement("div");
-		var laneDiv
-		for(var laneIndex in snapshot.lanes){			
-			laneDiv = buildSnapshotColumn(snapshot,flowData,laneIndex);
-			snapshotDiv.appendChild(laneDiv);
-		} 	
-		return snapshotDiv;
+		var laneDiv;
+		var laneIndex;
+		var snapshot = boardData.getLatestSnapshot();//snapshots[snapshots.length-1];
+		var flowData = boardData.flowData;
+		
+		for(laneIndex in snapshot.lanes){
+			buildSnapshotForColumn(snapshot,flowData,laneIndex);
+		}
+		return snapshot;
 	}
 
-	function buildSnapshotColumn(snapshot, flowData,laneIndex){
+	function buildSnapshotForColumn(snapshot, flowData,laneIndex){
 		var laneDiv =document.createElement("div");
 		var lane = snapshot.lanes[laneIndex];
-		var laneHeader = document.createElement("h2");
-		var laneGrid = [];
 		var ticket;
 		var i;
-		var dataTable;
-		laneHeader.textContent = lane.name;
-		laneDiv.appendChild(laneHeader);
-
-		laneGrid.push(["Id","title","days in lane","days on board"]);
 		for(i = 0 ; i < lane.tickets.length ; i++ ){
 			ticket = lane.tickets[i];
-			laneGrid.push(["<a href='"+ ticket.url() +"'>" + ticket.id +"</a>", ticket.title,daysInColumn(flowData,ticket.id,lane.name),daysOnBoard(flowData,ticket.id)]);
+			ticket.daysInColumn = daysInColumn(flowData,ticket.id,lane.name);
+			ticket.daysOnBoard = daysOnBoard(flowData,ticket.id);
 		}
-		if (laneGrid.length == 1){				
-			laneGrid = [["Lane is empty"]];
-		}
-		dataTable = createDataTable(laneGrid);
-		dataTable.setAttribute("class","presentationTable");
-		laneDiv.appendChild(dataTable);
-		return laneDiv;
 	}
 
 
@@ -123,7 +113,7 @@
 		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
     }
 
-    function daysOnBoard (flowData,ticketId) {	
+    function daysOnBoard (flowData,ticketId) {
 		return highlightTime(daysSince(getEnterBoardMilliseconds(flowData,ticketId)));
     }
 	
@@ -135,9 +125,9 @@
 		for(laneName in flowTicket.lanes){
 			lane = flowTicket.lanes[laneName];
 			if(lane.enterMilliseconds<enterMilliseconds){
-				enterMilliseconds = lane.enterMilliseconds
+				enterMilliseconds = lane.enterMilliseconds;
 			}
-		} 
+		}
 		return enterMilliseconds;
 	}
 
@@ -160,95 +150,82 @@
 	}
 
 
-	function setHandsOnTableData(data , tableId){
-   		$('#'+tableId).handsontable({
-				data: data,
-				minSpareRows: 1,
-				colHeaders: true,
-				contextMenu: false
-  		});
-    }
+//setup();
 
-    function createHandsOnTable(data,tableId) {
-    	var tableDiv = document.createElement("div");
-    	tableDiv.setAttribute("id",tableId);
-    	tableDiv.setAttribute("class", "handsontable")
-    	setTableContainerContent(tableDiv);
-    	setHandsOnTableData(data,tableId);
-    }
+var app = angular.module("flowData", []);
 
-    function setTableContainerContent(content){
-    	var tableContainer = $("#tableContainer");
-    	tableContainer.empty();
-    	tableContainer.append(content);
-    }
-
-    function presentFlowReport(flowData){
-		var flowReport = buildFlowReport(flowData)
-		var flowReportTable;
-		document.getElementById("csv").onclick = function(){ downloadAsCSV(jsonGridToCSV(flowReport),"FlowReport");};
-		document.getElementById("json").onclick = function(){
-			downloadAsJson(flowData,"FlowReport");
-		};
-		flowReportTable = createDataTable(flowReport);
-   		flowReportTable.setAttribute("class","presentationTable");
-		
-    	setTableContainerContent(flowReportTable);
-
-	}
-
-    function presentFlowDataGrid(flowData , lanes){
-		var flowDataGrid = new FlowDataGrid(flowData,lanes);
-		createHandsOnTable(flowDataGrid,"flowDataTable");
-		document.getElementById("csv").onclick = function(){ table2csv("FlowDataGrid")};
-		document.getElementById("json").addEventListener("click", function (a){
-			downloadAsJson(flowDataGrid,"FlowDataGrid");
-		});
-    }
-
-    function presentBoardSnapshot(boardData){
-		var snapshot = boardData.getLatestSnapshot();//snapshots[snapshots.length-1];
-		var flowData = boardData.flowData;
-		var snapshotPresentation = buildSnapshot(snapshot,flowData);
-		console.log("Present Board snapshot");
-		setColumnWidths(snapshotPresentation,["80px","","150px","150px"]);
-		setTableContainerContent(snapshotPresentation);
-		document.getElementById("csv").onclick = function(){alert("No csv downoload of snapshot")};
-		document.getElementById("json").addEventListener("click", function (a){
-			downloadAsJson(snapshot,"BoardSnapshot");
-});
-
-    }
-
-	function setup(board){
+ app.controller("flowReportController", function($scope){
+       function fetchFlowData(){
 		var message = {type:"get-flow-data"};
 		message.board = decodeURIComponent(document.URL.split("?")[1]);
 		console.log(message.board);
-		//if(board){
-		//	message.board = board;
-		//}
 		chrome.runtime.sendMessage(message, function(response){
 			var boardData = new BoardData(response);
 			var lanes = boardData.getLaneHeaders();
-			document.getElementById("snapshot").onclick= function(){presentBoardSnapshot(boardData)};
-			document.getElementById("flowDataGrid").onclick = function(){presentFlowDataGrid(boardData.flowData,lanes);};
-			document.getElementById("flowReport").onclick = function(){presentFlowReport(boardData.flowData);};
-			document.getElementById("rawDataJson").onclick = function(){ 
-				downloadAsJson(response, "TfsFlowRawData");
+			$scope.snapshot = buildSnapshot(boardData);
+			$scope.flowReport = buildFlowReport(boardData.flowData);
+			$scope.flowReport.shift();
+			$scope.flowDataGrid = new FlowDataGrid(boardData.flowData , boardData.getLaneHeaders());
+			$scope.dataSize = "Data size = " +parseInt( boardData.size()/1024) +"KB";
+			$scope.board = boardData.board;
+			$scope.flowReportAction = function (){
+				
+					$scope.exportAsJson = function(){
+						downloadAsJson(buildFlowReport(boardData.flowData),"flowReport")
+					};
+					$scope.exportAsCsv = function(){
+						downloadAsCSV(buildFlowReport(boardData.flowData),"flowReport")
+					};
+					
+					
+					$scope.showSnapshot = false;
+					$scope.showFlowDataGrid = false;
+					$scope.showFlowReport = true;
+					//$scope.$apply();
 			};
-			document.getElementById("delete").onclick = function(){
-				var answer = window.confirm("You are about to delete all flow data collected for "+ message.board + " this data is not recoverable");
-				if(answer){
-					chrome.runtime.sendMessage({type : "delete-flow-data",
-												board : message.board}
-											  );
-					location.reload();
-				}
-			};
-			document.getElementById("board").innerHTML = "Data collected from " + boardData.board;
-			document.getElementById("dataSize").innerHTML = "Data size = " +parseInt( boardData.size()/1024) +"KB";
-			presentBoardSnapshot(boardData);
-		})
-	}
 
-setup();
+			$scope.flowDataGridAction = function (){
+					
+						$scope.exportAsJson = function(){
+						downloadAsJson(new FlowDataGrid(boardData.flowData, boardData.getLaneHeaders()),"flowDataGrid")
+					};
+					$scope.exportAsCsv = function(){
+						downloadAsCSV(new FlowDataGrid(boardData.flowData, boardData.getLaneHeaders()),"flowDataGrid")
+					};
+					
+					
+					$scope.showSnapshot = false;
+					$scope.showFlowDataGrid = true;
+					$scope.showFlowReport = false;
+					//$scope.$apply();
+			};
+
+			$scope.snapshotAction = function (){
+				
+				
+					
+					$scope.exportAsJson = function(){
+						downloadAsJson($scope.snapshot,"boardSnapshot");
+					};
+					$scope.exportAsCsv = function(){
+						alert("snapshot can not be exported as csv yet");
+					};
+					
+					$scope.showSnapshot = true;
+					$scope.showFlowDataGrid = false;
+					$scope.showFlowReport = false;
+					//$scope.$apply();	
+			};
+
+			$scope.exportRawData = function (){
+				downloadAsJson(boardData,"boardSnapshot");
+			};
+
+			$scope.snapshotAction();
+			$scope.$apply();
+			
+		});
+
+	} 
+  	fetchFlowData();
+ });

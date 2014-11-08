@@ -191,8 +191,8 @@ function FlowData(flowData, genericItemUrl){
             return genericItemUrl + this.id;
         };
         for(var laneIndex in flowItem.lanes){
-            flowItem.lanes[laneIndex].enter = readableTime(flowItem.enterMilliseconds);
-            flowItem.lanes[laneIndex].exit = readableTime(flowItem.exitMilliseconds);
+            flowItem.lanes[laneIndex].enter = readableTime(flowItem.lanes[laneIndex].enterMilliseconds);
+            flowItem.lanes[laneIndex].exit = readableTime(flowItem.lanes[laneIndex].exitMilliseconds);
             
         }
 
@@ -293,7 +293,7 @@ function FlowData(flowData, genericItemUrl){
 
     function readableTime(milliseconds){
         return function(){
-            return timestamp(milliseconds);
+            return timeFormat(milliseconds);
         };
     }
 
@@ -338,7 +338,6 @@ function BoardDesignHistory(boardDesignHistoryObject){
             var boardDesignRecord = new BoardDesignRecord(boardDesign,milliseconds);
             this.boardDesignRecords.push(boardDesignRecord);
         }
-        
     };
 
 
@@ -394,7 +393,7 @@ function BoardDesignHistory(boardDesignHistoryObject){
         this.boardDesignRecords = records;
     };
 
-    return boardDesignHistory;   
+    return boardDesignHistory;
 }
 
 function BoardDesignRecord(boardDesign, milliseconds){

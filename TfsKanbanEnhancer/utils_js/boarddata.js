@@ -29,10 +29,14 @@ function BoardData(data){
         
     };
 
-    this.getLatestBoardState = function(){
-        //Hämta board design
-        var boardState = this.boardDesignHistory.getLatestBoardDesign();
-        var milliseconds = this.boardDesignHistory.getLatestBoardObservationTime();
+
+    this.getLatestSnapshot = function(){
+        return this.getSnapshot(this.boardDesignHistory.getLatestBoardObservationTime());
+    };
+
+    this.getBoardState = function(milliseconds){
+        var boardDesignRecord = this.findBoardDesignRecord(milliseconds);
+        var boardState = boardDesignRecord.getBoardDesignForSnapshot();
         for(var index in boardState){
             var lane = boardState[index].name;
             var tickets = this.flowData.getTicketsInLane(lane,milliseconds);
@@ -50,14 +54,36 @@ function BoardData(data){
         return boardState;
     };
 
-    this.getLatestSnapshot = function(){
-        snapshot = {};
-        snapshot.milliseconds = this.boardDesignHistory.getLatestBoardObservationTime();
-        snapshot.board = this.board;
-        snapshot.genericItemUrl = this.genericItemUrl;
-        snapshot.lanes = this.getLatestBoardState();
+    this.getSnapshot = function(milliseconds){
+        var snapshot = {};
+        if( this.findBoardDesignRecord(milliseconds)!=null){
+           snapshot.milliseconds = milliseconds;
+            snapshot.board = this.board;
+            snapshot.genericItemUrl = this.genericItemUrl;
+            snapshot.lanes = this.getBoardState(milliseconds);
+        }
+        
         return SnapshotConstructor(snapshot);
     };
+
+    this.findBoardDesignRecord = function(milliseconds){
+        var designRecordIndex;
+        var boardDesignRecord = null;
+        var seenIndex;
+        for(designRecordIndex in this.boardDesignHistory.boardDesignRecords){
+            boardDesignRecord = this.boardDesignHistory.boardDesignRecords[designRecordIndex];
+            if(boardDesignRecord.firstSeen()<= milliseconds && boardDesignRecord.lastSeen()>= milliseconds){
+                for(seenIndex in boardDesignRecord.seen){
+                    if (boardDesignRecord.seen[seenIndex]===milliseconds){
+                        return boardDesignRecord;
+                    }
+                }
+                
+            }
+        }
+        return null;
+    };
+
 
     this.merge = function (boardData){
         if(this.board == boardData.board){
@@ -314,6 +340,24 @@ function createBoardDesignHistoryFromSnapshots(snapshots){
     return boardDesignHistory;
 }
 
+function buildSnapshotsFromBoardData(boardData){
+    var snapshots = [];
+    var boardState = null;
+    var designRecordIndex = 0;
+    var boardDesignRecords = boardData.boardDesignHistory.boardDesignRecords;
+    var seenIndex = 0;
+    var snapshot = null;
+    for(designRecordIndex in boardDesignRecords){
+        boardState = boardDesignRecords[designRecordIndex].boardDesign;
+        for(seenIndex in boardDesignRecords[designRecordIndex].seen){
+            snapshot = boardData.getSnapshot(boardDesignRecords[designRecordIndex].seen[seenIndex]);
+            snapshots.push(snapshot);
+        }
+    }
+    return snapshots;
+}
+
+
 function BoardDesignHistory(boardDesignHistoryObject){
     if(!boardDesignHistoryObject){
         boardDesignHistoryObject = {};
@@ -327,47 +371,30 @@ function BoardDesignHistory(boardDesignHistoryObject){
     
     boardDesignHistory.reportBoardDesign = function(boardDesign,milliseconds){
         var numberOfRecords = this.boardDesignRecords.length;
+        var boardDesignRecord
         if(numberOfRecords === 0){
-            var boardDesignRecord = new BoardDesignRecord(boardDesign,milliseconds);
+            boardDesignRecord = new BoardDesignRecord(boardDesign,milliseconds);
             this.boardDesignRecords.push(boardDesignRecord);
         }else if(this.boardDesignRecords[numberOfRecords-1].equals(boardDesign) ){
             console.log("The boardDesign has not changed updating observation time");
             this.boardDesignRecords[numberOfRecords-1].designSeenAt(milliseconds);
         }else{
             console.log("The boardDesign has changed adding new design to history");
-            var boardDesignRecord = new BoardDesignRecord(boardDesign,milliseconds);
+            boardDesignRecord = new BoardDesignRecord(boardDesign,milliseconds);
             this.boardDesignRecords.push(boardDesignRecord);
         }
     };
 
 
 
-    boardDesignHistory.getLatestBoardDesign = function(){
-        return this.boardDesignRecords[this.boardDesignRecords.length -1].getBoardDesignForSnapshot();
+    boardDesignHistory.getLatestBoardDesign = function(milliseconds){
+       return this.boardDesignRecords[this.boardDesignRecords.length -1].getBoardDesignForSnapshot();
     };
+
+    
 
     boardDesignHistory.getLatestBoardObservationTime = function(){
-        return this.boardDesignRecords[this.boardDesignRecords.length -1].lastSeen;
-    };
-
-    boardDesignHistory.merge = function(mergeItem){
-        for(var index in mergeItem.boardDesignRecords){
-            var record = this.getRecordForBoardDesign(mergeItem.boardDesignRecords[index].design);
-            if(record === null){
-                this.boardDesignRecords.push(mergeItem.boardDesignRecords[index]);
-            }
-            else{
-                if(record.firstSeen>mergeItem.boardDesignRecords[index].firstSeen){
-                    record.firstSeen=mergeItem.lanes[lane].firstSeen;
-                }
-
-                if(record.lastSeen<mergeItem.boardDesignRecords[index].lastSeen){
-                    record.lastSeen=mergeItem.boardDesignRecords[index].lastSeen;
-                }
-            }
-            
-        }
-        this.sortByTime();
+        return this.boardDesignRecords[this.boardDesignRecords.length -1].lastSeen();
     };
 
     boardDesignHistory.getRecordForBoardDesign = function(design){
@@ -382,9 +409,9 @@ function BoardDesignHistory(boardDesignHistoryObject){
     boardDesignHistory.sortByTime = function(){
         var records = this.boardDesignRecords;
         function compare(a,b) {
-          if (a.firstSeen < b.firstSeen)
+          if (a.firstSeen < b.firstSeen())
              return -1;
-          if (a.firstSeen > b.firstSeen)
+          if (a.firstSeen > b.firstSeen())
             return 1;
           return 0;
         }
@@ -401,10 +428,15 @@ function BoardDesignRecord(boardDesign, milliseconds){
     if(!milliseconds){
         boardDesignRecord = boardDesign;
     }else{
-        boardDesignRecord.firstSeen = milliseconds;
-        boardDesignRecord.lastSeen =  milliseconds;
+        boardDesignRecord.seen =[];
+        boardDesignRecord.seen.push(milliseconds);
         boardDesignRecord.design = boardDesign;
     }
+
+    boardDesignRecord.firstSeen = function(){return boardDesignRecord.seen[0];};
+    boardDesignRecord.lastSeen =  function(){
+        return boardDesignRecord.seen[boardDesignRecord.seen.length-1];
+    };
     
     boardDesignRecord.equals = function(boardDesign){
         console.log("this.design = " + jsonEncode(this.design));
@@ -413,13 +445,8 @@ function BoardDesignRecord(boardDesign, milliseconds){
     };
 
     boardDesignRecord.designSeenAt= function(milliseconds){
-        if (this.lastSeen<milliseconds){
-            this.lastSeen = milliseconds;
-        }
-
-        if (this.firstSeen>milliseconds){
-            this.firstSeen = milliseconds;
-        }
+        boardDesignRecord.seen.push(milliseconds);
+        boardDesignRecord.seen.sort();
     };
 
     boardDesignRecord.getBoardDesignForSnapshot = function(){

@@ -3,10 +3,9 @@ describe("BoardData", function() {
   var boardDesign;
   var snapshot;
 
-  beforeEach(function() {
-    boardData = new BoardData({});
-    snapshot = {
-        "milliseconds": 1411583924163,
+  function testSnapshot(milliseconds){
+    return {
+        "milliseconds": milliseconds,
         "board": "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection",
         "genericItemUrl" : "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=",
         "lanes": [
@@ -54,6 +53,11 @@ describe("BoardData", function() {
           }
         ]
       };
+  }
+
+  beforeEach(function() {
+    boardData = new BoardData({});
+    snapshot =  testSnapshot(10000000);
 
       boardDesign = [
           {
@@ -96,8 +100,8 @@ describe("BoardData", function() {
     snapshot.milliseconds = snapshot.milliseconds + 10;
     boardData.addSnapshot(snapshot);
     var boardDesign = boardData.boardDesignHistory.boardDesignRecords[0];
-    expect(boardDesign.firstSeen).toEqual(snapshot.milliseconds-10);
-    expect(boardDesign.lastSeen).toEqual(snapshot.milliseconds);
+    expect(boardDesign.firstSeen()).toEqual(snapshot.milliseconds-10);
+    expect(boardDesign.lastSeen()).toEqual(snapshot.milliseconds);
   });
 
   it("should contain new Board Design", function() {
@@ -149,6 +153,13 @@ describe("BoardData", function() {
     expect(lane.enterMilliseconds).toEqual(snapshot.milliseconds);
     expect(lane.exitMilliseconds).toEqual(snapshot.milliseconds+10);
   });
+
+  it("should create snapshots from boardData", function() {
+    boardData.addSnapshot(snapshot);
+    boardData.addSnapshot(testSnapshot(snapshot.milliseconds+10));
+    expect(jsonEncode(boardData.getSnapshot(snapshot.milliseconds))).toEqual(jsonEncode(snapshot));
+  });
+
 
 
 

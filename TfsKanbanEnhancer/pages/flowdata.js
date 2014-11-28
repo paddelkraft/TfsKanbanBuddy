@@ -84,8 +84,6 @@
 
 
 	function buildSnapshot(boardData){
-		var snapshotDiv = document.createElement("div");
-		var laneDiv;
 		var laneIndex;
 		var snapshot = boardData.getLatestSnapshot();//snapshots[snapshots.length-1];
 		var flowData = boardData.flowData;
@@ -97,7 +95,6 @@
 	}
 
 	function buildSnapshotForColumn(snapshot, flowData,laneIndex){
-		var laneDiv =document.createElement("div");
 		var lane = snapshot.lanes[laneIndex];
 		var ticket;
 		var i;

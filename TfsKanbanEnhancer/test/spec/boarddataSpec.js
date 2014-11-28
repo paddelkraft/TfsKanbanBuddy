@@ -130,11 +130,11 @@ describe("BoardData", function() {
   it("boardDesign with earlier firstSeen should be first", function() {
     boardData.addSnapshot(snapshot);
     var mergeData = new BoardData();
-    snapshot.milliseconds = snapshot.milliseconds - 10;
+    snapshot = testSnapshot(snapshot.milliseconds - 10);
     snapshot.lanes[0].name = "Att Göra";
     boardDesign[0].name = "Att Göra";
     mergeData.addSnapshot(snapshot);
-    boardData.merge(mergeData);
+    boardData = mergeBoardData(boardData,mergeData);
     console.log(jsonEncode(boardData));
     var mergedBoardDesign = boardData.boardDesignHistory.boardDesignRecords[0].getBoardDesignForSnapshot();
     expect(mergedBoardDesign).toEqual(boardDesign);
@@ -143,26 +143,30 @@ describe("BoardData", function() {
   it("flow Data ticket should have correct enter and exit time after merge", function() {
     boardData.addSnapshot(snapshot);
     var mergeData = new BoardData();
-    snapshot.milliseconds = snapshot.milliseconds - 10;
+    snapshot = testSnapshot(snapshot.milliseconds -10);
     snapshot.lanes[0].name = "Att Göra";
     boardDesign[0].name = "Att Göra";
     mergeData.addSnapshot(snapshot);
-    boardData.merge(mergeData);
+    boardData = mergeBoardData(boardData,mergeData);
     var ticket = boardData.flowData["3"];
     var lane = ticket.lanes["Dev DONE"];
     expect(lane.enterMilliseconds).toEqual(snapshot.milliseconds);
     expect(lane.exitMilliseconds).toEqual(snapshot.milliseconds+10);
   });
 
-  it("should create snapshots from boardData", function() {
+  it("should create first snapshot from boardData", function() {
     boardData.addSnapshot(snapshot);
     boardData.addSnapshot(testSnapshot(snapshot.milliseconds+10));
     expect(jsonEncode(boardData.getSnapshot(snapshot.milliseconds))).toEqual(jsonEncode(snapshot));
   });
 
-
-
-
+  it("should return all added snapshots from boardData", function() {
+    var snapshot2;
+    boardData.addSnapshot(snapshot);
+    snapshot2 = testSnapshot(snapshot.milliseconds+10);
+    boardData.addSnapshot(snapshot2);
+    expect(jsonEncode(boardData.getSnapshots())).toEqual(jsonEncode([snapshot,snapshot2]));
+  });
 });
 
  

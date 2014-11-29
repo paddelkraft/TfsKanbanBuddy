@@ -87,6 +87,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             key = "snapshots_" + snapshot.board;
             var boardData = new BoardData( getObjectFromStorage(key));
             boardData.addSnapshot(snapshot);
+            console.log(boardData.genericItemUrl);
             saveObjectToStorage(key, boardData);
             sendResponse("Saved");
             console.log("snapshot stored with key " + key);

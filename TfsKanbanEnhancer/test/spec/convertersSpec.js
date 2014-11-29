@@ -100,6 +100,12 @@ describe("Converters", function() {
 	  expect(newSettingsPageColorMap).toEqual(_newSettingsPageColorMap);
   });
 
+  it("should convert 2 dimensional json array to csv", function() {
+    var grid = [[1,2],[3,4]];
+    var csv = jsonGridToCSV(grid);
+    console.log(csv);
+    expect(csv).toEqual('"1","2"\r\n"3","4"');
+  });
 });
 
  

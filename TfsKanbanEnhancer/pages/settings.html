@@ -27,14 +27,7 @@
 		<li ng-class="{active:tab===4}"> 
 			<a href ng-click="tab = 4">Import/Export Settings</a> 
 		</li>
-		<!--li ng-class="{active:tab===5}"> 
-			<a href ng-click="tab = 5">Import from URL</a> 
-		</li-->
 		<br><br><br>
-		<!--p ng-show="tab === 1"> I eat chocolates, alive! </p>
-		<p ng-show="tab === 2"> I drink pulpy orange juice, mango milk shake... </p>
-		<p ng-show="tab === 3"> yeah, I sleep at weekend. I am human... :D</p>
-	</ul-->		
 
 	
 	<div ng-show="tab === 1" id="kanbanboardsettings" class="settingssection">
@@ -45,9 +38,9 @@
 				<div class="column">
 					<input class="color-input" type="text" maxlength="255" ng-model="maping.prefix" ng-disabled="automaticImport">
 				</div>
-				<div class="column">
+				<!--div class="column">
 					<input class="color-input" type="text" maxlength="255" ng-model="maping.prefix" ng-disabled="automaticImport">
-				</div>
+				</div-->
 			</div>
 			<br>
 			<div class="footer">TFS Kanban Buddy - Written by Magnus Siverbrant and Tom M&aringrdh</div>
@@ -67,9 +60,9 @@
 				<div class="column">
 					<input class="color-input" type="text" maxlength="255" ng-model="tbMaping.prefix" ng-disabled="automaticImport">
 				</div>
-				<div class="column">
+				<!--div class="column">
 					<input class="color-input" type="text" maxlength="255" ng-model="tbMaping.prefix" ng-disabled="automaticImport">
-				</div>
+				</div-->
 			</div>
 			<br>
 			<div class="footer">TFS Kanban Buddy - Written by Magnus Siverbrant and Tom M&aringrdh</div>
@@ -106,23 +99,17 @@
 	</div>
    
     <div ng-show="tab === 4" id="exportsettings" class="settingssection">
-    	<div class="header">Import/Export Settings to File</div>
+    	<div class="header">Import/Export Settings to/from File</div>
 		<br>
 		<div class="row">
 			Import settings from file
     		<input type="file" id="importSettings" name="files[]" ng-disabled="automaticImport"/>
 		</div>
-		<!--div class="row">
-			<button id="importSettings" ng-click="importSettingsFromJson()">Import Settings</button>
-		</div-->		
 		<br>
 		<div class="row">
 			<button id="exportSettings" ng-click="exportSettingsAsJson()">Export Settings</button>
 		</div>
 		<br>
-		<!--/div>
-	
-    <div ng-show="tab === 5" id="importurlsettings" class="settingssection"-->
     	<div class="header">Import settings from url</div>
      	<br>
 		<div class="row">

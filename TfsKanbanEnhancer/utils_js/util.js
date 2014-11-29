@@ -90,7 +90,7 @@
     }
 
     function downloadAsCSV(data, filePrefix){
-        var blob = new Blob([data], {type: "data:application/csv;charset=utf-8"});
+        var blob = new Blob([jsonGridToCSV(data)], {type: "data:application/csv;charset=utf-8"});
         saveAs(blob, filePrefix + timestamp()+".csv");
     }
 
@@ -100,15 +100,22 @@
       var j;
       var csv = "";
       var row = "";
+      var value = "";
       for (i =0; i < grid.length; i++) {
         row = "";
         for (j=0;  j<grid[i].length ; j++) {
-            row = row +'"'+grid[i][j]+((grid[i].length-1 === j)?'"':'",');
+            value = grid[i][j]
+            if(value=== undefined){
+                value = "";
+            }
+            row = row +'"'+value+((grid[i].length-1 === j)?'"':'",');
         }
         csv = csv+row+((grid[i].length-1 === i)?'':'\r\n');
       }
       return csv;
     }
+
+
 
     
 

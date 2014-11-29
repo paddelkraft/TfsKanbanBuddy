@@ -1,6 +1,4 @@
-	
-
-	function FlowDataGrid(flowData , lanes){
+function FlowDataGrid(flowData , lanes){
 		//internal helper functions
 		function flowDataLaneNamesHeader(lanes){
 			var columnIndexes = getLaneIndexes(lanes);
@@ -50,7 +48,9 @@
 			
 			for (var id in flowData){
 				flowTicket = flowData[id];
-				grid.push(flowDataRow(flowTicket,columnIndexes,lanes));
+				if(typeof flowTicket !== "function"){
+					grid.push(flowDataRow(flowTicket,columnIndexes,lanes));
+				}
 			}
 			return grid;
 		}

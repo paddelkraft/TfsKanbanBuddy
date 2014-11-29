@@ -218,6 +218,16 @@ var app = angular.module("flowData", []);
 				downloadAsJson(boardData,"boardSnapshot");
 			};
 
+			$scope.deleteDataAction = function(){
+				var answer = window.confirm("You are about to delete all flow data collected for "+ $scope.board + " this data is not recoverable");
+				if(answer){
+					chrome.runtime.sendMessage({type : "delete-flow-data",
+												board : $scope.board}
+											  );
+					location.reload();
+				}
+			};
+
 			$scope.snapshotAction();
 			$scope.$apply();
 			
@@ -225,4 +235,5 @@ var app = angular.module("flowData", []);
 
 	} 
   	fetchFlowData();
+
  });

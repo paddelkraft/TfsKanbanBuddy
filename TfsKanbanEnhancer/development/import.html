@@ -1,0 +1,32 @@
+<html>
+<head>
+    <title>TFS Kanban Buddy settings</title>
+    <script type="text/javascript" src="../utils_js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="../utils_js/filesaver.js"></script>
+
+    <script type="text/javascript" src="../utils_js/util.js"></script>
+     <script type="text/javascript" src="../utils_js/boarddata.js"></script>
+    <script type="text/javascript" src="../utils_js/converters.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="format.css"> 
+
+</head>
+<body>
+<div id="colorMapping" style="width:500px">
+  
+
+  
+  
+  <div ng-app="settings" ng-controller="importController" id="links" style="width:500px" >
+    <div class="row500">
+      <hr>
+      Import data from file (BETA)
+      <input type="file" id="importSettings" name="files[]" />
+    </div>
+  </div>
+</div>
+<script type="text/javascript" src="../utils_js/angular.min.js"></script>
+    <script type="text/javascript" src="import.js"></script>
+
+</body>
+</html>

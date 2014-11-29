@@ -338,6 +338,7 @@ function FlowData(flowData, genericItemUrl){
 function mergeBoardData(boardData,mergeData){
     var boardSnapshots = boardData.getSnapshots();
     var snapshotIndex;
+    
     boardSnapshots = boardSnapshots.concat(mergeData.getSnapshots());
     function compare(a,b) {
           return  a.milliseconds - b.milliseconds;

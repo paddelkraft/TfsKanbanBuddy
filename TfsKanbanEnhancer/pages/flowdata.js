@@ -1,5 +1,3 @@
-	
-
 	function FlowDataGrid(flowData , lanes){
 		//internal helper functions
 		function flowDataLaneNamesHeader(lanes){

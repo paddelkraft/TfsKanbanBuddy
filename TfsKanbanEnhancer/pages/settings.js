@@ -1,4 +1,4 @@
- var app = angular.module("settings", []);
+var app = angular.module("settings", []);
 
     app.controller("settingsController", function($scope){
         

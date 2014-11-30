@@ -1,4 +1,4 @@
-	function FlowDataGrid(flowData , lanes){
+function FlowDataGrid(flowData , lanes){
 		//internal helper functions
 		function flowDataLaneNamesHeader(lanes){
 			var columnIndexes = getLaneIndexes(lanes);
@@ -48,7 +48,9 @@
 			
 			for (var id in flowData){
 				flowTicket = flowData[id];
-				grid.push(flowDataRow(flowTicket,columnIndexes,lanes));
+				if(typeof flowTicket !== "function"){
+					grid.push(flowDataRow(flowTicket,columnIndexes,lanes));
+				}
 			}
 			return grid;
 		}
@@ -82,8 +84,6 @@
 
 
 	function buildSnapshot(boardData){
-		var snapshotDiv = document.createElement("div");
-		var laneDiv;
 		var laneIndex;
 		var snapshot = boardData.getLatestSnapshot();//snapshots[snapshots.length-1];
 		var flowData = boardData.flowData;
@@ -95,7 +95,6 @@
 	}
 
 	function buildSnapshotForColumn(snapshot, flowData,laneIndex){
-		var laneDiv =document.createElement("div");
 		var lane = snapshot.lanes[laneIndex];
 		var ticket;
 		var i;
@@ -219,6 +218,16 @@ var app = angular.module("flowData", []);
 				downloadAsJson(boardData,"boardSnapshot");
 			};
 
+			$scope.deleteDataAction = function(){
+				var answer = window.confirm("You are about to delete all flow data collected for "+ $scope.board + " this data is not recoverable");
+				if(answer){
+					chrome.runtime.sendMessage({type : "delete-flow-data",
+												board : $scope.board}
+											  );
+					location.reload();
+				}
+			};
+
 			$scope.snapshotAction();
 			$scope.$apply();
 			
@@ -226,4 +235,5 @@ var app = angular.module("flowData", []);
 
 	} 
   	fetchFlowData();
+
  });

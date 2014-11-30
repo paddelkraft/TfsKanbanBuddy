@@ -1,6 +1,6 @@
- var app = angular.module("settings", []);
+ var app = angular.module("import", []);
 
-    app.controller("settingsController", function($scope){
+    app.controller("importController", function($scope){
         
         
         function handleFileSelect(evt) {
@@ -8,6 +8,7 @@
             function importData(boardData){
                   boardData = new BoardData(boardData);
                   chrome.runtime.sendMessage({"type": "set-board-data","boardData": boardData}, function(response) {
+                  alert("import done")
                   console.log(response);
                   location.reload();
                 });
@@ -29,7 +30,7 @@
             }
         }
 
-        $('#importSettings').change(handleFileSelect);
+        $('#importData').change(handleFileSelect);
 
         
     });

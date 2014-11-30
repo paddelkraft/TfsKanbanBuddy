@@ -101,7 +101,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
                 key = "snapshots_" + boardData.board;
                 saveObjectToStorage(key, boardData);
                 sendResponse("Saved");
-                console.log("snapshot stored with key " + key);
+                console.log("Imported Boarddata saved with key " + key);
                 //console.log(getStringFromStorage(key));
             }
             setBoardData(request.boardData);

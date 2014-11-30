@@ -6,7 +6,7 @@ function BoardData(data){
     if(!data){
         data = {};
     }
-    this.ver="0.4.0";
+    this.ver="0.4.5";
     this.board = (data.board)?data.board:null;
     this.storageKey = "snapshots_" + this.board;
     this.genericItemUrl = (data.genericItemUrl)? data.genericItemUrl:"";

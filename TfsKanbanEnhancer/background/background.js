@@ -93,7 +93,20 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             console.log("snapshot stored with key " + key);
             //console.log(getStringFromStorage(key));
             break;
-        
+        case "set-board-data"://Incoming data from kanban board
+            
+            function setBoardData(boardData){
+                var snapshot = request.snapshot;
+                console.log(jsonEncode(request.snapshot));
+                key = "snapshots_" + boardData.board;
+                saveObjectToStorage(key, boardData);
+                sendResponse("Saved");
+                console.log("Imported Boarddata saved with key " + key);
+                //console.log(getStringFromStorage(key));
+            }
+            setBoardData(request.boardData);
+            break;
+
         case "show-flow-data"://board triggering flowData page opening
             console.log("flowdata for"  + request.board + " requested");
             var newURL = "pages/flowData.html?"+encodeURIComponent(request.board);

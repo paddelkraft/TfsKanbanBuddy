@@ -6,7 +6,6 @@
 <script type="text/javascript" src="../utils_js/util.js"></script>
 <script type="text/javascript" src="../utils_js/boarddata.js"></script>
 
-<link rel="stylesheet" media="screen" href="jquery.handsontable.full.css">
 <link rel="stylesheet" media="screen" href="samples.css">
 <link rel="stylesheet" media="screen" href="presentationTable.css">
 
@@ -19,7 +18,7 @@
       <button ng-click="exportAsCsv()"id="csv">Download report as Csv</button>
       <button ng-click="exportAsJson()" id="json">Download report as JSON</button>
       <button ng-click="exportRawData()"id="rawDataJson">Download all data as JSON</button>
-      <button id="delete">Delete all data</button>
+      <button ng-click="deleteDataAction()"id="delete">Delete all data</button>
       <div id="dataSize">{{dataSize}}</div>
       <div id="board">Data collected from {{board}}</div>
 

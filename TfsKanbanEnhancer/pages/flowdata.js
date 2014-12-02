@@ -160,6 +160,25 @@ var app = angular.module("flowData", []);
 			var boardData = new BoardData(response);
 			var lanes = boardData.getLaneHeaders();
 			$scope.snapshot = buildSnapshot(boardData);
+			$scope.snapshotAction = function (){
+				
+				
+					
+					$scope.exportAsJson = function(){
+						downloadAsJson($scope.snapshot,"boardSnapshot");
+					};
+					$scope.exportAsCsv = function(){
+						alert("snapshot can not be exported as csv yet");
+					};
+					
+					$scope.showSnapshot = true;
+					$scope.showFlowDataGrid = false;
+					$scope.showFlowReport = false;
+					//$scope.$apply();	
+			};
+			$scope.snapshotAction();
+			$scope.$apply();
+			
 			$scope.flowReport = buildFlowReport(boardData.flowData);
 			$scope.flowReport.shift();
 			$scope.flowDataGrid = new FlowDataGrid(boardData.flowData , boardData.getLaneHeaders());
@@ -184,10 +203,12 @@ var app = angular.module("flowData", []);
 			$scope.flowDataGridAction = function (){
 					
 						$scope.exportAsJson = function(){
-						downloadAsJson(new FlowDataGrid(boardData.flowData, boardData.getLaneHeaders()),"flowDataGrid")
+						//downloadAsJson(new FlowDataGrid(boardData.flowData, boardData.getLaneHeaders()),"flowDataGrid");
+						downloadAsJson($scope.flowdataGrid,"flowDataGrid");
 					};
 					$scope.exportAsCsv = function(){
-						downloadAsCSV(new FlowDataGrid(boardData.flowData, boardData.getLaneHeaders()),"flowDataGrid")
+						//downloadAsCSV(new FlowDataGrid(boardData.flowData, boardData.getLaneHeaders()),"flowDataGrid");
+						downloadAsCSV($scope.flowdataGrid,"flowDataGrid");
 					};
 					
 					
@@ -197,23 +218,7 @@ var app = angular.module("flowData", []);
 					//$scope.$apply();
 			};
 
-			$scope.snapshotAction = function (){
-				
-				
-					
-					$scope.exportAsJson = function(){
-						downloadAsJson($scope.snapshot,"boardSnapshot");
-					};
-					$scope.exportAsCsv = function(){
-						alert("snapshot can not be exported as csv yet");
-					};
-					
-					$scope.showSnapshot = true;
-					$scope.showFlowDataGrid = false;
-					$scope.showFlowReport = false;
-					//$scope.$apply();	
-			};
-
+			
 			$scope.exportRawData = function (){
 				downloadAsJson(boardData,"boardSnapshot");
 			};
@@ -228,8 +233,8 @@ var app = angular.module("flowData", []);
 				}
 			};
 
-			$scope.snapshotAction();
-			$scope.$apply();
+			//$scope.snapshotAction();
+			//$scope.$apply();
 			
 		});
 

@@ -216,36 +216,7 @@ function BoardData(data){
 
 function FlowData(flowData, genericItemUrl){
     
-    function flowItemConstructor(flowItemData, genericItemUrl){
-        var flowItem = flowItemData;
-        flowItem.url = function(){
-            return genericItemUrl + this.id;
-        };
-        for(var laneIndex in flowItem.lanes){
-            flowItem.lanes[laneIndex].enter = readableTime(flowItem.lanes[laneIndex].enterMilliseconds);
-            flowItem.lanes[laneIndex].exit = readableTime(flowItem.lanes[laneIndex].exitMilliseconds);
-            
-        }
-
-        flowItem.merge = function(mergeItem){
-            for(var lane in mergeItem.lanes){
-                if(!this.lanes[lane]){
-                    this.lanes[lane]= mergeItem.lanes[lane];
-                }else{
-                    if(this.lanes[lane].enterMilliseconds>mergeItem.lanes[lane].enterMilliseconds){
-                        this.lanes[lane].enterMilliseconds=mergeItem.lanes[lane].enterMilliseconds;
-                    }
-
-                    if(this.lanes[lane].exitMilliseconds<mergeItem.lanes[lane].exitMilliseconds){
-                        this.lanes[lane].exitMilliseconds=mergeItem.lanes[lane].exitMilliseconds;
-                    }
-                }
-            }
-        };
-        
-        return flowItem;
-    }
-
+    
     this.getEnterDate = function (id,lane){
         return this[id].lanes[lane].enter;
     };
@@ -268,8 +239,12 @@ function FlowData(flowData, genericItemUrl){
                time<=ticket.lanes[lane].exitMilliseconds){
                 var snapshotTicket = {
                     "id" : ticket.id,
-                    "title" : ticket.title
+                    "title" : ticket.title,
                 };
+                
+                if(ticket.wasBlocked(time)===true){
+                    snapshotTicket.blocked = true;
+                }
                 tickets.push(snapshotTicket);
             }
         }
@@ -297,12 +272,13 @@ function FlowData(flowData, genericItemUrl){
                 var ticket = lane.tickets[i];
                 var flowTicket;
                 if(!this[ticket.id]){
-                    this[ticket.id]= {};
+                    this[ticket.id]= {"id":ticket.id};
                 }
-                flowTicket = flowItemConstructor(this[ticket.id]);
-                flowTicket.title = ticket.title;
-                flowTicket.url = ticket.url;
+                flowTicket = new FlowTicket(this[ticket.id], snapshot.genericItemUrl);
                 flowTicket.id = ticket.id;
+                flowTicket.title = ticket.title;
+                flowTicket.setBlockStatus(ticket,snapshot.milliseconds);
+                this[ticket.id]=flowTicket;
                 if(!flowTicket.lanes){
                     flowTicket.lanes = {};
                 }
@@ -322,17 +298,66 @@ function FlowData(flowData, genericItemUrl){
         
     };
 
-    function readableTime(milliseconds){
-        return function(){
-            return timeFormat(milliseconds);
-        };
-    }
+    
 
     if (flowData){
         for(var index in flowData){
-            this[index] = flowItemConstructor(flowData[index],genericItemUrl);
+            this[index] = new FlowTicket(flowData[index],genericItemUrl);
         }
     }
+}
+
+function FlowTicket(flowItemData, genericItemUrl){
+    this.title = (flowItemData.title)? flowItemData.title : null;
+    this.id = (flowItemData.id)? flowItemData.id : null;
+    this.lanes = (flowItemData.lanes) ? flowItemData.lanes : {};
+    this.isBlocked = (flowItemData.blocked)? flowItemData.blocked : false;
+    this.blockedRecords = (flowItemData.blockedRecords)?flowItemData.blockedRecords:[];
+    
+    for(var laneIndex in this.lanes){
+        this.lanes[laneIndex].enter = readableTime(this.lanes[laneIndex].enterMilliseconds);
+        this.lanes[laneIndex].exit = readableTime(this.lanes[laneIndex].exitMilliseconds);
+    }
+
+    this.url = function(){
+        return genericItemUrl + this.id;
+    };
+
+    this.setBlockStatus = function (snapshotTicket, milliseconds){
+        if(snapshotTicket.blocked){
+            if(!this.blockedRecords){
+                    this.blockedRecords = [];
+                }if(!this.isBlocked){
+                    this.blockedRecords.push({"firstSeen": milliseconds});
+                }
+                this.blockedRecords[this.blockedRecords.length-1]["lastSeen"] = milliseconds;
+        }
+        this.isBlocked = snapshotTicket.blocked;
+    };
+
+    this.getTotalBlockedTime = function (){
+        var totalBlockedTime = 0;
+        var blockIndex ;
+        for(blockIndex in this.blockedRecords){
+            totalBlockedTime += (this.blockedRecords[blockIndex].lastSeen - this.blockedRecords[blockIndex].firstSeen);
+        }
+        return totalBlockedTime;
+    };
+
+    this.wasBlocked = function(milliseconds){
+        var blockIndex ;
+        for(blockIndex in this.blockedRecords){
+            if(this.blockedRecords[blockIndex].lastSeen >= milliseconds && milliseconds>= this.blockedRecords[blockIndex].firstSeen){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    
+
+    
+    return this;
 }
 
 function mergeBoardData(boardData,mergeData){

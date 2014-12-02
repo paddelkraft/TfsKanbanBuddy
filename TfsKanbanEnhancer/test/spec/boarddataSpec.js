@@ -1,9 +1,4 @@
-describe("BoardData", function() {
-  var boardData;
-  var boardDesign;
-  var snapshot;
-
-  function testSnapshot(milliseconds){
+function testSnapshot(milliseconds){
     return {
         "milliseconds": milliseconds,
         "board": "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection",
@@ -27,7 +22,8 @@ describe("BoardData", function() {
             "tickets": [
               {
                 "id": "9",
-                "title": "ticket 1",
+                "title": "BL ticket 1",
+                "blocked": true
               },
             ]
           },
@@ -55,11 +51,8 @@ describe("BoardData", function() {
       };
   }
 
-  beforeEach(function() {
-    boardData = new BoardData({});
-    snapshot =  testSnapshot(10000000);
-
-      boardDesign = [
+  function testBoardDesign(){
+    return [
           {
             "name": "ToDo",
           },
@@ -79,6 +72,19 @@ describe("BoardData", function() {
             "name": "In production",
           }
         ];
+  }
+
+describe("BoardData", function() {
+  var boardData;
+  var boardDesign;
+  var snapshot;
+
+  
+  beforeEach(function() {
+    boardData = new BoardData({});
+    snapshot =  testSnapshot(10000000);
+
+      boardDesign = testBoardDesign();
   });
 
   
@@ -168,5 +174,98 @@ describe("BoardData", function() {
     expect(jsonEncode(boardData.getSnapshots())).toEqual(jsonEncode([snapshot,snapshot2]));
   });
 });
+
+describe("FlowTicket", function() {
+  var testValues ;
+  var i;
+  var blockedSnapshotItem= {"id":"2","title":"testTitle","blocked":true};
+  var snapshotItem = {"id":"2","title":"testTitle","blocked":false};;
+  var flowTicket;
+  
+  function flowticketWithTwoBlockagesA10milliseconds(){
+    flowTicket.setBlockStatus(blockedSnapshotItem,10);
+    flowTicket.setBlockStatus(blockedSnapshotItem,20);
+    flowTicket.setBlockStatus(snapshotItem,30);
+    flowTicket.setBlockStatus(blockedSnapshotItem,40);
+    flowTicket.setBlockStatus(blockedSnapshotItem,50);
+    return flowTicket;
+  }
+
+  beforeEach(function() {
+    flowTicket = new FlowTicket({},"url");
+  });
+
+  
+
+
+
+  it("should curently be blocked", function() {
+    flowTicket.setBlockStatus(blockedSnapshotItem,10);
+    expect(flowTicket.isBlocked).toBe(true);
+    
+  });
+
+  it("should curently not be blocked", function() {
+    flowTicket.setBlockStatus(snapshotItem,10);
+    expect(flowTicket.isBlocked).toBe(false);
+    
+  });
+
+  it("should have correct blockedRecord firstSeen", function() {
+    flowTicket.setBlockStatus(blockedSnapshotItem,10);
+    flowTicket.setBlockStatus(blockedSnapshotItem,20);
+    expect(flowTicket.blockedRecords[0].firstSeen).toBe(10);
+  });
+
+  
+
+  it(" should  have correct blockedRecord lastSeen", function() {
+    flowTicket.setBlockStatus(blockedSnapshotItem,10);
+    flowTicket.setBlockStatus(blockedSnapshotItem,20);
+    expect(flowTicket.blockedRecords[0].lastSeen).toBe(20);
+  });
+
+  it("should have blockedRecord with length 2", function() {
+    flowTicket.setBlockStatus(blockedSnapshotItem,10);
+    flowTicket.setBlockStatus(snapshotItem,20);
+    flowTicket.setBlockStatus(blockedSnapshotItem,30);
+    expect(flowTicket.blockedRecords.length).toBe(2);
+  });
+
+
+
+  it("should have correct totalBlocked time", function() {
+    var flowTicket= flowticketWithTwoBlockagesA10milliseconds();
+    expect(flowTicket.getTotalBlockedTime()).toBe(20);
+  });
+
+  testValues = [10,15,20,40,50];
+  for(i in testValues){
+    (function (time){
+      it("should have been blocked for time =" +testValues[i], function() {
+        var flowTicket= flowticketWithTwoBlockagesA10milliseconds();
+        expect(flowTicket.wasBlocked(time)).toBe(true);
+        
+      });
+    })(testValues[i]);
+    
+  }
+
+  testValues = [21,25,29];
+  for(i in testValues){
+    (function (time){
+      it("should not have been blocked for time =" +testValues[i], function() {
+        
+        var flowTicket= flowticketWithTwoBlockagesA10milliseconds();
+        expect(flowTicket.wasBlocked(time)).toBe(false);
+            
+      });
+    })(testValues[i]);
+    
+  }
+
+  
+});
+
 
  

@@ -6,7 +6,7 @@
 
     function onloadSnapshot(){
         var tiles = $(".board-tile");
-        if(tiles.length == 0){
+        if(tiles.length === 0){
             setTimeout(onloadSnapshot,5000);
             return;
         }
@@ -14,11 +14,17 @@
     }
 
     function createTicketObject(element){
-        return{
+        var isBlocked = (element.getAttribute("class").indexOf("blocked")> -1);
+        var ticketObject = {
             id : element.getAttribute("data-item-id"),
             title : element.textContent,
-            //url : genericItemUrl + element.getAttribute("data-item-id")
+            
         };
+        if(isBlocked){
+          ticketObject.blocked = isBlocked;  
+        }
+        
+        return ticketObject;
     }
 
     function appendLiToUlByClass(matchClass, li) {
@@ -58,8 +64,8 @@
         message.type = "save-snapshot";
         message.snapshot = getBoardSnapshot();
         chrome.runtime.sendMessage(message, function(response){
-            if(giveFeedback!=false){
-                alert(response);    
+            if(giveFeedback!==false){
+                alert(response);
             }
             
         });
@@ -89,7 +95,7 @@
         var columns = columnContainer.getElementsByClassName("member-content");
         snapshot.lanes = [];
         for (i in headers) {
-            if(headers[i].textContent != undefined){
+            if(headers[i].textContent !== undefined){
                 var lane ={};
                 snapshot.lanes.push(lane);
                 lane.name =  headers[i].getAttribute("title");
@@ -106,11 +112,11 @@
                     lane.wip.limit = (limit==="")?"0":limit ;
                 }
                 var tickets = columns[i].getElementsByClassName("board-tile");
-                lane.tickets = []
+                lane.tickets = [];
                 var j;
                 for (j in tickets){
                     var ticket={};
-                    if (tickets[j].textContent != undefined){
+                    if (tickets[j].textContent !== undefined){
                         lane.tickets.push(createTicketObject(tickets[j]));
                         
                     }

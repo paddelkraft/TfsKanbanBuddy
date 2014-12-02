@@ -27,6 +27,12 @@
         return jsonDecode(jsonEncode(obj));
     }
 
+    function readableTime(milliseconds){
+        return function(){
+            return timeFormat(milliseconds);
+        };
+    }
+    
     function daysSince(date){
         var day = 86400000 //24*60*60*1000=86400000
         var now = new Date();

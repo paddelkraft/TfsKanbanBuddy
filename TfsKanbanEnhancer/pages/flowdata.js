@@ -160,6 +160,8 @@ var app = angular.module("flowData", []);
 			var boardData = new BoardData(response);
 			var lanes = boardData.getLaneHeaders();
 			$scope.snapshot = buildSnapshot(boardData);
+			$scope.dataSize = "Data size = " +parseInt( boardData.size()/1024) +"KB";
+			$scope.board = boardData.board;
 			$scope.snapshotAction = function (){
 				
 				
@@ -177,48 +179,6 @@ var app = angular.module("flowData", []);
 					//$scope.$apply();	
 			};
 			$scope.snapshotAction();
-			$scope.$apply();
-			
-			$scope.flowReport = buildFlowReport(boardData.flowData);
-			$scope.flowReport.shift();
-			$scope.flowDataGrid = new FlowDataGrid(boardData.flowData , boardData.getLaneHeaders());
-			$scope.dataSize = "Data size = " +parseInt( boardData.size()/1024) +"KB";
-			$scope.board = boardData.board;
-			$scope.flowReportAction = function (){
-				
-					$scope.exportAsJson = function(){
-						downloadAsJson(buildFlowReport(boardData.flowData),"flowReport")
-					};
-					$scope.exportAsCsv = function(){
-						downloadAsCSV(buildFlowReport(boardData.flowData),"flowReport")
-					};
-					
-					
-					$scope.showSnapshot = false;
-					$scope.showFlowDataGrid = false;
-					$scope.showFlowReport = true;
-					//$scope.$apply();
-			};
-
-			$scope.flowDataGridAction = function (){
-					
-						$scope.exportAsJson = function(){
-						//downloadAsJson(new FlowDataGrid(boardData.flowData, boardData.getLaneHeaders()),"flowDataGrid");
-						downloadAsJson($scope.flowdataGrid,"flowDataGrid");
-					};
-					$scope.exportAsCsv = function(){
-						//downloadAsCSV(new FlowDataGrid(boardData.flowData, boardData.getLaneHeaders()),"flowDataGrid");
-						downloadAsCSV($scope.flowdataGrid,"flowDataGrid");
-					};
-					
-					
-					$scope.showSnapshot = false;
-					$scope.showFlowDataGrid = true;
-					$scope.showFlowReport = false;
-					//$scope.$apply();
-			};
-
-			
 			$scope.exportRawData = function (){
 				downloadAsJson(boardData,"boardSnapshot");
 			};
@@ -233,8 +193,57 @@ var app = angular.module("flowData", []);
 				}
 			};
 
-			//$scope.snapshotAction();
-			//$scope.$apply();
+			$scope.$apply();
+			function loadFlowReportData(){
+				$scope.flowReport = buildFlowReport(boardData.flowData);
+				$scope.flowReport.shift();
+				
+				
+				$scope.flowReportAction = function (){
+					
+						$scope.exportAsJson = function(){
+							downloadAsJson(buildFlowReport(boardData.flowData),"flowReport")
+						};
+						$scope.exportAsCsv = function(){
+							downloadAsCSV(buildFlowReport(boardData.flowData),"flowReport")
+						};
+						
+						
+						$scope.showSnapshot = false;
+						$scope.showFlowDataGrid = false;
+						$scope.showFlowReport = true;
+						//$scope.$apply();
+				};
+				$scope.$apply();
+			}
+
+			function loadFlowDataGridData(){
+				$scope.flowDataGrid = new FlowDataGrid(boardData.flowData , boardData.getLaneHeaders());
+				$scope.flowDataGridAction = function (){
+						
+							$scope.exportAsJson = function(){
+							//downloadAsJson(new FlowDataGrid(boardData.flowData, boardData.getLaneHeaders()),"flowDataGrid");
+							downloadAsJson($scope.flowdataGrid,"flowDataGrid");
+						};
+						$scope.exportAsCsv = function(){
+							//downloadAsCSV(new FlowDataGrid(boardData.flowData, boardData.getLaneHeaders()),"flowDataGrid");
+							downloadAsCSV($scope.flowdataGrid,"flowDataGrid");
+						};
+						
+						
+						$scope.showSnapshot = false;
+						$scope.showFlowDataGrid = true;
+						$scope.showFlowReport = false;
+						//$scope.$apply();
+				};
+
+				
+				
+				
+				$scope.$apply();
+			} 
+			setTimeout(loadFlowDataGridData,500);
+			setTimeout(loadFlowReportData,1500);	
 			
 		});
 

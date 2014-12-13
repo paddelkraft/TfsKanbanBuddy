@@ -225,11 +225,7 @@ function FlowData(flowData, genericItemUrl){
         return this[id].lanes[lane].enterMilliseconds;
     };
 
-    this.getEnterBoardMilliseconds = function (id,lane){
-        //TODO New implementation, current implementation in flowdata
-        return this[id].lanes[lane].enterMilliseconds;
-    };
-
+    
     this.getTicketsInLane = function (lane, time){
         var tickets = [];
         for(var id in this){
@@ -261,6 +257,7 @@ function FlowData(flowData, genericItemUrl){
         }
     };
 
+    
      this.addSnapshot = function (snapshot){
         log("add snapdhot " + snapshot.time);
         var index, laneIndex ;
@@ -285,12 +282,12 @@ function FlowData(flowData, genericItemUrl){
                 if(!flowTicket.lanes[lane.name]){
                     flowTicket.lanes[lane.name]={};
                     flowTicket.lanes[lane.name].enterMilliseconds = snapshot.milliseconds;
-                    flowTicket.lanes[lane.name].enter = readableTime(flowTicket.lanes[lane.name].enterMilliseconds);
+                    flowTicket.lanes[lane.name].enter = timeUtil.readableTime(flowTicket.lanes[lane.name].enterMilliseconds);
                     
                 }
 
                 flowTicket.lanes[lane.name].exitMilliseconds = snapshot.milliseconds;
-                flowTicket.lanes[lane.name].exit = readableTime(flowTicket.lanes[lane.name].exitMilliseconds);
+                flowTicket.lanes[lane.name].exit = timeUtil.readableTime(flowTicket.lanes[lane.name].exitMilliseconds);
                 
 
             }
@@ -315,13 +312,28 @@ function FlowTicket(flowItemData, genericItemUrl){
     this.blockedRecords = (flowItemData.blockedRecords)?flowItemData.blockedRecords:[];
     
     for(var laneIndex in this.lanes){
-        this.lanes[laneIndex].enter = readableTime(this.lanes[laneIndex].enterMilliseconds);
-        this.lanes[laneIndex].exit = readableTime(this.lanes[laneIndex].exitMilliseconds);
+        this.lanes[laneIndex].enter = timeUtil.readableTime(this.lanes[laneIndex].enterMilliseconds);
+        this.lanes[laneIndex].exit = timeUtil.readableTime(this.lanes[laneIndex].exitMilliseconds);
     }
 
     this.url = function(){
         return genericItemUrl + this.id;
     };
+
+    this.enteredBoard = function () {
+        var enterMilliseconds;
+        var laneName;
+        var lane;
+        for(laneName in this.lanes){
+            lane = this.lanes[laneName];
+            if(lane.enterMilliseconds<enterMilliseconds){
+                enterMilliseconds = lane.enterMilliseconds;
+            }
+        }
+        return enterMilliseconds;
+    };
+
+
 
     this.setBlockStatus = function (snapshotTicket, milliseconds){
         if(snapshotTicket.blocked){

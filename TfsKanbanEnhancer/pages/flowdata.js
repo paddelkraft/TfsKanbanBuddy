@@ -202,10 +202,10 @@ var app = angular.module("flowData", []);
 				$scope.flowReportAction = function (){
 					
 						$scope.exportAsJson = function(){
-							downloadAsJson(buildFlowReport(boardData.flowData),"flowReport")
+							downloadAsJson($scope.flowReport,"flowReport")
 						};
 						$scope.exportAsCsv = function(){
-							downloadAsCSV(buildFlowReport(boardData.flowData),"flowReport")
+							downloadAsCSV($scope.flowReport,"flowReport")
 						};
 						
 						
@@ -223,11 +223,11 @@ var app = angular.module("flowData", []);
 						
 							$scope.exportAsJson = function(){
 							//downloadAsJson(new FlowDataGrid(boardData.flowData, boardData.getLaneHeaders()),"flowDataGrid");
-							downloadAsJson($scope.flowdataGrid,"flowDataGrid");
+							downloadAsJson($scope.flowDataGrid,"flowDataGrid");
 						};
 						$scope.exportAsCsv = function(){
 							//downloadAsCSV(new FlowDataGrid(boardData.flowData, boardData.getLaneHeaders()),"flowDataGrid");
-							downloadAsCSV($scope.flowdataGrid,"flowDataGrid");
+							downloadAsCSV($scope.flowDataGrid,"flowDataGrid");
 						};
 						
 						

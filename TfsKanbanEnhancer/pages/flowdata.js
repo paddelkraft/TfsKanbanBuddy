@@ -1,41 +1,50 @@
-function FlowDataGrid(flowData , lanes){
+function FlowDataGrid(boardData){
+	var flowData = boardData.flowData;
+	var lanes = boardData.getLaneHeaders();
+	lanes.push("Blocked");
 	//internal helper functions
 	function flowDataLaneNamesHeader(lanes){
 		var columnIndexes = getLaneIndexes(lanes);
-		var columnsInRow = 2*lanes.length+2;
+		var columnsInRow = lanes.length+2;
 		var row = new Array(columnsInRow);
 		var columnName;
+		row[0] = "TFS Id";
+		row[1] = "Title";
 		for(columnName in columnIndexes){
 			row[columnIndexes[columnName]] = columnName;
 		}
 		return row;
 	}
 
-	function flowDataEnterExitLaneHeader(numberOfLanes){
-		var columnsInRow = 2*numberOfLanes+2;
-		var row = new Array(columnsInRow);
-		var index;
-		row[0] = "TFS Id";
-		row[1] = "Title";
-		for(index =2; index<columnsInRow; index +=2){
-			row[index] = "First";
-			row[index + 1] = "Last";
-		}
-		return row;
-	}
+
 
 	function flowDataRow(flowTicket,columnIndexes,lanes){
-		var row = new Array(lanes.length*2 + 2);
+		var row = new Array(lanes.length+ 2);
 		var laneName;
 		var lane;
+
 		row[0]=  flowTicket.id;
 		row[1] =  flowTicket.title;
 		for(laneName in flowTicket.lanes){
 			lane = flowTicket.lanes[laneName];
-			row[columnIndexes[laneName]] = lane.enter();
-			row[columnIndexes[laneName]+1] = lane.exit();
+			row[columnIndexes[laneName]] = timeUtil.timeFormat(lane.exitMilliseconds-lane.enterMilliseconds);
 		}
+		if(flowTicket.getTotalBlockedTime()){
+			row[columnIndexes["Blocked"]] = timeUtil.timeFormat(flowTicket.getTotalBlockedTime());
+		}/*else{
+			row[columnIndexes["Blocked"]] = "";
+		}*/
+		
 		return row;
+	}
+
+	function getLaneIndexes(lanes){
+		var indexes = {};
+		var lane;
+		for(lane = 0; lane<lanes.length; lane++){
+			indexes[lanes[lane]] = lane +2;
+		}
+		return indexes;
 	}
 
 	//construction
@@ -44,7 +53,6 @@ function FlowDataGrid(flowData , lanes){
 		var grid = [];
 		var flowTicket;
 		grid.push(flowDataLaneNamesHeader(lanes));
-		grid.push(flowDataEnterExitLaneHeader(lanes.length));
 		
 		for (var id in flowData){
 			flowTicket = flowData[id];
@@ -64,16 +72,23 @@ function FlowDataGrid(flowData , lanes){
 
 function buildFlowReport(flowData){
 	var flowReport = [];
-	//Header
+	var laneName;
+	var blockageIndex;
+	var blockage;
+	var lane;
 	var row = ["Id", "Title","url","lane", "first" , "last"];
 	flowReport.push(row);
 	
 	for (var id in flowData){
 		var flowTicket = flowData[id];
 		if(flowTicket.id){
-			for(var laneName in flowTicket.lanes){
-				var lane = flowTicket.lanes[laneName];
+			for(laneName in flowTicket.lanes){
+				lane = flowTicket.lanes[laneName];
 				flowReport.push( [ flowTicket.id, flowTicket.title, flowTicket.url(), laneName, lane.enter(), lane.exit()] );
+			}
+			for(blockageIndex in flowTicket.blockedRecords){
+				blockage = flowTicket.blockedRecords[blockageIndex];
+				flowReport.push([ flowTicket.id, flowTicket.title, flowTicket.url(), "Blocked", timeUtil.timeFormat(blockage.firstSeen), timeUtil.timeFormat(blockage.lastSeen)]);
 			}
 			flowReport.push( ["","","","","",""] );
 		}
@@ -102,26 +117,26 @@ function buildSnapshotForColumn(snapshot, flowData,laneIndex){
 		ticket = lane.tickets[i];
 		ticket.daysInColumn = daysInColumn(flowData,ticket.id,lane.name);
 		ticket.daysOnBoard = daysOnBoard(flowData,ticket.id);
+		ticket.blockedSince = blockedDays(flowData[ticket.id]);
 	}
 }
 
+function blockedDays (ticket) {
+	if(! ticket.blockedSince()){
+		return "";
+	}
+	return timeUtil.highlightTime(timeUtil.daysSince(ticket.blockedSince()));
+}
 
 function daysInColumn (flowData,ticketId,laneName) {
-	return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
+	return timeUtil.highlightTime(timeUtil.daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
 }
 
 function daysOnBoard (flowData,ticketId) {
-	return highlightTime(daysSince(flowData[ticketId].enteredBoard()));
+	return timeUtil.highlightTime(timeUtil.daysSince(flowData[ticketId].enteredBoard()));
 }
 
-function getLaneIndexes(lanes){
-	var indexes = {};
-	var lane;
-	for(lane = 0; lane<lanes.length; lane++){
-		indexes[lanes[lane]] = 2*lane +2;
-	}
-	return indexes;
-}
+
 
 
 //setup();
@@ -195,7 +210,7 @@ var app = angular.module("flowData", []);
 			}
 
 			function loadFlowDataGridData(){
-				$scope.flowDataGrid = new FlowDataGrid(boardData.flowData , boardData.getLaneHeaders());
+				$scope.flowDataGrid = new FlowDataGrid(boardData);
 				$scope.flowDataGridAction = function (){
 						
 							$scope.exportAsJson = function(){

@@ -23,9 +23,15 @@ describe("TimeUtil", function() {
   }
 
 
-  it("readable time should be 2014-12-06 22:22", function() {
-    var readableTime = timeUtil.timeFormat(1417900965183);
-    expect(readableTime).toBe("2014-12-06 22:22");
+  it("readable date should be 2014-12-06 22:22", function() {
+    var readableDate = timeUtil.dateFormat(1417900965183);
+    expect(readableDate).toBe("2014-12-06 22:22");
+    
+  });
+
+  it("readable time should be 1:1:1", function() {
+    var readableDate = timeUtil.timeFormat(timeUtil.MILLISECONDS_DAY+timeUtil.MILLISECONDS_HOUR + 60000);
+    expect(readableDate).toBe("1:01:01");
     
   });
 

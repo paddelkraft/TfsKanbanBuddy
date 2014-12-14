@@ -225,6 +225,7 @@ describe("FlowTicket", function() {
     expect(flowTicket.blockedRecords[0].lastSeen).toBe(20);
   });
 
+
   it("should have blockedRecord with length 2", function() {
     flowTicket.setBlockStatus(blockedSnapshotItem,10);
     flowTicket.setBlockStatus(snapshotItem,20);
@@ -237,6 +238,15 @@ describe("FlowTicket", function() {
   it("should have correct totalBlocked time", function() {
     var flowTicket= flowticketWithTwoBlockagesA10milliseconds();
     expect(flowTicket.getTotalBlockedTime()).toBe(20);
+  });
+
+  it("should be blocked since 40", function() {
+    var flowTicket= flowticketWithTwoBlockagesA10milliseconds();
+    expect(flowTicket.blockedSince()).toBe(40);
+  });
+
+  it("should be blocked since null", function() {
+    expect(flowTicket.blockedSince()).toBe(null);
   });
 
   testValues = [10,15,20,40,50];

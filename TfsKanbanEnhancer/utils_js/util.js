@@ -30,18 +30,19 @@
 
 function TimeUtil(){
     this.MILLISECONDS_DAY = 86400000; //24*60*60*1000=86400000 
-    
+    this.MILLISECONDS_HOUR = this.MILLISECONDS_DAY/24; 
     this.now = function(){
         return new Date();
     };
 
-    this.readableTime = function (milliseconds){
+    this.readableDate = function (milliseconds){
         var that  = this;
         return function(){
-            return that.timeFormat(milliseconds);
+            return that.dateFormat(milliseconds);
         };
     };
     
+
     this.daysSince = function(date){
         return Math.floor((this.now()-date)/this.MILLISECONDS_DAY);
     };
@@ -55,13 +56,24 @@ function TimeUtil(){
         return days;
     };
 
-    this.timeFormat = function ( milliseconds ){
+    this.dateFormat = function ( milliseconds ){
         time = new Date(milliseconds);
-        var formatedTime = "" + time.getFullYear() + "-" + twoDigits(time.getMonth() +1) +
+        var formatedDate = "" + time.getFullYear() + "-" + twoDigits(time.getMonth() +1) +
                                                   "-" + twoDigits(time.getDate()) +
                                                   " " + twoDigits(time.getHours()) +
                                                   ":" + twoDigits(time.getMinutes());
-        return formatedTime;
+        return formatedDate;
+    };
+
+    this.timeFormat = function ( milliseconds ){
+        time = new Date(milliseconds);
+        var days = Math.floor(milliseconds/this.MILLISECONDS_DAY);
+        var hours;
+        var minutes;
+        milliseconds = milliseconds%this.MILLISECONDS_DAY;
+        hours = Math.floor(milliseconds/(this.MILLISECONDS_HOUR));
+        minutes = Math.floor((milliseconds%this.MILLISECONDS_HOUR)/60000);
+        return "" + days + ":" + twoDigits(hours) + ":" + twoDigits(minutes) ;
     };
 
     return this;

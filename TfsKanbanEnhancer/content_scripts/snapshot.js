@@ -21,7 +21,7 @@
             
         };
         if(isBlocked){
-          ticketObject.blocked = isBlocked;  
+          ticketObject.blocked = isBlocked;
         }
         
         return ticketObject;

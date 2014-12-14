@@ -2,6 +2,7 @@
 <head>
 <title>TFS Kanban Buddy Flow data</title>
 <script type="text/javascript" src="../utils_js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="../utils_js/lodash.js"></script>
 <script type="text/javascript" src="../utils_js/filesaver.js"></script>
 <script type="text/javascript" src="../utils_js/util.js"></script>
 <script type="text/javascript" src="../utils_js/boarddata.js"></script>
@@ -28,12 +29,13 @@
           <h3 ng-if="lane.tickets.length===0">Lane is empty</h3>
           <table ng-if="lane.tickets.length!==0" class="presentationTable flowReportTable">
             <tbody>
-              <tr><td>Id</td><td>Title</td><td "width:150px;">Days in lane</td><td "width:150px;">Days on board</td></tr>
+              <tr><td>Id</td><td>Title</td><td "width:150px;">Days in lane</td><td "width:150px;">Days on board</td><td "width:150px;">Days blocked</td></tr>
               <tr ng-repeat="ticket in lane.tickets">
                 <td >{{ ticket.id }}</td>
                 <td ><a href="{{ticket.url()}}">{{ ticket.title }}</a></td>
                 <td class="timestamp">{{ ticket.daysInColumn }}</td>
                 <td class="timestamp">{{ ticket.daysOnBoard }}</td>
+                <td class="timestamp">{{ ticket.blockedSince }}</td>
               </tr>
             </tbody>
           </table>

@@ -1,3 +1,4 @@
+
  function jsonDecode(string) {
         try {
             return JSON.parse(string);
@@ -27,12 +28,52 @@
         return jsonDecode(jsonEncode(obj));
     }
 
-    function daysSince(date){
-        var day = 86400000 //24*60*60*1000=86400000
-        var now = new Date();
-		return Math.floor((now-date)/day);
-	}
+function TimeUtil(){
+    this.MILLISECONDS_DAY = 86400000; //24*60*60*1000=86400000 
+    this.MILLISECONDS_HOUR = this.MILLISECONDS_DAY/24; 
+    this.now = function(){
+        return new Date();
+    };
 
+    this.daysSince = function(date){
+        return Math.floor((this.now()-date)/this.MILLISECONDS_DAY);
+    };
+
+    this.highlightTime = function (days){
+        if(days<2){
+            return "new";
+        } else if(days>14){
+            return days+" (old)";
+        }
+        return days;
+    };
+
+    this.dateFormat = function ( milliseconds ){
+        time = new Date(milliseconds);
+        var formatedDate = "" + time.getFullYear() + "-" + twoDigits(time.getMonth() +1) +
+                                                  "-" + twoDigits(time.getDate()) +
+                                                  " " + twoDigits(time.getHours()) +
+                                                  ":" + twoDigits(time.getMinutes());
+        return formatedDate;
+    };
+
+    this.timeFormat = function ( milliseconds ){
+        time = new Date(milliseconds);
+        var days = Math.floor(milliseconds/this.MILLISECONDS_DAY);
+        var hours;
+        var minutes;
+        milliseconds = milliseconds%this.MILLISECONDS_DAY;
+        hours = Math.floor(milliseconds/(this.MILLISECONDS_HOUR));
+        minutes = Math.floor((milliseconds%this.MILLISECONDS_HOUR)/60000);
+        return "" + days + ":" + twoDigits(hours) + ":" + twoDigits(minutes) ;
+    };
+
+    return this;
+}
+
+timeUtil = new TimeUtil();
+    
+    
     function saveObjectToStorage(key, toSave){
         var content = jsonEncode(toSave);
         localStorage.setItem(key,content);
@@ -40,7 +81,7 @@
 
     function getObjectFromStorage(key){
         var content = localStorage.getItem(key);
-        if(content === "" || content == null){
+        if(content === "" || content === null){
           content = "{}";
         }
         return jsonDecode(content);
@@ -58,30 +99,21 @@
     }
 
 
-    function timeFormat( milliseconds ){
-        time = new Date(milliseconds);      
-        var formatedTime = "" + time.getFullYear() + "-" + twoDigits(time.getMonth() +1) +
-                                                  "-" + twoDigits(time.getDate()) +
-                                                  " " + twoDigits(time.getHours()) +
-                                                  ":" + twoDigits(time.getMinutes());
-        return formatedTime;
+    function arrayOfNulls(length){
+        var self = [];
+        var i;
+        for(i=0;i<length;i++){
+            self[i]=null;
+        }
+
+        return self
     }
 
-    function timestamp( time ){
-        if(!time){
-            time = new Date();
-        }
-        
-        var timeStamp = "" + time.getFullYear() + "-" + twoDigits(time.getMonth() +1) +
-                                                  "-" + twoDigits(time.getDate()) +
-                                                  " " + twoDigits(time.getHours()) +
-                                                  ":" + twoDigits(time.getMinutes());
-        return timeStamp;
-    }
+    
 
     function twoDigits(input){
         var output = "0"+input;
-        return output.substring(output.length -2 ,output.length)
+        return output.substring(output.length -2 ,output.length);
     }
 
     function downloadAsJson(data, filePrefix){
@@ -104,7 +136,7 @@
       for (i =0; i < grid.length; i++) {
         row = "";
         for (j=0;  j<grid[i].length ; j++) {
-            value = grid[i][j]
+            value = grid[i][j];
             if(value=== undefined){
                 value = "";
             }

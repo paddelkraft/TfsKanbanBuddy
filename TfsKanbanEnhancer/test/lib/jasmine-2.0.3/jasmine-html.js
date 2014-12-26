@@ -125,6 +125,7 @@ jasmineRequire.HtmlReporter = function(j$) {
 
         for (var i = 0; i < result.failedExpectations.length; i++) {
           var expectation = result.failedExpectations[i];
+          
           messages.appendChild(createDom('div', {className: 'result-message'}, expectation.message));
           messages.appendChild(createDom('div', {className: 'stack-trace'}, expectation.stack));
         }

@@ -1,150 +1,141 @@
-function FlowDataGrid(flowData , lanes){
-		//internal helper functions
-		function flowDataLaneNamesHeader(lanes){
-			var columnIndexes = getLaneIndexes(lanes);
-			var columnsInRow = 2*lanes.length+2;
-			var row = new Array(columnsInRow);
-			var columnName;
-			for(columnName in columnIndexes){
-				row[columnIndexes[columnName]] = columnName;
-			}
-			return row;
+function FlowDataGrid(boardData){
+	var flowData = boardData.flowData;
+	var lanes = boardData.getLaneHeaders();
+	lanes.push("Blocked");
+	//internal helper functions
+	function flowDataLaneNamesHeader(lanes){
+		var columnIndexes = getLaneIndexes(lanes);
+		var columnsInRow = lanes.length+2;
+		var row = new Array(columnsInRow);
+		var columnName;
+		row[0] = "TFS Id";
+		row[1] = "Title";
+		for(columnName in columnIndexes){
+			row[columnIndexes[columnName]] = columnName;
 		}
-
-		function flowDataEnterExitLaneHeader(numberOfLanes){
-			var columnsInRow = 2*numberOfLanes+2;
-			var row = new Array(columnsInRow);
-			var index;
-			row[0] = "TFS Id";
-			row[1] = "Title";
-			for(index =2; index<columnsInRow; index +=2){
-				row[index] = "First";
-				row[index + 1] = "Last";
-			}
-			return row;
-		}
-
-		function flowDataRow(flowTicket,columnIndexes,lanes){
-			var row = new Array(lanes.length*2 + 2);
-			var laneName;
-			var lane;
-			row[0]=  flowTicket.id;
-			row[1] =  flowTicket.title;
-			for(laneName in flowTicket.lanes){
-				lane = flowTicket.lanes[laneName];
-				row[columnIndexes[laneName]] = lane.enter();
-				row[columnIndexes[laneName]+1] = lane.exit();
-			}
-			return row;
-		}
-
-		//construction
-		function bulidFlowDataGrid(flowData , lanes){
-			var columnIndexes = getLaneIndexes(lanes);
-			var grid = [];
-			var flowTicket;
-			grid.push(flowDataLaneNamesHeader(lanes));
-			grid.push(flowDataEnterExitLaneHeader(lanes.length));
-			
-			for (var id in flowData){
-				flowTicket = flowData[id];
-				if(typeof flowTicket !== "function"){
-					grid.push(flowDataRow(flowTicket,columnIndexes,lanes));
-				}
-			}
-			return grid;
-		}
-		return bulidFlowDataGrid(flowData , lanes);
-		
-	} //flowdataGrid
-
-		
-	
-		
-
-	function buildFlowReport(flowData){
-		var flowReport = [];
-		//Header
-		var row = ["Id", "Title","url","lane", "first" , "last"];
-		flowReport.push(row);
-		
-		for (var id in flowData){
-			var flowTicket = flowData[id];
-			if(flowTicket.id){
-				for(var laneName in flowTicket.lanes){
-					var lane = flowTicket.lanes[laneName];
-					flowReport.push( [ flowTicket.id, flowTicket.title, flowTicket.url(), laneName, lane.enter(), lane.exit()] );
-				}
-				flowReport.push( ["","","","","",""] );
-			}
-		}
-		
-		return flowReport;
+		return row;
 	}
 
 
-	function buildSnapshot(boardData){
-		var laneIndex;
-		var snapshot = boardData.getLatestSnapshot();//snapshots[snapshots.length-1];
-		var flowData = boardData.flowData;
-		
-		for(laneIndex in snapshot.lanes){
-			buildSnapshotForColumn(snapshot,flowData,laneIndex);
-		}
-		return snapshot;
-	}
 
-	function buildSnapshotForColumn(snapshot, flowData,laneIndex){
-		var lane = snapshot.lanes[laneIndex];
-		var ticket;
-		var i;
-		for(i = 0 ; i < lane.tickets.length ; i++ ){
-			ticket = lane.tickets[i];
-			ticket.daysInColumn = daysInColumn(flowData,ticket.id,lane.name);
-			ticket.daysOnBoard = daysOnBoard(flowData,ticket.id);
-		}
-	}
-
-
-    function daysInColumn (flowData,ticketId,laneName) {
-		return highlightTime(daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
-    }
-
-    function daysOnBoard (flowData,ticketId) {
-		return highlightTime(daysSince(getEnterBoardMilliseconds(flowData,ticketId)));
-    }
-	
-	function getEnterBoardMilliseconds (flowData,ticketId) {
-		var enterMilliseconds = new Date();
-		var flowTicket = flowData[ticketId];
+	function flowDataRow(flowTicket,columnIndexes,lanes){
+		var row = arrayOfNulls(lanes.length+ 2);
 		var laneName;
 		var lane;
+
+		row[0]=  flowTicket.id;
+		row[1] =  flowTicket.title;
 		for(laneName in flowTicket.lanes){
 			lane = flowTicket.lanes[laneName];
-			if(lane.enterMilliseconds<enterMilliseconds){
-				enterMilliseconds = lane.enterMilliseconds;
-			}
+			//_.forEach()
+			row[columnIndexes[laneName]] = timeUtil.timeFormat(flowTicket.getTotalTimeInLane(laneName));
+			//row[columnIndexes[laneName]] = timeUtil.timeFormat(lane[0].firstSeen-lane[lane.length-1].lastSeen);
 		}
-		return enterMilliseconds;
+		if(flowTicket.getTotalBlockedTime()){
+			row[columnIndexes["Blocked"]] = timeUtil.timeFormat(flowTicket.getTotalBlockedTime());
+		}
+		
+		return row;
 	}
 
-	function highlightTime(days){
-		if(days<2){
-			return "new";
-		} else if(days>14){
-			return days+" (old)";
-		}
-		return days;
-	}
-	
 	function getLaneIndexes(lanes){
 		var indexes = {};
 		var lane;
 		for(lane = 0; lane<lanes.length; lane++){
-			indexes[lanes[lane]] = 2*lane +2;
+			indexes[lanes[lane]] = lane +2;
 		}
 		return indexes;
 	}
+
+	//construction
+	function bulidFlowDataGrid(flowData , lanes){
+		var columnIndexes = getLaneIndexes(lanes);
+		var grid = [];
+		var flowTicket;
+		grid.push(flowDataLaneNamesHeader(lanes));
+		
+		for (var id in flowData){
+			flowTicket = flowData[id];
+			if(typeof flowTicket !== "function"){
+				grid.push(flowDataRow(flowTicket,columnIndexes,lanes));
+			}
+		}
+		return grid;
+	}
+	return bulidFlowDataGrid(flowData , lanes);
+	
+} //flowdataGrid
+
+
+function buildFlowReport(flowData){
+	var flowReport = [];
+	var laneName;
+	var blockageIndex;
+	var blockage;
+	var lane;
+	var row = ["Id", "Title","url","lane", "first" , "last"];
+	flowReport.push(row);
+	
+	for (var id in flowData){
+		var flowTicket = flowData[id];
+		if(flowTicket.id){
+			for(laneName in flowTicket.lanes){
+				_.forEach(flowTicket.lanes[laneName], function(laneRecord){
+					lane = flowTicket.lanes[laneName];
+					flowReport.push( [ flowTicket.id, flowTicket.title, flowTicket.url(), laneName, laneRecord.enter(), laneRecord.exit()] );
+				});
+			}
+			for(blockageIndex in flowTicket.blockedRecords){
+				blockage = flowTicket.blockedRecords[blockageIndex];
+				flowReport.push([ flowTicket.id, flowTicket.title, flowTicket.url(), "Blocked", timeUtil.dateFormat(blockage.firstSeen), timeUtil.dateFormat(blockage.lastSeen)]);
+			}
+			flowReport.push( ["","","","","",""] );
+		}
+	}
+	
+	return flowReport;
+}
+
+
+function buildSnapshot(boardData){
+	var laneIndex;
+	var snapshot = boardData.getLatestSnapshot();//snapshots[snapshots.length-1];
+	var flowData = boardData.flowData;
+	
+	for(laneIndex in snapshot.lanes){
+		buildSnapshotForColumn(snapshot,flowData,laneIndex);
+	}
+	return snapshot;
+}
+
+function buildSnapshotForColumn(snapshot, flowData,laneIndex){
+	var lane = snapshot.lanes[laneIndex];
+	var ticket;
+	var i;
+	for(i = 0 ; i < lane.tickets.length ; i++ ){
+		ticket = lane.tickets[i];
+		ticket.daysInColumn = daysInColumn(flowData,ticket.id,lane.name);
+		ticket.daysOnBoard = daysOnBoard(flowData,ticket.id);
+		ticket.blockedSince = blockedDays(flowData[ticket.id]);
+	}
+}
+
+function blockedDays (ticket) {
+	if(! ticket.blockedSince()){
+		return "";
+	}
+	return timeUtil.highlightTime(timeUtil.daysSince(ticket.blockedSince()));
+}
+
+function daysInColumn (flowData,ticketId,laneName) {
+	return timeUtil.highlightTime(timeUtil.daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
+}
+
+function daysOnBoard (flowData,ticketId) {
+	return timeUtil.highlightTime(timeUtil.daysSince(flowData[ticketId].enteredBoard()));
+}
+
+
 
 
 //setup();
@@ -218,7 +209,7 @@ var app = angular.module("flowData", []);
 			}
 
 			function loadFlowDataGridData(){
-				$scope.flowDataGrid = new FlowDataGrid(boardData.flowData , boardData.getLaneHeaders());
+				$scope.flowDataGrid = new FlowDataGrid(boardData);
 				$scope.flowDataGridAction = function (){
 						
 							$scope.exportAsJson = function(){

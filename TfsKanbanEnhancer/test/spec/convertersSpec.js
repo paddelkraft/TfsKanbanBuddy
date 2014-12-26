@@ -12,7 +12,9 @@ describe("Converters", function() {
                           {caption : "", url : ""}
                          ];
 
-  var _storageColorMap = {"!":"expediter","*":"blocked","CR":"blue"};
+  var _storageColorMap = {"!":"black","*":"red","CR":"blue"};
+
+  var _storageDescriptionMap = {"!":"expediter","*":"blocked","CR":""};
   
   var _settingsPageColorMap = [{"color" : "expediter" ,   "prefix" : "!" },
                                {"color" : "blocked" ,     "prefix" : "*"},
@@ -81,18 +83,23 @@ describe("Converters", function() {
   });
 
   it("should return empty colorMap with null input", function() {
-    var settingsPageColorMap = convertStorageColorMapToSettingsColorMap(null);
-    expect(settingsPageColorMap).toEqual(_emptySettingsPageColorMap);
+    var settingsPageColorMap = convertStorageColorMapToSettingsColorMap(null,null);
+    expect(settingsPageColorMap).toEqual(_newEmptySettingsPageColorMap);
   });
 
   it("should convert stored color map to view format", function() {
-    var settingsPageColorMap = convertStorageColorMapToSettingsColorMap(_storageColorMap);
-    expect(settingsPageColorMap).toEqual(_settingsPageColorMap);
+    var settingsPageColorMap = convertStorageColorMapToSettingsColorMap(_storageColorMap,_storageDescriptionMap);
+    expect(settingsPageColorMap).toEqual(_newSettingsPageColorMap);
   });
 
-  it("should convert settings color map to storage format", function() {
-    var storageColorMap = convertSettingsColorMapToStorageColorMap(_settingsPageColorMap);
+  it("should convert settings color map to storage color format", function() {
+    var storageColorMap = convertSettingsColorMapToStorageColorMap(_newSettingsPageColorMap);
     expect(storageColorMap).toEqual(_storageColorMap);
+  });
+
+  it("should convert settings color map to storage description format", function() {
+    var storageDescriptionMap = convertSettingsColorMapToStorageDescriptionMap(_newSettingsPageColorMap);
+    expect(storageDescriptionMap).toEqual(_storageDescriptionMap);
   });
   
   it("should convert old seetings page color map to new format", function () {

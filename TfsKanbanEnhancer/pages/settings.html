@@ -38,9 +38,10 @@
 				<div class="column">
 					<input class="color-input" type="text" maxlength="255" ng-model="maping.prefix" ng-disabled="automaticImport">
 				</div>
-				<!--div class="column">
-					<input class="color-input" type="text" maxlength="255" ng-model="maping.prefix" ng-disabled="automaticImport">
-				</div-->
+				<div class="column">
+					<input class="color-input" type="text" maxlength="255" ng-model="maping.description" ng-if="maping.description != 'blocked' && maping.description != 'expediter'" ng-disabled="automaticImport">
+					<div ng-if="maping.description == 'blocked' || maping.description == 'expediter'">{{maping.description}}</div>
+				</div>
 			</div>
 			<br>
 			<div class="footer">TFS Kanban Buddy - Written by Magnus Siverbrant and Tom M&aringrdh</div>
@@ -60,9 +61,10 @@
 				<div class="column">
 					<input class="color-input" type="text" maxlength="255" ng-model="tbMaping.prefix" ng-disabled="automaticImport">
 				</div>
-				<!--div class="column">
-					<input class="color-input" type="text" maxlength="255" ng-model="tbMaping.prefix" ng-disabled="automaticImport">
-				</div-->
+				<div class="column">
+					<input class="color-input" type="text" maxlength="255" ng-model="tbMaping.description" ng-if="tbMaping.description != 'blocked' && tbMaping.description != 'expediter'" ng-disabled="automaticImport">					
+					<div ng-if="tbMaping.description == 'blocked' || tbMaping.description == 'expediter'">{{tbMaping.description}}</div>
+				</div>
 			</div>
 			<br>
 			<div class="footer">TFS Kanban Buddy - Written by Magnus Siverbrant and Tom M&aringrdh</div>

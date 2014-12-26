@@ -1,31 +1,53 @@
 // listening for an event / one-time requests
 // coming from the popup/and content
-var GET_KANBAN_BOARD_MAPPING = "get-color-map";
-  var GET_TASK_BOARD_MAPPING = "get-task-color-map";
-  var SET_KANBAN_BOARD_MAPPING = "set-color-map";
-  var SET_TASK_BOARD_MAPPING = "set-task-color-map";
+var GET_KANBAN_BOARD_COLOR_MAPPING = "get-color-map";
+var GET_TASK_BOARD_COLOR_MAPPING = "get-task-color-map";
+var SET_KANBAN_BOARD_COLOR_MAPPING = "set-color-map";
+var SET_TASK_BOARD_COLOR_MAPPING = "set-task-color-map";
+var GET_KANBAN_BOARD_DESCRIPTION_MAPPING = "get-description-map";
+var GET_TASK_BOARD_DESCRIPTION_MAPPING = "get-task-description-map";
+var SET_KANBAN_BOARD_DESCRIPTION_MAPPING = "set-description-map";
+var SET_TASK_BOARD_DESCRIPTION_MAPPING = "set-task-description-map";
 
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     var data,settings,key;
     switch(request.type) {
-        case SET_KANBAN_BOARD_MAPPING://Color mapping for kanban board 
-            setKanbanBoardColorMap(request.colorMap);
-            sendResponse("Saved " );
-            break;
-        case GET_KANBAN_BOARD_MAPPING:
-            sendResponse(getKanbanBoardColorMap());
-            console.log("color-map sent " + jsonEncode(getKanbanBoardColorMap()));
-            break;
-        
-        case SET_TASK_BOARD_MAPPING://Color mapping for Task (scrum board)
-            setTaskBoardColorMap(request.colorMap);
-            sendResponse("Saved " );
-            break;
-        case GET_TASK_BOARD_MAPPING:
-            sendResponse(getTaskBoardColorMap());
-            console.log("task-color-map sent " + jsonEncode(getTaskBoardColorMap()));
-            break;
-        
+		case SET_KANBAN_BOARD_COLOR_MAPPING://Color mapping for kanban board 
+        	setKanbanBoardColorMap(request.colorMap);
+        	sendResponse("Saved " );
+        	break;
+    	case GET_KANBAN_BOARD_COLOR_MAPPING:
+        	sendResponse(getKanbanBoardColorMap());
+        	console.log("color-map sent " + jsonEncode(getKanbanBoardColorMap()));
+        	break;
+    
+    	case SET_TASK_BOARD_COLOR_MAPPING://Color mapping for Task (scrum board)
+       		setTaskBoardColorMap(request.colorMap);
+        	sendResponse("Saved " );
+        	break;
+    	case GET_TASK_BOARD_COLOR_MAPPING:
+        	sendResponse(getTaskBoardColorMap());
+        	console.log("task-color-map sent " + jsonEncode(getTaskBoardColorMap()));
+        	break;
+    
+    	case SET_KANBAN_BOARD_DESCRIPTION_MAPPING://Color mapping for kanban board 
+        	setKanbanBoardDescriptionMap(request.descriptionMap);
+        	sendResponse("Saved " );
+        	break;
+    	case GET_KANBAN_BOARD_DESCRIPTION_MAPPING:
+       		sendResponse(getKanbanBoardDescriptionMap());
+        	console.log("description-map sent " + jsonEncode(getKanbanBoardDescriptionMap()));
+       		break;
+    
+    	case SET_TASK_BOARD_DESCRIPTION_MAPPING://Color mapping for Task (scrum board)
+        	setTaskBoardDescriptionMap(request.descriptionMap);
+        	sendResponse("Saved " );
+        	break;
+    	case GET_TASK_BOARD_DESCRIPTION_MAPPING:
+        	sendResponse(getTaskBoardDescriptionMap());
+        	console.log("description-color-map sent " + jsonEncode(getTaskBoardDescriptionMap()));
+        	break;
+    
         case "set-links"://Project links
             setBoardLinks(request.links);
             sendResponse("Saved " );
@@ -58,7 +80,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
         case "get-settings"://complete board config
             settings = {
                 kanbanBoardColorMap : getKanbanBoardColorMap(),
+				kanbanBoardDescriptionMap : getKanbanBoardDescriptionMap(),
                 taskBoardColorMap : getTaskBoardColorMap(),
+				taskBoardDescriptionMap : getTaskBoardDescriptionMap(),
                 boardLinks : getBoardLinks()
             };
             if(request.importInfo){
@@ -75,8 +99,14 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             if(settings.taskBoardColorMap){
                 setTaskBoardColorMap(settings.taskBoardColorMap);
             }
+            if(settings.taskBoardDescriptionMap){
+                setTaskBoardDescriptionMap(settings.taskBoardDescriptionMap);
+            }
             if(settings.kanbanBoardColorMap){
                 setKanbanBoardColorMap(settings.kanbanBoardColorMap);
+            }
+            if(settings.kanbanBoardDescriptionMap){
+                setKanbanBoardDescriptionMap(settings.kanbanBoardDescriptionMap);
             }
             sendResponse("Settings saved");
             break;
@@ -158,15 +188,37 @@ function setTaskBoardColorMap(taskBoardColorMap){
     console.log("task-color-map saved to local storage " + localStorage.getItem("taskBoardColorMap"));
 }
 
+function getTaskBoardDescriptionMap(){
+    var taskBoardDescriptionMap = getObjectFromStorage("taskBoardDescriptionMap");
+    console.log("taskDescriptionMap read from local storage");
+    return taskBoardDescriptionMap;
+}
+
+function setTaskBoardDescriptionMap(taskBoardDescriptionMap){
+    saveObjectToStorage("taskBoardDescriptionMap", taskBoardDescriptionMap) ;
+    console.log("task-description-map saved to local storage " + localStorage.getItem("taskBoardDescriptionMap"));
+}
+
 function getKanbanBoardColorMap(){
     var kanbanBoardColorMap = getObjectFromStorage("colorMap");
-    console.log("ColorMap read from local storage");
+    console.log("Kanban Color Map read from local storage");
     return kanbanBoardColorMap;
 }
 
 function setKanbanBoardColorMap(kanbanBoardColorMap){
     saveObjectToStorage( "colorMap" , kanbanBoardColorMap);
     console.log("Kanban color-map saved to local storage " + localStorage.getItem("colorMap"));
+}
+
+function getKanbanBoardDescriptionMap(){
+    var kanbanBoardDescriptionMap = getObjectFromStorage("descriptionMap");
+    console.log("Kanban description Map read from local storage");
+    return kanbanBoardDescriptionMap;
+}
+
+function setKanbanBoardDescriptionMap(kanbanBoardDescriptionMap){
+    saveObjectToStorage( "descriptionMap" , kanbanBoardDescriptionMap);
+    console.log("Kanban description-map saved to local storage " + localStorage.getItem("descriptionMap"));
 }
 
 function autoImport(){

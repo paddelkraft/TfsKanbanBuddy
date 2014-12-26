@@ -35,7 +35,9 @@ function updateBoard(settings) {
         ".$tileClass.asure.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.purple.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.expediter.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+        ".$tileClass.black.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.blocked.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+        ".$tileClass.red.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.lightgreen.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.gray.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.standard.pale {background-color: transparent; border-color: #ddd; color: #ddd}"
@@ -50,7 +52,9 @@ function updateBoard(settings) {
         ".$tileClass.asure {background-color: #00FFFF; border-color: #01DFD7; color: black} " +
         ".$tileClass.purple {background-color: #9A2EFE; border-color: #A901DB; color: white} " +
         ".$tileClass.expediter {background-color: black; border-color: #DDDDDD; color: white} " +
+        ".$tileClass.black {background-color: black; border-color: #DDDDDD; color: white} " +
         ".$tileClass.blocked {background-color: #d2322d; border-color: #ac2925; color: white} " +
+        ".$tileClass.red {background-color: #d2322d; border-color: #ac2925; color: white} " +
         ".$tileClass.lightgreen {background-color: #C3FCD4; border-color: #00FF80; color: black} " +
         ".$tileClass.gray {background-color: #A1A19F; border-color:black; color: white} " +
         ".$tileClass.standard {border-left-color: rgb(0, 156, 204); background-color: rgb(214, 236, 242) color = black}"

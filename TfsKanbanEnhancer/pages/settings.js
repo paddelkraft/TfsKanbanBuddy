@@ -2,9 +2,9 @@ var app = angular.module("settings", []);
 
     app.controller("settingsController", function($scope){
         
-        $scope.kanbanBoardColorMap = convertStorageColorMapToSettingsColorMap({});
+        $scope.kanbanBoardColorMap = convertStorageColorMapToSettingsColorMap({},{});		
         $scope.links = convertStorageLinksToSettingsLinks({});
-        $scope.taskBoardColorMap = convertStorageColorMapToSettingsColorMap({});
+        $scope.taskBoardColorMap = convertStorageColorMapToSettingsColorMap({},{});
         
         $scope.saveImportData = function(){
             var message = {type : "set-import-url",
@@ -33,9 +33,9 @@ var app = angular.module("settings", []);
                     console.log ("Settings  recieved = " + jsonEncode(response));
                     $scope.links = convertStorageLinksToSettingsLinks(response.boardLinks);
                     console.log("links = " + jsonEncode($scope.links));
-                    $scope.kanbanBoardColorMap = convertStorageColorMapToSettingsColorMap(response.kanbanBoardColorMap);
+                    $scope.kanbanBoardColorMap = convertStorageColorMapToSettingsColorMap(response.kanbanBoardColorMap,response.kanbanBoardDescriptionMap);
                     console.log("kanbanBoardColorMap = " + jsonEncode($scope.kanbanBoardColorMap));
-                    $scope.taskBoardColorMap = convertStorageColorMapToSettingsColorMap(response.taskBoardColorMap);
+                    $scope.taskBoardColorMap = convertStorageColorMapToSettingsColorMap(response.taskBoardColorMap,response.taskBoardDescriptionMap);
                     console.log("taskBoardColorMap = " + jsonEncode($scope.taskBoardColorMap));
                     $scope.importUrl =response.importData.url;
                     $scope.automaticImport =response.importData.automaticImport;
@@ -44,15 +44,15 @@ var app = angular.module("settings", []);
         };
 
         
-        
-
         $scope.saveSettings = function (){
             console.log(" kanbanBoardColorMap = "+ jsonEncode(convertSettingsColorMapToStorageColorMap($scope.kanbanBoardColorMap)));
             var message = {
                 type: "set-settings",
-                "settings" :{ "boardLinks"          : convertSettingsLinksToStorageLinks($scope.links),
-                              "kanbanBoardColorMap" : convertSettingsColorMapToStorageColorMap($scope.kanbanBoardColorMap),
-                              "taskBoardColorMap"   : convertSettingsColorMapToStorageColorMap($scope.taskBoardColorMap)
+                "settings" :{	"boardLinks"                : convertSettingsLinksToStorageLinks($scope.links),
+								"kanbanBoardColorMap"       : convertSettingsColorMapToStorageColorMap($scope.kanbanBoardColorMap),
+								"kanbanBoardDescriptionMap" : convertSettingsColorMapToStorageDescriptionMap($scope.kanbanBoardColorMap),
+								"taskBoardColorMap"         : convertSettingsColorMapToStorageColorMap($scope.taskBoardColorMap),
+								"taskBoardDescriptionMap"   : convertSettingsColorMapToStorageDescriptionMap($scope.taskBoardColorMap)
                       }
                 };
             chrome.extension.sendMessage(message,function(response){

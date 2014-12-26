@@ -29,24 +29,24 @@ function convertSettingsLinksToStorageLinks(settingsLinks){
 	return storageLinks;
 }
 
-function convertStorageColorMapToSettingsColorMap(storageColorMap){
-	var settingsColorMap =[ {"color" : "expediter" ,   "prefix" : "" },
-							{"color" : "blocked" ,     "prefix" : ""},
-							{"color" : "blue" ,        "prefix" : ""},
-							{"color" : "yellow" ,      "prefix" : ""},
-							{"color" : "orange" ,      "prefix" : ""},
-							{"color" : "green" ,       "prefix" : ""},
-							{"color" : "pink" ,        "prefix" : ""},
-							{"color" : "asure" ,       "prefix" : ""},
-							{"color" : "purple" ,      "prefix" : ""},
-							{"color" : "lightgreen" ,  "prefix" : ""},
-							{"color" : "gray" ,        "prefix" : ""}];
+function convertStorageColorMapToSettingsColorMap(storageColorMap,storageDescriptionMap){
+	var settingsColorMap =[ {"color" : "black" ,       "prefix" : "", "description" : "expediter"},
+							{"color" : "red" ,         "prefix" : "", "description" : "blocked"},
+							{"color" : "blue" ,        "prefix" : "", "description" : ""},
+							{"color" : "yellow" ,      "prefix" : "", "description" : ""},
+							{"color" : "orange" ,      "prefix" : "", "description" : ""},
+							{"color" : "green" ,       "prefix" : "", "description" : ""},
+							{"color" : "pink" ,        "prefix" : "", "description" : ""},
+							{"color" : "asure" ,       "prefix" : "", "description" : ""},
+							{"color" : "purple" ,      "prefix" : "", "description" : ""},
+							{"color" : "lightgreen" ,  "prefix" : "", "description" : ""},
+							{"color" : "gray" ,        "prefix" : "", "description" : ""}];
 
 	function setColorMap(color,prefix){
 		for(var i in settingsColorMap){
-			if(settingsColorMap[i].color == color){
+			if(settingsColorMap[i].color == color) {
 				settingsColorMap[i].prefix = prefix;
-				return;
+				// return;
 			}
 		}
 	}
@@ -54,6 +54,20 @@ function convertStorageColorMapToSettingsColorMap(storageColorMap){
 	for(var i in storageColorMap){
 		setColorMap(storageColorMap[i],i);
 	}
+	
+	function setDescriptionMap(description,prefix){
+		for(var i in settingsColorMap){
+			if(settingsColorMap[i].prefix == prefix) {
+				settingsColorMap[i].description = description;
+				// return;
+			}
+		}
+	}
+	
+	for(var j in storageDescriptionMap){
+		setDescriptionMap(storageDescriptionMap[j],j);
+	}
+	
 	return settingsColorMap;
 }
 
@@ -67,6 +81,16 @@ function convertSettingsColorMapToStorageColorMap(settingsPageColorMap){
 	return storageColorMap;
 }
 
+function convertSettingsColorMapToStorageDescriptionMap(settingsPageColorMap){
+	var storageDescriptionMap = {};
+	for(var i in settingsPageColorMap){
+		if(settingsPageColorMap[i].prefix !== ""){
+			storageDescriptionMap[settingsPageColorMap[i].prefix] = settingsPageColorMap[i].description;
+		}
+	}
+	return storageDescriptionMap;
+}
+
 
 function convertSettingsPageColorMapToNewFormat(settingsPageColorMap) {
 
@@ -75,7 +99,6 @@ function convertSettingsPageColorMapToNewFormat(settingsPageColorMap) {
 	var description="";
 	
 	for(var i in settingsPageColorMap){
-		//console.log("color: " + settingsPageColorMap[i].color + " prefix: "+ settingsPageColorMap[i].prefix);
 		
 		color=settingsPageColorMap[i].color;
 				
@@ -95,7 +118,6 @@ function convertSettingsPageColorMapToNewFormat(settingsPageColorMap) {
 			"prefix"      : settingsPageColorMap[i].prefix,
 			"description" : description
 		});
-		//console.log("color: " + newSettingsPageColorMap[i].color + " prefix: "+ newSettingsPageColorMap[i].prefix+ " description: "+ newSettingsPageColorMap[i].description);
 		
 	}
 	

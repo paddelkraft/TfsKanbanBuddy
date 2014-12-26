@@ -35,14 +35,6 @@ function TimeUtil(){
         return new Date();
     };
 
-    this.readableDate = function (milliseconds){
-        var that  = this;
-        return function(){
-            return that.dateFormat(milliseconds);
-        };
-    };
-    
-
     this.daysSince = function(date){
         return Math.floor((this.now()-date)/this.MILLISECONDS_DAY);
     };
@@ -107,7 +99,15 @@ timeUtil = new TimeUtil();
     }
 
 
-    
+    function arrayOfNulls(length){
+        var self = [];
+        var i;
+        for(i=0;i<length;i++){
+            self[i]=null;
+        }
+
+        return self
+    }
 
     
 

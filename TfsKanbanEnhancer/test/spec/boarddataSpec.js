@@ -1,3 +1,5 @@
+
+
 function testSnapshot(milliseconds){
     return {
         "milliseconds": milliseconds,
@@ -51,6 +53,41 @@ function testSnapshot(milliseconds){
       };
   }
 
+  function simpleSnapshot(milliseconds,toDo,devIP,devDone,inProd){
+    return snapshot = {
+        "milliseconds": milliseconds,
+        "board": "https://boardUrl/",
+        "genericItemUrl" : "https://collectionUrl/_workitems#_a=edit&id=",
+        "lanes": [
+          {
+            "name": "ToDo",
+            "tickets": toDo
+          },
+          {
+            "name": "Dev IP",
+            "wip": {
+              "limit": "5",
+              "current": 2
+            },
+            "tickets": devIP
+          },
+          {
+            "name": "Dev DONE",
+            "wip": {
+              "limit": "0",
+              "current": "0"
+              
+            },
+            "tickets": devDone
+          },
+          {
+            "name": "In production",
+            "tickets": inProd
+          }
+        ]
+      };
+  }
+
   function testBoardDesign(){
     return [
           {
@@ -74,6 +111,46 @@ function testSnapshot(milliseconds){
         ];
   }
 
+  function createSnapshotTicket(id,name,blocked){
+    var newTicket = {};
+    newTicket.id = id;
+    newTicket.name = name;
+    if(blocked){
+      newTicket.blocked = true;
+    }
+    return newTicket;
+  }
+
+  function boardDataOneTicketMovingBackAndforth(){
+    var boardData = new BoardData();
+    var ticket = createSnapshotTicket("1","CR testTicket");
+    var day = timeUtil.MILLISECONDS_DAY;
+    boardData.addSnapshot(simpleSnapshot(10*day,[ticket],[],[],[]));
+    boardData.addSnapshot(simpleSnapshot(19*day,[ticket],[],[],[]));
+    
+
+    boardData.addSnapshot(simpleSnapshot(20*day,[],[ticket],[],[]));
+    boardData.addSnapshot(simpleSnapshot(29*day,[],[ticket],[],[]));
+    
+    boardData.addSnapshot(simpleSnapshot(30*day,[ticket],[],[],[]));
+    return boardData;
+  }
+
+  function boardDataOneTicketBlocked2Times(){
+    var boardData = new BoardData();
+    var blockedTicket = createSnapshotTicket("1","CR testTicket",true);
+    var ticket = createSnapshotTicket("1","CR testTicket");
+    var day = timeUtil.MILLISECONDS_DAY;
+    boardData.addSnapshot(simpleSnapshot(10*day,[blockedTicket],[],[],[]));
+    boardData.addSnapshot(simpleSnapshot(19*day,[blockedTicket],[],[],[]));
+    
+    boardData.addSnapshot(simpleSnapshot(20*day,[ticket],[],[],[]));
+    boardData.addSnapshot(simpleSnapshot(29*day,[ticket],[],[],[]));
+    
+    boardData.addSnapshot(simpleSnapshot(30*day,[blockedTicket],[],[],[]));
+    return boardData;
+  }
+
 describe("BoardData", function() {
   var boardData;
   var boardDesign;
@@ -91,14 +168,23 @@ describe("BoardData", function() {
 
 
 
-  it("should contain addedSnapshot", function() {
+  jsonApproveIt("should contain addedSnapshot", function() {
     boardData.addSnapshot(snapshot);
-    expect(jsonEncode(boardData.getLatestSnapshot())).toEqual(jsonEncode(snapshot));
+    return boardData.getLatestSnapshot();
+  });
+
+  jsonApproveIt("boardData for 1 ticket moving back and forth",function(){
+    return jsonEncode(boardDataOneTicketMovingBackAndforth());
+  });
+
+  jsonApproveIt("boardData for 1 ticket blocked 2 times",function(){
+    
+    return jsonEncode(boardDataOneTicketBlocked2Times());
   });
 
   it("should contain Board Design", function() {
     boardData.addSnapshot(snapshot);
-    expect(boardData.boardDesignHistory.boardDesignRecords[0].getBoardDesignForSnapshot()).toEqual(boardDesign);
+    expect(boardData.boardDesignHistory.boardDesignRecords[0].getBoardDesignForSnapshot()).approve(boardDesign);
   });
 
   it("boardDesign shoud have correct firstSeen and lastSeen times", function() {
@@ -117,7 +203,7 @@ describe("BoardData", function() {
     boardDesign[0].name = "Att Göra";
     boardData.addSnapshot(snapshot);
     var newBoardDesign = boardData.boardDesignHistory.boardDesignRecords[1].getBoardDesignForSnapshot();
-    expect(newBoardDesign).toEqual(boardDesign);
+    expect(newBoardDesign).approve(boardDesign);
   });
 
 
@@ -129,8 +215,8 @@ describe("BoardData", function() {
     var ticket = boardData.flowData["3"];
     var lane = ticket.lanes["Dev DONE"];
     console.log(lane);
-    expect(lane.enterMilliseconds).toEqual(snapshot.milliseconds-10);
-    expect(lane.exitMilliseconds).toEqual(snapshot.milliseconds);
+    expect(lane[0].firstSeen).toEqual(snapshot.milliseconds-10);
+    expect(lane[0].lastSeen).toEqual(snapshot.milliseconds);
   });
 
   it("boardDesign with earlier firstSeen should be first", function() {
@@ -143,7 +229,7 @@ describe("BoardData", function() {
     boardData = mergeBoardData(boardData,mergeData);
     console.log(jsonEncode(boardData));
     var mergedBoardDesign = boardData.boardDesignHistory.boardDesignRecords[0].getBoardDesignForSnapshot();
-    expect(mergedBoardDesign).toEqual(boardDesign);
+    expect(mergedBoardDesign).approve(boardDesign);
   });
 
   it("flow Data ticket should have correct enter and exit time after merge", function() {
@@ -156,8 +242,8 @@ describe("BoardData", function() {
     boardData = mergeBoardData(boardData,mergeData);
     var ticket = boardData.flowData["3"];
     var lane = ticket.lanes["Dev DONE"];
-    expect(lane.enterMilliseconds).toEqual(snapshot.milliseconds);
-    expect(lane.exitMilliseconds).toEqual(snapshot.milliseconds+10);
+    expect(lane[0].firstSeen).toEqual(snapshot.milliseconds);
+    expect(lane[0].lastSeen).toEqual(snapshot.milliseconds+10);
   });
 
   it("should create first snapshot from boardData", function() {
@@ -171,17 +257,28 @@ describe("BoardData", function() {
     boardData.addSnapshot(snapshot);
     snapshot2 = testSnapshot(snapshot.milliseconds+10);
     boardData.addSnapshot(snapshot2);
-    expect(jsonEncode(boardData.getSnapshots())).toEqual(jsonEncode([snapshot,snapshot2]));
+    expect(boardData.getSnapshots()).approve([snapshot,snapshot2]);
   });
 });
 
 describe("FlowTicket", function() {
   var testValues ;
+  var expectedResults ;
   var i;
   var blockedSnapshotItem= {"id":"2","title":"testTitle","blocked":true};
-  var snapshotItem = {"id":"2","title":"testTitle","blocked":false};;
+  var snapshotItem = {"id":"2","title":"testTitle","blocked":false};
   var flowTicket;
   
+  function flowticketWithTwoRecordsInLaneA10milliseconds(){
+    var laneName = "lane";
+    flowTicket.setLane(laneName,10);
+    flowTicket.setLane(laneName,20);
+    flowTicket.setLane("other lane",25);
+    flowTicket.setLane(laneName,30);
+    flowTicket.setLane(laneName,40);
+    return flowTicket;
+  }
+
   function flowticketWithTwoBlockagesA10milliseconds(){
     flowTicket.setBlockStatus(blockedSnapshotItem,10);
     flowTicket.setBlockStatus(blockedSnapshotItem,20);
@@ -195,9 +292,56 @@ describe("FlowTicket", function() {
     flowTicket = new FlowTicket({},"url");
   });
 
-  
+//lane location
+  it("should curently be in lane", function() {
+    var laneName = "lane";
+    flowTicket.setLane(laneName,10);
+    expect(flowTicket.inLane).toBe(laneName);
+    
+  });
 
 
+  it("should have firstSeen ===10", function() {
+    var laneName = "lane";
+    flowTicket.setLane(laneName,10);
+    flowTicket.setLane(laneName,20);
+    expect(flowTicket.getCurrentLaneRecord().firstSeen).toBe(10);
+  });
+
+  it("should have lastSeen ===20", function() {
+    var laneName = "lane";
+    flowTicket.setLane(laneName,10);
+    flowTicket.setLane(laneName,20);
+    expect(flowTicket.getCurrentLaneRecord().lastSeen).toBe(20);
+  });
+
+
+  it("should have bin in lane 2 times", function() {
+    var laneName = "lane";
+    flowTicket.setLane(laneName,10);
+    flowTicket.setLane("other lane",15);
+    flowTicket.setLane(laneName,20);
+    expect(flowTicket.lanes[laneName].length).toBe(2);
+  });
+
+  it("should have bin in lane 20 milliseconds", function() {
+    flowTicket = flowticketWithTwoRecordsInLaneA10milliseconds();
+    expect(flowTicket.getTotalTimeInLane("lane")).toBe(20);
+
+  });
+
+  testValues = [10,15,20,25,30,40,26];
+  expectedResults = ["lane","lane","lane","other lane","lane","lane",null];
+  for(i in testValues){
+    (function (time,inLane){
+      it("should have been "+inLane+" at " +time, function() {
+        flowTicket = flowticketWithTwoRecordsInLaneA10milliseconds();
+        expect(flowTicket.wasInLane(time)).toBe(inLane);
+      });
+    })(testValues[i],expectedResults[i]);
+  }
+
+//Blockages
 
   it("should curently be blocked", function() {
     flowTicket.setBlockStatus(blockedSnapshotItem,10);

@@ -19,7 +19,7 @@ function FlowDataGrid(boardData){
 
 
 	function flowDataRow(flowTicket,columnIndexes,lanes){
-		var row = new Array(lanes.length+ 2);
+		var row = arrayOfNulls(lanes.length+ 2);
 		var laneName;
 		var lane;
 
@@ -27,13 +27,13 @@ function FlowDataGrid(boardData){
 		row[1] =  flowTicket.title;
 		for(laneName in flowTicket.lanes){
 			lane = flowTicket.lanes[laneName];
-			row[columnIndexes[laneName]] = timeUtil.timeFormat(lane.exitMilliseconds-lane.enterMilliseconds);
+			//_.forEach()
+			row[columnIndexes[laneName]] = timeUtil.timeFormat(flowTicket.getTotalTimeInLane(laneName));
+			//row[columnIndexes[laneName]] = timeUtil.timeFormat(lane[0].firstSeen-lane[lane.length-1].lastSeen);
 		}
 		if(flowTicket.getTotalBlockedTime()){
 			row[columnIndexes["Blocked"]] = timeUtil.timeFormat(flowTicket.getTotalBlockedTime());
-		}/*else{
-			row[columnIndexes["Blocked"]] = "";
-		}*/
+		}
 		
 		return row;
 	}
@@ -66,9 +66,6 @@ function FlowDataGrid(boardData){
 	
 } //flowdataGrid
 
-		
-	
-		
 
 function buildFlowReport(flowData){
 	var flowReport = [];
@@ -83,12 +80,14 @@ function buildFlowReport(flowData){
 		var flowTicket = flowData[id];
 		if(flowTicket.id){
 			for(laneName in flowTicket.lanes){
-				lane = flowTicket.lanes[laneName];
-				flowReport.push( [ flowTicket.id, flowTicket.title, flowTicket.url(), laneName, lane.enter(), lane.exit()] );
+				_.forEach(flowTicket.lanes[laneName], function(laneRecord){
+					lane = flowTicket.lanes[laneName];
+					flowReport.push( [ flowTicket.id, flowTicket.title, flowTicket.url(), laneName, laneRecord.enter(), laneRecord.exit()] );
+				});
 			}
 			for(blockageIndex in flowTicket.blockedRecords){
 				blockage = flowTicket.blockedRecords[blockageIndex];
-				flowReport.push([ flowTicket.id, flowTicket.title, flowTicket.url(), "Blocked", timeUtil.timeFormat(blockage.firstSeen), timeUtil.timeFormat(blockage.lastSeen)]);
+				flowReport.push([ flowTicket.id, flowTicket.title, flowTicket.url(), "Blocked", timeUtil.dateFormat(blockage.firstSeen), timeUtil.dateFormat(blockage.lastSeen)]);
 			}
 			flowReport.push( ["","","","","",""] );
 		}

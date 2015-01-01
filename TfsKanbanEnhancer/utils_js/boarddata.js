@@ -3,108 +3,156 @@ function log(msg){
 }
 
 function BoardData(data){
+    var self = this;
     if(!data){
         data = {};
     }
-    this.ver="0.4.5";
-    this.board = (data.board)?data.board:null;
-    this.storageKey = "snapshots_" + this.board;
-    this.genericItemUrl = (data.genericItemUrl)? data.genericItemUrl:"";
-    this.snapshots = (data.snapshots) ? SnapshotsConstructor(data.snapshots) : [];//remove in later version
-    this.boardDesignHistory = (data.boardDesignHistory)? new BoardDesignHistory(data.boardDesignHistory):
-                                                        createBoardDesignHistoryFromSnapshots(this.snapshots);//remove when snapshot is removed
-                                                        //BoardDesignHistoryConstructor(); //uncomment when snapshot is removed
-    this.flowData = (data.flowData) ? new FlowData(data.flowData,this.genericItemUrl) : new FlowData() ;
     
+    if (data.ver === "0.4.5"){
+        data = convertTo050(data);
+    }
+    self.ver="0.5.0";
+    self.board = (data.board)?data.board:null;
+    self.storageKey = "snapshots_" + self.board;
+    self.genericItemUrl = (data.genericItemUrl)? data.genericItemUrl:"";
+    self.snapshotRecords = (data.snapshotRecords) ? data.snapshotRecords : [];//remove in later version
+    self.boardDesignHistory = (data.boardDesignHistory)? new BoardDesignHistory(data.boardDesignHistory):
+                                                         new BoardDesignHistory();
+    self.flowData = (data.flowData) ? new FlowData(data.flowData,self.genericItemUrl) : new FlowData() ;
+    
+    var blockedPrefix=null;
     //functions
 
+    function updateSnapshotRecord(milliseconds){
+        _.last(self.snapshotRecords).lastSeen=milliseconds;
+    }
+
+    function newSnapshotRecord(milliseconds){
+        self.snapshotRecords.push({"firstSeen":milliseconds,"lastSeen":milliseconds});
+    }
+
+    
+
+    
+
+    self.boardHasNotChanged = function (snapshot){
+        var latestSnapshot = self.getLatestSnapshot();
+        return latestSnapshot && snapshot.equals(latestSnapshot);
+    };
    
-    this.addSnapshot = function(snapshot){
-        snapshot = new SnapshotConstructor(snapshot);
-        this.flowData.addSnapshot(snapshot);
-        this.genericItemUrl = snapshot.genericItemUrl;
-        this.board = snapshot.board;
-        console.log("genericItemUrl " + this.genericItemUrl);
-        this.boardDesignHistory.reportBoardDesign(snapshot.getBoardDesign(),snapshot.milliseconds);
-        
-    };
-
-
-    this.getLatestSnapshot = function(){
-        return this.getSnapshot(this.boardDesignHistory.getLatestBoardObservationTime());
-    };
-
-    this.getSnapshots = function(){
-        var boardObservationTimes = this.boardDesignHistory.getBoardObservationTimes();
-        var snapshots = [];
-        var observationIndex;
-        for(observationIndex in boardObservationTimes){
-            snapshots.push(this.getSnapshot(boardObservationTimes[observationIndex]));
-        }
-        return snapshots;
-    };
-
-
-    this.getBoardState = function(milliseconds){
-        var boardDesignRecord = this.findBoardDesignRecord(milliseconds);
-        var boardState = boardDesignRecord.getBoardDesignForSnapshot();
-        for(var index in boardState){
-            var lane = boardState[index].name;
-            var tickets = this.flowData.getTicketsInLane(lane,milliseconds);
-            boardState[index].tickets = tickets;
-            if(boardState[index].wip){
-                boardState[index].wip.current = "";
-            }
-            if(boardState[index].wip && boardState[index].wip.limit!=="0" ){
-                boardState[index].wip.current = (!isNaN(tickets.length))? tickets.length: "";
-            }else if (boardState[index-1] && boardState[index-1].wip){
-                boardState[index-1].wip.current += (!isNaN(tickets.length))? tickets.length: "";
-            }
-
-        }
-        return boardState;
-    };
-
-    this.getSnapshot = function(milliseconds){
-        var snapshot = {};
-        if( this.findBoardDesignRecord(milliseconds)!==null){
-           snapshot.milliseconds = milliseconds;
-            snapshot.board = this.board;
-            snapshot.genericItemUrl = this.genericItemUrl;
-            snapshot.lanes = this.getBoardState(milliseconds);
-        }
-        
-        return SnapshotConstructor(snapshot);
-    };
-
-    this.findBoardDesignRecord = function(milliseconds){
-        var designRecordIndex;
-        var boardDesignRecord = null;
-        var seenIndex;
-        for(designRecordIndex in this.boardDesignHistory.boardDesignRecords){
-            boardDesignRecord = this.boardDesignHistory.boardDesignRecords[designRecordIndex];
-            if(boardDesignRecord.firstSeen()<= milliseconds && boardDesignRecord.lastSeen()>= milliseconds){
-                for(seenIndex in boardDesignRecord.seen){
-                    if (boardDesignRecord.seen[seenIndex]===milliseconds){
-                        return boardDesignRecord;
-                    }
+    function setBlocked (snapshot){
+        _.forEach(snapshot.lanes,function(lane){
+            _.forEach(lane.tickets,function(ticket){
+                if(ticket.title.split(" ")[0]===blockedPrefix){
+                    ticket.blocked = true;
                 }
-                
-            }
+            });
+        });
+        return snapshot;
+    }
+
+    self.addSnapshot = function(snapshot){
+        if(blockedPrefix){
+            snapshot = setBlocked(snapshot);
+        }
+        snapshot = new Snapshot(snapshot);
+        self.boardDesignHistory.reportBoardDesign(snapshot.getBoardDesign(),snapshot.milliseconds);
+        if(self.boardHasNotChanged(snapshot)){
+            console.log("Snapshot has not changed since last observation");
+            updateSnapshotRecord(snapshot.milliseconds);
+        }else{
+            console.log("Snapshot has changed since last observation");
+            newSnapshotRecord(snapshot.milliseconds);
+        }
+        self.flowData.addSnapshot(snapshot);
+        self.genericItemUrl = snapshot.genericItemUrl;
+        self.board = snapshot.board;
+        //console.log("genericItemUrl " + self.genericItemUrl);
+        
+        
+    };
+
+
+    self.getLatestSnapshot = function(){
+        if(self.snapshotRecords.length>0){
+            return self.getSnapshot(_.last(self.snapshotRecords).lastSeen);
         }
         return null;
     };
 
+    self.getSnapshots = function(){
+        var boardObservationTimes = getBoardObservationTimes();
+        var snapshots = [];
+        var observationIndex;
+        for(observationIndex in boardObservationTimes){
+            snapshots.push(self.getSnapshot(boardObservationTimes[observationIndex]));
+        }
+        return snapshots;
+    };
+
+    function getBoardObservationTimes(){
+        var boardObservationTimes = [];
+        _.forEach(self.snapshotRecords,function(record){
+            boardObservationTimes.push(record.firstSeen);
+            if(record.firstSeen!==record.lastSeen){
+                boardObservationTimes.push(record.lastSeen);
+            }
+        });
+        return boardObservationTimes;
+    }
+
+    self.getBoardState = function(milliseconds){
+        var boardDesignRecord = self.findBoardDesignRecord(milliseconds);
+        var boardState = boardDesignRecord.getBoardDesignForSnapshot();
+        for(var index in boardState){
+            var lane = boardState[index].name;
+            var tickets = self.flowData.getTicketsInLane(lane,milliseconds);
+            boardState[index].tickets = tickets;
+        }
+        return boardState;
+    };
+
+    self.getSnapshot = function(milliseconds){
+        var snapshot = {};
+        if( self.findBoardDesignRecord(milliseconds)!==null){
+           snapshot.milliseconds = milliseconds;
+            snapshot.board = self.board;
+            snapshot.genericItemUrl = self.genericItemUrl;
+            snapshot.lanes = self.getBoardState(milliseconds);
+        }
+        return new Snapshot(snapshot);
+    };
+
+    self.findBoardDesignRecord = function(milliseconds){
+        var designRecordIndex;
+        var snapshotTime;
+        var boardDesign = null;
+        _.forEach(self.snapshotRecords,function (record){
+            if(record.firstSeen <= milliseconds && record.lastSeen>=milliseconds){
+                snapshotTime = milliseconds;
+                return false;
+            }
+        });
+        _.forEach(self.boardDesignHistory.boardDesignRecords, function (boardDesignRecord){
+            if(boardDesignRecord.firstSeen<= snapshotTime && boardDesignRecord.lastSeen>= snapshotTime){
+                boardDesign = boardDesignRecord;
+                return false;
+            }
+        });
+        
+        return boardDesign;
+    };
+
 
     
 
-    this.getLaneHeaders = function (){
+    self.getLaneHeaders = function (){
         var lanes = newLaneNode("");
         var lanesArray = [];
         var lastAdded;
         var index, laneIndex ;
-        for(index in this.boardDesignHistory.boardDesignRecords){
-            var boardDesignRecord = this.boardDesignHistory.boardDesignRecords[index];
+        for(index in self.boardDesignHistory.boardDesignRecords){
+            var boardDesignRecord = self.boardDesignHistory.boardDesignRecords[index];
             var lastCheckedNode = lanes;
             for(laneIndex in boardDesignRecord.design){
                 if(!lanes.find(boardDesignRecord.design[laneIndex].name)){
@@ -161,77 +209,197 @@ function BoardData(data){
         return header;
     }
 
-    this.size = function(){
-        return jsonEncode(this).length * 2;
+    self.size = function(){
+        return jsonEncode(self).length * 2;
     };
 
-
-    function SnapshotConstructor(snapshotDataObject){
-        snapshot = snapshotDataObject;
-        
-        snapshot.getBoardDesign = function (){
-            var boardLayout = [];
-            var lane;
-            for (var index in snapshot.lanes){
-                 lane = {};
-                lane.name = snapshot.lanes[index].name;
-                if(snapshot.lanes[index].wip){
-                    lane.wip = {"limit": snapshot.lanes[index].wip.limit};
-                }
-                
-                boardLayout.push(lane);
-            }
-            return  boardLayout;
-
-        };
-
-        for (var lane in snapshot.lanes){
-            for(var ticket in snapshot.lanes[lane].tickets){
-                snapshot.lanes[lane].tickets[ticket].url = function(){
-                    return snapshot.genericItemUrl+this.id;
-                };
-
-                snapshot.lanes[lane].tickets[ticket].time = function(){
-                    return timestamp(this.milliseconds);
-                };
-            }
-        }
-        return snapshot;
+    self.setBlockedPrefix = function (prefix){
+        blockedPrefix = prefix;
     }
 
-    function SnapshotsConstructor(snapshotsDataObject){
-        var snapshots = snapshotsDataObject;
-        for(var snapshot in snapshots){
-            
-            snapshots[snapshot] =  SnapshotConstructor(snapshots[snapshot]);
-        }
-        return snapshots;
-    }
-
-    this.snapshots = null;
     
 }//BoardData
 
 
+function Snapshot(snapshot){
+    var self = this;
+    self.board =  snapshot.board;
+    self.milliseconds = snapshot.milliseconds;
+    self.genericItemUrl = snapshot.genericItemUrl;
+    self.lanes = [];
+    _.forEach(snapshot.lanes,function(lane){
+        self.lanes.push( new SnapshotLane(snapshot.genericItemUrl,lane));
+    });
+    self.lanes = fixWip(self.lanes);
+
+    function fixWip(lanes){
+        var current = 0;
+        for(var index in lanes){
+            var tickets = lanes[index].tickets;
+            
+            if(lanes[index].wip){
+               // console.log("limit = "+lanes[index].wip.limit);
+                if( lanes[index].wip.limit===0){
+                    current =lanes[index].wip.current;
+                    
+                    if (lanes[index-1] && lanes[index-1].wip && lanes[index-1].wip.limit>0){
+                        lanes[index-1].wip.current += current;
+                        lanes[index].wip.current = 0;
+                    }
+                }
+            }
+            
+        }
+        return lanes;
+
+    }
+
+
+    
+    self.getBoardDesign = function (){
+        var boardLayout = [];
+        var lane;
+        _.forEach (self.lanes,function(item){
+             lane = {};
+            lane.name = item.name;
+            if(item.wip){
+                lane.wip = {"limit": item.wip.limit};
+            }
+            boardLayout.push(lane);
+        });
+        return  boardLayout;
+    };
+
+    /*self.getLaneNames =function(){
+        var laneNames = [];
+        _.forEach(self.lanes,function(lane){
+            laneNames.push(lane.name );
+        });
+        console.log("laneNames = "+ jsonEncode(laneNames));
+        return laneNames;
+    };*/
+
+    self.getLaneNames = function (){
+        var lanes = [];
+        _.forEach(self.lanes,function (lane){
+            var wip;
+            if(!lane.wip){
+                wip = 0;
+            }else if(lane.wip.limit ===""){
+                lane.wip.limit = 0;
+                wip = 0;
+            }else{
+                wip = parseInt(lane.wip.limit);
+            }
+            lanes.push(lane.name + "("+wip+")");
+        });
+       // console.log("laneNames = "+ jsonEncode(lanes));
+        return lanes;
+    }
+
+    self.equals = function(comp){
+        
+        var isEqual = arraysAreIdentical(self.getLaneNames() , comp.getLaneNames());
+        var laneIndex;
+        if(!isEqual){
+            console.log("Snapshot.equals | BoardDesigns is not identical");
+        }
+        if(isEqual){
+
+            for(laneIndex in self.lanes){
+                isEqual = self.lanes[laneIndex].equals(comp.lanes[laneIndex]);
+                if(!isEqual){
+                    console.log("Snapshot.equals | lane " +self.lanes[laneIndex].name + " has changed");
+                    return isEqual;
+                }
+            }
+
+        }
+        return isEqual;
+    };
+
+
+    return self;
+}
+
+function SnapshotLane (genericItemUrl,lane){
+    
+    var self = this;
+    self.name = lane.name;
+    if(lane.wip){
+        if(lane.wip.limit === ""){
+            lane.wip.limit = 0;
+        }
+        self.wip = {"limit":parseInt(lane.wip.limit), "current" : 0};
+    }
+    self.tickets = [];
+    _.forEach(lane.tickets,function(ticket){
+        self.tickets.push(new SnapshotTicket(genericItemUrl,ticket));
+        if(lane.wip){
+            self.wip.current++;
+        }
+    });
+
+
+    self.equals = function(comp){
+        var same = true;
+        if(comp.tickets.length != self.tickets.length){
+            return false;
+        }
+        var selfTickets = _.sortBy(self.tickets,function(ticket){return ticket.id;});
+        var compTickets = _.sortBy(comp.tickets,function(ticket){return ticket.id;});
+        var i ;
+        for (i in selfTickets){
+            same = selfTickets[i].equals(compTickets[i]);
+            if(!same){
+                console.log ("SnapshotLine | tickets not identical \n" +jsonEncode(selfTickets[i])+"\n!=\n"+ jsonEncode(compTickets[i]));
+                return same;
+            }
+        }
+        return same;
+    };
+
+    return self;
+}
+
+function SnapshotTicket(genericItemUrl,data){
+    var self = this;
+    self.id = data.id;
+    self.title = data.title;
+    if (data.blocked){
+        self.blocked = data.blocked;
+    }
+    self.url = function(){
+        return snapshot.genericItemUrl+self.id;
+    };
+
+    self.equals = function(comp){
+        var same = true;
+        if(!(self.id === comp.id && self.title === comp.title)){
+            return false;
+        } 
+        
+        return(self.blocked === comp.blocked);
+    };
+    return self;
+}
+
+
 
 function FlowData(flowData, genericItemUrl){
-    
-    
-    //this.getEnterDate = function (id,lane){
-    //    return this[id].lanes[lane].enter;
-    //};
+    self = this;
 
-    this.getEnterMilliseconds = function (id,lane){
-        return this[id].lanes[lane][0].firstSeen;
+    self.getEnterMilliseconds = function (id,lane){
+        return self[id].lanes[lane][0].firstSeen;
     };
 
     
-    this.getTicketsInLane = function (lane, time){
+    self.getTicketsInLane = function (lane, time){
         var tickets = [];
-        for(var id in this){
-            var ticket = this[id];
+        for(var id in self){
+            var ticket = self[id];
             if(ticket.lanes && ticket.lanes[lane]&&
-               ticket.wasInLane(time)){
+               (lane===ticket.wasInLane(time))){
                 var snapshotTicket = {
                     "id" : ticket.id,
                     "title" : ticket.title,
@@ -246,12 +414,12 @@ function FlowData(flowData, genericItemUrl){
         return tickets;
     };
 
-    this.merge = function(flowData){
+    self.merge = function(flowData){
         for(var id in flowData){
-            if(!this[id]){
-                this[id]=flowData[id];
-            } else if(this[id].merge) {
-                this[id].merge(flowData[id]);
+            if(!self[id]){
+                self[id]=flowData[id];
+            } else if(self[id].merge) {
+                self[id].merge(flowData[id]);
             }
         }
     };
@@ -269,10 +437,10 @@ function FlowData(flowData, genericItemUrl){
         flowTicket.setLane(lane.name,snapshot.milliseconds);
         that[ticket.id]=flowTicket;
         return flowTicket;
-    })(this);
+    })(self);
 
-    this.addSnapshot = function (snapshot){
-        log("add snapdhot " + snapshot.time);
+    self.addSnapshot = function (snapshot){
+        log("add snapshot millisecond = " + snapshot.milliseconds);
         var index, laneIndex ;
         for(laneIndex in snapshot.lanes){
             var lane = snapshot.lanes[laneIndex];
@@ -280,7 +448,7 @@ function FlowData(flowData, genericItemUrl){
             //console.log("lane.tickets.length = "+ lane.tickets.length );
             for(var i = 0 ; i < lane.tickets.length ; i++ ){
                 var ticket = lane.tickets[i];
-                this[ticket.id] = createOrUpdateFlowTicket(ticket,lane, snapshot);
+                self[ticket.id] = createOrUpdateFlowTicket(ticket,lane, snapshot);
             }
         }
         
@@ -290,7 +458,7 @@ function FlowData(flowData, genericItemUrl){
 
     if (flowData){
         for(var index in flowData){
-            this[index] = new FlowTicket(flowData[index],genericItemUrl);
+            self[index] = new FlowTicket(flowData[index],genericItemUrl);
         }
     }
 }
@@ -446,6 +614,51 @@ function FlowTicket(flowItemData, genericItemUrl){
     return this;
 }
 
+function convertTo050(boardData){
+    var snapshots = [];
+    var converted = new BoardData();
+    
+    function getObservationTimes (boardDesignRecords){
+        var observationTimes = [];
+        _.forEach(boardDesignRecords,function(boardDesignRecord){
+            observationTimes = observationTimes.concat(boardDesignRecord.seen);
+        });
+        return observationTimes;
+    }
+    
+    function createSnapshotRecords(observationTimes){
+        var snapshotRecords = [];
+        _.forEach(observationTimes,function (observationTime){
+            snapshotRecords.push({"firstSeen" : observationTime,
+                                  "lastSeen" : observationTime });
+        });
+        return snapshotRecords;
+    }
+
+    function setBoardDesignRecordsFirstAndLastSeen(boardDesignRecords){
+        _.forEach(boardDesignRecords,function(boardDesignRecord){
+            boardDesignRecord.firstSeen = _.first(boardDesignRecord.seen);
+            boardDesignRecord.lastSeen = _.last(boardDesignRecord.seen);
+            boardDesignRecord.seen = null;
+        });
+    }
+
+    if(boardData.ver === "0.4.5"){
+        boardData.snapshotRecords = createSnapshotRecords(getObservationTimes(boardData.boardDesignHistory.boardDesignRecords));
+        setBoardDesignRecordsFirstAndLastSeen(boardData.boardDesignHistory.boardDesignRecords);
+        boardData.ver = "0.5.0";
+        boardData = new BoardData(boardData);
+        snapshots = boardData.getSnapshots();
+        _.forEach(snapshots,function(snapshot){
+            console.log("Snapshot = "+jsonEncode(snapshot));
+            converted.addSnapshot(snapshot);
+        });
+    }
+
+    return converted;
+    
+}
+
 function mergeBoardData(boardData,mergeData){
     var boardSnapshots = boardData.getSnapshots();
     var snapshotIndex;
@@ -462,17 +675,6 @@ function mergeBoardData(boardData,mergeData){
     return boardData;
 }
 
-//TODO Remove this function when snapshpts is removed from boardData
-//Function to migrate old data to new data format
-function createBoardDesignHistoryFromSnapshots(snapshots){
-    var boardDesignHistory = new BoardDesignHistory();
-    for(var index in snapshots){
-        boardDesignHistory.reportBoardDesign(snapshots[index].getBoardDesign(),snapshots[index].milliseconds);
-    }
-    return boardDesignHistory;
-}
-
-
 
 function BoardDesignHistory(boardDesignHistoryObject){
     if(!boardDesignHistoryObject){
@@ -487,13 +689,13 @@ function BoardDesignHistory(boardDesignHistoryObject){
     
     boardDesignHistory.reportBoardDesign = function(boardDesign,milliseconds){
         var numberOfRecords = this.boardDesignRecords.length;
-        var boardDesignRecord
+        var boardDesignRecord;
         if(numberOfRecords === 0){
             boardDesignRecord = new BoardDesignRecord(boardDesign,milliseconds);
             this.boardDesignRecords.push(boardDesignRecord);
         }else if(this.boardDesignRecords[numberOfRecords-1].equals(boardDesign) ){
             console.log("The boardDesign has not changed updating observation time");
-            this.boardDesignRecords[numberOfRecords-1].designSeenAt(milliseconds);
+            this.boardDesignRecords[numberOfRecords-1].newObservation(milliseconds);
         }else{
             console.log("The boardDesign has changed adding new design to history");
             boardDesignRecord = new BoardDesignRecord(boardDesign,milliseconds);
@@ -501,20 +703,7 @@ function BoardDesignHistory(boardDesignHistoryObject){
         }
     };
 
-    boardDesignHistory.getBoardObservationTimes = function buildSnapshotsFromBoardData(boardData){
-        var observations = [];
-        var designRecordIndex = 0;
-        var boardState;
-        var boardDesignRecords = this.boardDesignRecords;
-        var seenIndex = 0;
-        for(designRecordIndex in boardDesignRecords){
-            boardState = boardDesignRecords[designRecordIndex].boardDesign;
-            for(seenIndex in boardDesignRecords[designRecordIndex].seen){
-                observations.push(boardDesignRecords[designRecordIndex].seen[seenIndex]);
-            }
-        }
-        return observations;
-    };
+    
 
 
     boardDesignHistory.getLatestBoardDesign = function(){
@@ -524,7 +713,7 @@ function BoardDesignHistory(boardDesignHistoryObject){
     
 
     boardDesignHistory.getLatestBoardObservationTime = function(){
-        return this.boardDesignRecords[this.boardDesignRecords.length -1].lastSeen();
+        return this.boardDesignRecords[this.boardDesignRecords.length -1].lastSeen;
     };
 
     boardDesignHistory.getRecordForBoardDesign = function(design){
@@ -556,33 +745,47 @@ function BoardDesignHistory(boardDesignHistoryObject){
 function BoardDesignRecord(boardDesign, milliseconds){
     var boardDesignRecord = {};
     if(!milliseconds){
+        //existing record
         boardDesignRecord = boardDesign;
-        if(!boardDesignRecord.seen){ //Convert between intermediate formats this should be removed before releasing
-            boardDesignRecord.seen =[];
-            boardDesignRecord.seen.push(boardDesignRecord.firstSeen);
-            boardDesignRecord.seen.push(boardDesignRecord.lastSeen);    
+        if(boardDesignRecord.seen){ //Convert between intermediate formats this should be removed 
+           boardDesignRecord.firstSeen = _.first(boardDesignRecord.seen);
+           boardDesignRecord.lastSeen  = _.last(boardDesignRecord.seen);
+           boardDesignRecord.seen = null;
         }//end remove
     }else{
-        boardDesignRecord.seen =[];
-
-        boardDesignRecord.seen.push(milliseconds);
+        //new boardDesign record
+        boardDesignRecord.firstSeen = milliseconds;
+        boardDesignRecord.lastSeen  = milliseconds;
         boardDesignRecord.design = boardDesign;
     }
 
-    boardDesignRecord.firstSeen = function(){return boardDesignRecord.seen[0];};
-    boardDesignRecord.lastSeen =  function(){
-        return boardDesignRecord.seen[boardDesignRecord.seen.length-1];
-    };
     
     boardDesignRecord.equals = function(boardDesign){
-        console.log("this.design = " + jsonEncode(this.design));
-        console.log("boardDesign = " + jsonEncode(boardDesign));
-        return jsonEncode(this.design) == jsonEncode(boardDesign);
+        //console.log("this.design = " + jsonEncode(this.design));
+        //console.log("boardDesign = " + jsonEncode(boardDesign));
+        
+        return arraysAreIdentical(getLaneNames(this.design),getLaneNames(boardDesign));
     };
 
-    boardDesignRecord.designSeenAt= function(milliseconds){
-        boardDesignRecord.seen.push(milliseconds);
-        boardDesignRecord.seen.sort();
+    function getLaneNames(design){
+        var lanes = [];
+        _.forEach(design,function (lane){
+            var wip;
+            if(!lane.wip){
+                wip = 0;
+            }else if(lane.wip.limit ===""){
+                lane.wip.limit = 0;
+                wip = 0;
+            }else{
+                wip = parseInt(lane.wip.limit);
+            }
+            lanes.push(lane.name + "("+wip+")");
+        });
+        return lanes;
+    }
+
+    boardDesignRecord.newObservation= function(milliseconds){
+        boardDesignRecord.lastSeen = milliseconds;
     };
 
     boardDesignRecord.getBoardDesignForSnapshot = function(){

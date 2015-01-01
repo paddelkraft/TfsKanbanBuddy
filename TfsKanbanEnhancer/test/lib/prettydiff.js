@@ -116,7 +116,7 @@ function avoidCache(){
     
     return "?"+new Date().getTime();
 }
-function jsonApproveIt(description, test){
+function approveIt(description, test){
     
     it("(approval) " + description,function(done){
         var testOutput = test();

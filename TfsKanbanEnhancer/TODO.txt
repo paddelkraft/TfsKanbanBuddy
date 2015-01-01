@@ -1,6 +1,8 @@
 TODO
 
+write a compare boardDesign function that compares compares all data and not only json
 Clean out conversion code from BoardData
 Write tests for FlowData
+
 Refactor background
 Write tests for background functions

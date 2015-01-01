@@ -19,7 +19,7 @@ function testSnapshot(milliseconds){
             "name": "Dev IP",
             "wip": {
               "limit": "5",
-              "current": 2
+              "current": "2"
             },
             "tickets": [
               {
@@ -33,7 +33,7 @@ function testSnapshot(milliseconds){
             "name": "Dev DONE",
             "wip": {
               "limit": "0",
-              "current": "0"
+              "current": ""
               
             },
             "tickets": [
@@ -54,7 +54,13 @@ function testSnapshot(milliseconds){
   }
 
   function simpleSnapshot(milliseconds,toDo,devIP,devDone,inProd){
-    return snapshot = {
+    var currentWip = devIP.length+devDone.length;
+    if (currentWip === 0){
+      currentWip = 0;
+    }else{
+      currentWip == currentWip;
+    }
+    return new Snapshot({
         "milliseconds": milliseconds,
         "board": "https://boardUrl/",
         "genericItemUrl" : "https://collectionUrl/_workitems#_a=edit&id=",
@@ -66,16 +72,16 @@ function testSnapshot(milliseconds){
           {
             "name": "Dev IP",
             "wip": {
-              "limit": "5",
-              "current": 2
+              "limit": 5,
+              "current": currentWip
             },
             "tickets": devIP
           },
           {
             "name": "Dev DONE",
             "wip": {
-              "limit": "0",
-              "current": "0"
+              "limit": 0,
+              "current": ""
               
             },
             "tickets": devDone
@@ -85,7 +91,7 @@ function testSnapshot(milliseconds){
             "tickets": inProd
           }
         ]
-      };
+      });
   }
 
   function testBoardDesign(){
@@ -96,13 +102,13 @@ function testSnapshot(milliseconds){
           {
             "name": "Dev IP",
             "wip": {
-              "limit": "5"
+              "limit": 5
             },
           },
           {
             "name": "Dev DONE",
             "wip": {
-              "limit": "0"
+              "limit": 0
             },
           },
           {
@@ -111,14 +117,14 @@ function testSnapshot(milliseconds){
         ];
   }
 
-  function createSnapshotTicket(id,name,blocked){
+  function createSnapshotTicket(id,title,blocked){
     var newTicket = {};
     newTicket.id = id;
-    newTicket.name = name;
+    newTicket.title = title;
     if(blocked){
       newTicket.blocked = true;
     }
-    return newTicket;
+    return new SnapshotTicket( "https://collectionUrl/_workitems#_a=edit&id=",newTicket);
   }
 
   function boardDataOneTicketMovingBackAndforth(){
@@ -164,20 +170,28 @@ describe("BoardData", function() {
       boardDesign = testBoardDesign();
   });
 
-  
+  approveIt("create empty object ",function(){
+    return boardData;
+  });
 
-
-
-  jsonApproveIt("should contain addedSnapshot", function() {
+  approveIt("construction from existing data",function(){
+    var boardDataJson;
     boardData.addSnapshot(snapshot);
+    boardDataJson = jsonEncode(boardData);
+    return new BoardData(jsonDecode(boardDataJson));
+  });
+
+  approveIt("should contain added Snapshot", function() {
+    boardData.addSnapshot(snapshot);
+    
     return boardData.getLatestSnapshot();
   });
 
-  jsonApproveIt("boardData for 1 ticket moving back and forth",function(){
+  approveIt("boardData for 1 ticket moving back and forth",function(){
     return jsonEncode(boardDataOneTicketMovingBackAndforth());
   });
 
-  jsonApproveIt("boardData for 1 ticket blocked 2 times",function(){
+  approveIt("boardData for 1 ticket blocked 2 times",function(){
     
     return jsonEncode(boardDataOneTicketBlocked2Times());
   });
@@ -192,8 +206,8 @@ describe("BoardData", function() {
     snapshot.milliseconds = snapshot.milliseconds + 10;
     boardData.addSnapshot(snapshot);
     var boardDesign = boardData.boardDesignHistory.boardDesignRecords[0];
-    expect(boardDesign.firstSeen()).toEqual(snapshot.milliseconds-10);
-    expect(boardDesign.lastSeen()).toEqual(snapshot.milliseconds);
+    expect(boardDesign.firstSeen).toEqual(snapshot.milliseconds-10);
+    expect(boardDesign.lastSeen).toEqual(snapshot.milliseconds);
   });
 
   it("should contain new Board Design", function() {
@@ -219,7 +233,7 @@ describe("BoardData", function() {
     expect(lane[0].lastSeen).toEqual(snapshot.milliseconds);
   });
 
-  it("boardDesign with earlier firstSeen should be first", function() {
+  approveIt("boardDesign with earlier firstSeen should be first", function() {
     boardData.addSnapshot(snapshot);
     var mergeData = new BoardData();
     snapshot = testSnapshot(snapshot.milliseconds - 10);
@@ -229,10 +243,11 @@ describe("BoardData", function() {
     boardData = mergeBoardData(boardData,mergeData);
     console.log(jsonEncode(boardData));
     var mergedBoardDesign = boardData.boardDesignHistory.boardDesignRecords[0].getBoardDesignForSnapshot();
-    expect(mergedBoardDesign).approve(boardDesign);
+    //expect(mergedBoardDesign).approve(boardDesign);
+    return boardData.boardDesignHistory.boardDesignRecords;
   });
 
-  it("flow Data ticket should have correct enter and exit time after merge", function() {
+  approveIt("flow Data ticket should have correct enter and exit time after merge", function() {
     boardData.addSnapshot(snapshot);
     var mergeData = new BoardData();
     snapshot = testSnapshot(snapshot.milliseconds -10);
@@ -242,22 +257,24 @@ describe("BoardData", function() {
     boardData = mergeBoardData(boardData,mergeData);
     var ticket = boardData.flowData["3"];
     var lane = ticket.lanes["Dev DONE"];
-    expect(lane[0].firstSeen).toEqual(snapshot.milliseconds);
-    expect(lane[0].lastSeen).toEqual(snapshot.milliseconds+10);
+    //expect(lane[0].firstSeen).toEqual(snapshot.milliseconds);
+    //expect(lane[0].lastSeen).toEqual(snapshot.milliseconds+10);
+    return ticket;
   });
 
-  it("should create first snapshot from boardData", function() {
+  approveIt("should create first snapshot from boardData", function() {
     boardData.addSnapshot(snapshot);
     boardData.addSnapshot(testSnapshot(snapshot.milliseconds+10));
-    expect(jsonEncode(boardData.getSnapshot(snapshot.milliseconds))).toEqual(jsonEncode(snapshot));
+    return(jsonEncode(boardData.getSnapshot(snapshot.milliseconds)));
   });
 
-  it("should return all added snapshots from boardData", function() {
+  approveIt("should return all added snapshots from boardData", function() {
     var snapshot2;
     boardData.addSnapshot(snapshot);
     snapshot2 = testSnapshot(snapshot.milliseconds+10);
     boardData.addSnapshot(snapshot2);
-    expect(boardData.getSnapshots()).approve([snapshot,snapshot2]);
+    //expect(boardData.getSnapshots()).approve([snapshot,snapshot2]);
+    return boardData.getSnapshots();
   });
 });
 
@@ -417,8 +434,6 @@ describe("FlowTicket", function() {
     })(testValues[i]);
     
   }
-
-  
 });
 
 

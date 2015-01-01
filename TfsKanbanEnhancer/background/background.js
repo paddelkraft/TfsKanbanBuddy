@@ -8,14 +8,16 @@ var GET_KANBAN_BOARD_DESCRIPTION_MAPPING = "get-description-map";
 var GET_TASK_BOARD_DESCRIPTION_MAPPING = "get-task-description-map";
 var SET_KANBAN_BOARD_DESCRIPTION_MAPPING = "set-description-map";
 var SET_TASK_BOARD_DESCRIPTION_MAPPING = "set-task-description-map";
-
+var tfsKanbanBuddy = {};
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     var data,settings,key;
+    console.log ("Incomming request type = " + request.type);
     switch(request.type) {
 		case SET_KANBAN_BOARD_COLOR_MAPPING://Color mapping for kanban board 
-        	setKanbanBoardColorMap(request.colorMap);
-        	sendResponse("Saved " );
-        	break;
+            setKanbanBoardColorMap(request.colorMap);
+            tfsKanbanBuddy.blockedPrefix = getBlockedPrefix(request.colorMap);
+            sendResponse("Saved " );
+            break;
     	case GET_KANBAN_BOARD_COLOR_MAPPING:
         	sendResponse(getKanbanBoardColorMap());
         	console.log("color-map sent " + jsonEncode(getKanbanBoardColorMap()));
@@ -104,6 +106,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             }
             if(settings.kanbanBoardColorMap){
                 setKanbanBoardColorMap(settings.kanbanBoardColorMap);
+                tfsKanbanBuddy.blockedPrefix = getBlockedPrefix(settings.kanbanBoardColorMap);
             }
             if(settings.kanbanBoardDescriptionMap){
                 setKanbanBoardDescriptionMap(settings.kanbanBoardDescriptionMap);
@@ -112,17 +115,12 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             break;
         
         case "save-snapshot"://Incoming data from kanban board
+            
             var snapshot = request.snapshot;
-            console.log(jsonEncode(request.snapshot));
-            key = "snapshots_" + snapshot.board;
-            var boardData = new BoardData( getObjectFromStorage(key));
-            boardData.addSnapshot(snapshot);
-            console.log(boardData.genericItemUrl);
-            saveObjectToStorage(key, boardData);
+            saveSnapshot(snapshot);
             sendResponse("Saved");
-            console.log("snapshot stored with key " + key);
-            //console.log(getStringFromStorage(key));
             break;
+        
         case "set-board-data"://Incoming data from kanban board
             
             function setBoardData(boardData){
@@ -165,6 +163,34 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     return true;
 });
 
+function getBlockedPrefix(colorMap){
+    var prefix;
+    var color;
+    for(prefix in colorMap){
+        color = colorMap[prefix];
+        if(color === "red" || color === "blocked" ){
+            return prefix;
+        }
+    }
+    return null;
+}
+
+function saveSnapshot(snapshot){
+    var boardData;
+    var key;
+    console.log("Snapshot to save = "+jsonEncode(snapshot));
+    key = "snapshots_" + snapshot.board;
+    //var boardData = new BoardData();
+    boardData = new BoardData( getObjectFromStorage(key));
+    
+    boardData.setBlockedPrefix(tfsKanbanBuddy.blockedPrefix);
+    
+    boardData.addSnapshot(snapshot);
+    //console.log(boardData.genericItemUrl);
+    saveObjectToStorage(key, boardData);
+    console.log("boardData updated key = " + key);
+    
+}
 
 function getBoardLinks(){
     var links = getObjectFromStorage("links") ;
@@ -234,4 +260,5 @@ function autoImport(){
   setTimeout(autoImport, 3600000);
 }
 
+tfsKanbanBuddy.blockedPrefix = getBlockedPrefix(getKanbanBoardColorMap());
 autoImport();

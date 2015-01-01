@@ -26,7 +26,13 @@
 
     "background": 
     {
-    	"scripts": ["/utils_js/jquery-2.1.1.min.js","utils_js/boarddata.js","utils_js/util.js","background/background.js"],
+    	"scripts": ["/utils_js/jquery-2.1.1.min.js",
+                    "/utils_js/lodash.js",
+                    "utils_js/util.js",
+                    "utils_js/boarddata.js",
+                    "utils_js/apiSnapshot.js",
+                    "background/background.js",
+                    "background/api.js"],
     	"persistent": false
 	},
 

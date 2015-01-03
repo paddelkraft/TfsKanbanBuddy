@@ -387,7 +387,8 @@ function SnapshotTicket(genericItemUrl,data){
 
 
 function FlowData(flowData, genericItemUrl){
-    self = this;
+    var self = this;
+
 
     self.getEnterMilliseconds = function (id,lane){
         return self[id].lanes[lane][0].firstSeen;
@@ -425,19 +426,20 @@ function FlowData(flowData, genericItemUrl){
     };
 
     
-    createOrUpdateFlowTicket = _.curry(function(that,ticket,lane,snapshot){
+    function createOrUpdateFlowTicket (ticket,lane,snapshot){
         var flowTicket;
-        if(!that[ticket.id]){
-            that[ticket.id]= {"id":ticket.id};
+        
+        if(!self[ticket.id]){
+            self[ticket.id]= {"id":ticket.id};
         }
-        flowTicket = new FlowTicket(that[ticket.id], snapshot.genericItemUrl);
+        flowTicket = new FlowTicket(self[ticket.id], snapshot.genericItemUrl);
         flowTicket.id = ticket.id;
         flowTicket.title = ticket.title;
         flowTicket.setBlockStatus(ticket,snapshot.milliseconds);
         flowTicket.setLane(lane.name,snapshot.milliseconds);
-        that[ticket.id]=flowTicket;
+        self[ticket.id]=flowTicket;
         return flowTicket;
-    })(self);
+    };
 
     self.addSnapshot = function (snapshot){
         log("add snapshot millisecond = " + snapshot.milliseconds);
@@ -448,6 +450,7 @@ function FlowData(flowData, genericItemUrl){
             //console.log("lane.tickets.length = "+ lane.tickets.length );
             for(var i = 0 ; i < lane.tickets.length ; i++ ){
                 var ticket = lane.tickets[i];
+                
                 self[ticket.id] = createOrUpdateFlowTicket(ticket,lane, snapshot);
             }
         }
@@ -461,17 +464,19 @@ function FlowData(flowData, genericItemUrl){
             self[index] = new FlowTicket(flowData[index],genericItemUrl);
         }
     }
+    return self;
 }
 
 function FlowTicket(flowItemData, genericItemUrl){
-    this.title = (flowItemData.title)? flowItemData.title : null;
-    this.id = (flowItemData.id)? flowItemData.id : null;
-    this.lanes = (flowItemData.lanes) ? flowItemData.lanes : {};
-    this.isBlocked = (flowItemData.isBlocked)? flowItemData.isBlocked : false;
-    this.blockedRecords = (flowItemData.blockedRecords)?flowItemData.blockedRecords:[];
-    this.inLane = (flowItemData.inLane)? flowItemData.inLane : null;
+    var self = this;
+    self.title = (flowItemData.title)? flowItemData.title : null;
+    self.id = (flowItemData.id)? flowItemData.id : null;
+    self.lanes = (flowItemData.lanes) ? flowItemData.lanes : {};
+    self.isBlocked = (flowItemData.isBlocked)? flowItemData.isBlocked : false;
+    self.blockedRecords = (flowItemData.blockedRecords)?flowItemData.blockedRecords:[];
+    self.inLane = (flowItemData.inLane)? flowItemData.inLane : null;
     //internal util functions
-    function addEnterandExitFunctions(item){
+    function addEnterAndExitFunctions(item){
         item.enter = function(){
             return timeUtil.dateFormat(item.firstSeen);
         };
@@ -484,42 +489,32 @@ function FlowTicket(flowItemData, genericItemUrl){
     //
     function createLaneRecord(laneName,milliseconds){
         var laneRecord={};
+        console.log("ID = " + this.id +" Create lane record for lane "+laneName);
         laneRecord.firstSeen = milliseconds;
         laneRecord.lastSeen = milliseconds;
         laneRecord.name = laneName;
-        laneRecord = addEnterandExitFunctions(laneRecord);
+        laneRecord = addEnterAndExitFunctions(laneRecord);
         return laneRecord;
     }
-    
-    for(var laneIndex in this.lanes){
-        
-        //TODO Remove
-        //convert from old format to new
-        if(this.lanes[laneIndex].enterMilliseconds){
-           this.lanes[laneIndex] = (function (oldRecord){
-                var newRecord = [];
-                newRecord.push({"firstSeen" : oldRecord.enterMilliseconds,
-                                "lastSeen"  : oldRecord.exitMilliseconds});
-                newRecord[0].name = laneIndex;
-                return newRecord;
-           })(this.lanes[laneIndex]);
-        } //end convert 
 
-        _.forEach(this.lanes[laneIndex],function(item){
-            addEnterandExitFunctions(item);
+    _.forEach(self.lanes ,function(laneRecords){
+        _.forEach(laneRecords,function(laneRecord){
+            addEnterAndExitFunctions(laneRecord);
         });
-    }
+    });
+    
+    
 
-    this.url = function(){
-        return genericItemUrl + this.id;
+    self.url = function(){
+        return genericItemUrl + self.id;
     };
 
-    this.enteredBoard = function () {
+    self.enteredBoard = function () {
         var firstSeen = timeUtil.now();
         var laneName;
         var lane;
-        for(laneName in this.lanes){
-            lane = this.lanes[laneName][0];
+        for(laneName in self.lanes){
+            lane = self.lanes[laneName][0];
             
             if(lane.firstSeen<firstSeen){
                 firstSeen = lane.firstSeen;
@@ -528,18 +523,20 @@ function FlowTicket(flowItemData, genericItemUrl){
         return firstSeen;
     };
 
-    this.setLane = function(laneName,milliseconds){
-        if(this.inLane!==laneName){
-          this.addLaneIfMissing(laneName);
-          this.lanes[laneName].push(createLaneRecord(laneName,milliseconds));
+    self.setLane = function(laneName,milliseconds){
+        console.log("Set lane lane for ticket " + self.id +" = " + laneName);
+        if(self.inLane!==laneName){
+          self.addLaneIfMissing(laneName);
+          self.lanes[laneName].push(createLaneRecord(laneName,milliseconds));
+          console.log("After createLaneRecord "+ laneName + " has " + self.lanes[laneName].length + " records");
         }
-        this.lanes[laneName][this.lanes[laneName].length-1].lastSeen = milliseconds;
-        this.inLane = laneName;
+        _.last(self.lanes[laneName]).lastSeen = milliseconds;
+        self.inLane = laneName;
     };
 
-    this.wasInLane = function(milliseconds){
+    self.wasInLane = function(milliseconds){
         var inLane=null;
-        _.forEach(this.lanes, function(lane){
+        _.forEach(self.lanes, function(lane){
             if(inLane!==null){
                 return false;
             }
@@ -554,75 +551,85 @@ function FlowTicket(flowItemData, genericItemUrl){
         return inLane;
     };
 
-    this.addLaneIfMissing = function (laneName){
-        if(!this.lanes[laneName]){
-            this.lanes[laneName]=[];
+    self.addLaneIfMissing = function (laneName){
+        if(!self.lanes[laneName]){
+            console.log("Creating lane record for "+ laneName);
+            self.lanes[laneName]=[];
         }
+        console.log("lane record added " + jsonEncode(self));
     };
 
-    this.getCurrentLaneRecord = function (){
-        return this.lanes[this.inLane][this.lanes[this.inLane].length-1];
+    self.getCurrentLaneRecord = function (){
+        return self.lanes[self.inLane][self.lanes[self.inLane].length-1];
     };
 
-    this.getTotalTimeInLane = function(laneName){
+    self.getTotalTimeInLane = function(laneName){
         var timeInLane = 0;
-        _.forEach(this.lanes[laneName],function(item){
+        _.forEach(self.lanes[laneName],function(item){
             timeInLane += item.lastSeen - item.firstSeen;
         });
         return timeInLane;
     };
 
-    this.setBlockStatus = function (snapshotTicket, milliseconds){
+    self.setBlockStatus = function (snapshotTicket, milliseconds){
         if(snapshotTicket.blocked){
-            if(!this.blockedRecords){
-                    this.blockedRecords = [];
-                }if(!this.isBlocked){
-                    this.blockedRecords.push({"firstSeen": milliseconds});
+            if(!self.blockedRecords){
+                    self.blockedRecords = [];
+                }if(!self.isBlocked){
+                    self.blockedRecords.push({"firstSeen": milliseconds});
                 }
-                this.blockedRecords[this.blockedRecords.length-1]["lastSeen"] = milliseconds;
+                self.blockedRecords[self.blockedRecords.length-1]["lastSeen"] = milliseconds;
         }
-        this.isBlocked = snapshotTicket.blocked;
+        self.isBlocked = snapshotTicket.blocked;
     };
 
-    this.getTotalBlockedTime = function (){
+    self.getTotalBlockedTime = function (){
         var totalBlockedTime = 0;
         var blockIndex ;
-        for(blockIndex in this.blockedRecords){
-            totalBlockedTime += (this.blockedRecords[blockIndex].lastSeen - this.blockedRecords[blockIndex].firstSeen);
+        for(blockIndex in self.blockedRecords){
+            totalBlockedTime += (self.blockedRecords[blockIndex].lastSeen - self.blockedRecords[blockIndex].firstSeen);
         }
         return totalBlockedTime;
     };
 
-    this.wasBlocked = function(milliseconds){
+    self.wasBlocked = function(milliseconds){
         var blockIndex ;
-        for(blockIndex in this.blockedRecords){
-            if(this.blockedRecords[blockIndex].lastSeen >= milliseconds && milliseconds>= this.blockedRecords[blockIndex].firstSeen){
+        for(blockIndex in self.blockedRecords){
+            if(self.blockedRecords[blockIndex].lastSeen >= milliseconds && milliseconds>= self.blockedRecords[blockIndex].firstSeen){
                 return true;
             }
         }
         return false;
     };
 
-    this.blockedSince = function(){
-        if(!this.isBlocked){
+    self.blockedSince = function(){
+        if(!self.isBlocked){
             return null;
         }
-        return this.blockedRecords[this.blockedRecords.length-1].firstSeen;
+        return self.blockedRecords[self.blockedRecords.length-1].firstSeen;
     }
 
     
-    return this;
+    return self;
 }
 
-function convertTo050(boardData){
+function convertTo050(boardData, logger){
+    if(!logger){
+        logger = function (log){
+            console.log("ConvertTo050 | "+ log);
+        };
+    }
+    logger("Convert boardData from 0.4.5 to 0.5.0 = " );
     var snapshots = [];
     var converted = new BoardData();
-    
+    logger("converted = " + jsonEncode(converted));
     function getObservationTimes (boardDesignRecords){
         var observationTimes = [];
         _.forEach(boardDesignRecords,function(boardDesignRecord){
             observationTimes = observationTimes.concat(boardDesignRecord.seen);
         });
+        logger("Observation times = " + jsonEncode(observationTimes));
+        logger("Observation times length = " + observationTimes.length);
         return observationTimes;
     }
     
@@ -632,25 +639,49 @@ function convertTo050(boardData){
             snapshotRecords.push({"firstSeen" : observationTime,
                                   "lastSeen" : observationTime });
         });
+        logger ("snapshot records = " + jsonEncode(snapshotRecords) );
+        logger ("snapshot records length = "+ snapshotRecords.length );
         return snapshotRecords;
+    }
+
+    function convertFlowTickets(flowData){
+        _.forEach(flowData, function(flowTicket){
+            var oldRecord;
+            for(var laneIndex in flowTicket.lanes){
+                oldRecord  = flowTicket.lanes[laneIndex]
+                var newRecord = [];
+                newRecord.push({"firstSeen" : oldRecord.enterMilliseconds,
+                                "lastSeen"  : oldRecord.exitMilliseconds});
+                newRecord[0].name = laneIndex;
+                flowTicket.inLane = laneIndex; 
+                flowTicket.lanes[laneIndex] = newRecord;
+            }
+        });
+        
     }
 
     function setBoardDesignRecordsFirstAndLastSeen(boardDesignRecords){
         _.forEach(boardDesignRecords,function(boardDesignRecord){
+            logger("Board design seen  = " + jsonEncode(boardDesignRecord.seen));
             boardDesignRecord.firstSeen = _.first(boardDesignRecord.seen);
             boardDesignRecord.lastSeen = _.last(boardDesignRecord.seen);
             boardDesignRecord.seen = null;
+            logger("Board design firstSeen  = " + jsonEncode(boardDesignRecord.firstSeen));
+            logger("Board design lastSeen  = " + jsonEncode(boardDesignRecord.lastSeen));
         });
     }
 
     if(boardData.ver === "0.4.5"){
         boardData.snapshotRecords = createSnapshotRecords(getObservationTimes(boardData.boardDesignHistory.boardDesignRecords));
         setBoardDesignRecordsFirstAndLastSeen(boardData.boardDesignHistory.boardDesignRecords);
+        convertFlowTickets(boardData.flowData);
         boardData.ver = "0.5.0";
         boardData = new BoardData(boardData);
         snapshots = boardData.getSnapshots();
+        logger(snapshots.length + " Snapshots generated ");
         _.forEach(snapshots,function(snapshot){
-            console.log("Snapshot = "+jsonEncode(snapshot));
+            logger("Adding snapshot = "+jsonEncode(snapshot));
+            logger("snapshot time  = "+timeUtil.dateFormat(snapshot.milliseconds));
             converted.addSnapshot(snapshot);
         });
     }

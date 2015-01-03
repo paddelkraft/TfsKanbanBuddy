@@ -55,11 +55,7 @@ function testSnapshot(milliseconds){
 
   function simpleSnapshot(milliseconds,toDo,devIP,devDone,inProd){
     var currentWip = devIP.length+devDone.length;
-    if (currentWip === 0){
-      currentWip = 0;
-    }else{
-      currentWip == currentWip;
-    }
+    
     return new Snapshot({
         "milliseconds": milliseconds,
         "board": "https://boardUrl/",
@@ -339,6 +335,13 @@ describe("FlowTicket", function() {
     flowTicket.setLane("other lane",15);
     flowTicket.setLane(laneName,20);
     expect(flowTicket.lanes[laneName].length).toBe(2);
+  });
+
+   it("should have bin in lane 1 times", function() {
+    var laneName = "lane";
+    flowTicket.setLane(laneName,10);
+    flowTicket.setLane(laneName,20);
+    expect(flowTicket.lanes[laneName].length).toBe(1);
   });
 
   it("should have bin in lane 20 milliseconds", function() {

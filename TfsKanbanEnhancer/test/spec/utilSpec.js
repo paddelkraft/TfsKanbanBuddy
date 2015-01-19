@@ -16,7 +16,6 @@ describe("TimeUtil", function() {
       it("daysSince should be "+ expectedResult, function() {
         var days = timeUtil.daysSince(timeUtil.now()-(input*timeUtil.MILLISECONDS_DAY));
         expect(days).toBe(expectedResult);
-        
       });
     })(testValues[i],expected[i]);
     
@@ -41,7 +40,7 @@ describe("TimeUtil", function() {
     
     (function (input,expectedResult){
       it("highlightTime should be " + expectedResult, function() {
-        var highlightTime = timeUtil.highlightTime(input);
+        var highlightTime = timeUtil.highlightTime(input,14);
         expect(highlightTime).toBe(expectedResult);
         
       });

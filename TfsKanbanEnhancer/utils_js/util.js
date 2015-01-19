@@ -28,6 +28,10 @@
         return jsonDecode(jsonEncode(obj));
     }
 
+    function objectDataIsEqual(obj1,obj2){
+        return jsonEncode(obj1)===jsonEncode(obj2);
+    }
+
 function TimeUtil(){
     this.MILLISECONDS_DAY = 86400000; //24*60*60*1000=86400000 
     this.MILLISECONDS_HOUR = this.MILLISECONDS_DAY/24; 
@@ -35,14 +39,21 @@ function TimeUtil(){
         return new Date();
     };
 
+    this.timestamp = function(){
+        return this.timeFormat(this.now().getTime);
+    };
+
     this.daysSince = function(date){
         return Math.floor((this.now()-date)/this.MILLISECONDS_DAY);
     };
 
-    this.highlightTime = function (days){
+    this.highlightTime = function (days,old){
+        if(!old){
+            old = 50;
+        }
         if(days<2){
             return "new";
-        } else if(days>14){
+        } else if(days>old){
             return days+" (old)";
         }
         return days;
@@ -109,7 +120,30 @@ timeUtil = new TimeUtil();
         return self
     }
 
-    
+    function arraysAreIdentical(arr1,arr2){
+        if (!arr1 || !arr2)
+        return false;
+
+        // compare lengths - can save a lot of time 
+        if (arr1.length != arr2.length)
+            return false;
+
+        for (var i = 0, l=arr1.length; i < l; i++) {
+            // Check if we have nested arrays
+            if (arr1[i] instanceof Array && arr2[i] instanceof Array) {
+                // recurse into the nested arrays
+                if (!arraysAreIdentical(arr1,arr2[i])){
+                    return false;
+                }
+                           
+            }           
+            else if (arr1[i] !== arr2[i]) { 
+                // Warning - two different object instances will never be equal: {x:20} != {x:20}
+                return false;   
+            }           
+        }       
+        return true;
+    }
 
     function twoDigits(input){
         var output = "0"+input;
@@ -118,7 +152,7 @@ timeUtil = new TimeUtil();
 
     function downloadAsJson(data, filePrefix){
         var blob = new Blob([jsonEncode(data)], {type: "data:application/json;charset=utf-8"});
-        saveAs(blob, filePrefix + timestamp()+".json");
+        saveAs(blob, filePrefix + timeUtil.timestamp()+".json");
     }
 
     function downloadAsCSV(data, filePrefix){

@@ -124,15 +124,15 @@ function blockedDays (ticket) {
 	if(! ticket.blockedSince()){
 		return "";
 	}
-	return timeUtil.highlightTime(timeUtil.daysSince(ticket.blockedSince()));
+	return timeUtil.highlightTime(timeUtil.daysSince(ticket.blockedSince()),7);
 }
 
 function daysInColumn (flowData,ticketId,laneName) {
-	return timeUtil.highlightTime(timeUtil.daysSince(flowData.getEnterMilliseconds(ticketId,laneName)));
+	return timeUtil.highlightTime(timeUtil.daysSince(flowData.getEnterMilliseconds(ticketId,laneName)),14);
 }
 
 function daysOnBoard (flowData,ticketId) {
-	return timeUtil.highlightTime(timeUtil.daysSince(flowData[ticketId].enteredBoard()));
+	return timeUtil.highlightTime(timeUtil.daysSince(flowData[ticketId].enteredBoard()),40);
 }
 
 

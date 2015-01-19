@@ -118,10 +118,10 @@ describe("Converters", function() {
     expect(csv).toEqual('"1","2"\r\n"3","4"');
   });
 
-  /*approveIt("should convert boarddata from 0.4.5 to ver 0.5.0 object ceration",function(){
+  approveIt("should convert boarddata from 0.4.5 to ver 0.5.0 object ceration",function(){
     var boardData = new BoardData(_boardData045);
     return boardData;
-  });*/
+  });
 
   approveIt("should convert boarddata from 0.4.5 to ver 0.5.0 function",function(){
     var boardData = convertTo050(smallerConversion);

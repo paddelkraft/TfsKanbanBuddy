@@ -92,3 +92,77 @@ function ApiSnapshot(apiUrl,boardUrl,genericItemUrl){
 }
 
 
+function Storage(){
+	self = {};
+
+	self.getRegisteredBoards = function(){
+		var registeredBoards = getObjectFromStorage("registered-boards") ;
+		console.log("registered boards read from local storage");
+		return registeredBoards;
+	};
+
+	self.setRegisteredBoards = function(registeredBoards){
+		saveObjectToStorage("registered-boards", registeredBoards) ;
+		console.log("registeredBoards saved to local storage " );
+	};
+
+	return self;
+}
+
+function apiUtil(storage){
+	var self = {};
+	if(!storage){
+		storage = Storage();
+	}
+	
+
+	self.getApiUrl = function(boardUrl){
+		var projName = boardUrl.split("/_backlogs")[0];
+		return projName + "/_api/_backlog/GetBoard?__v=3";
+	};
+
+	
+	self.createBoardRecord = function (snapshot){
+		var boardRecord = {};
+		boardRecord.boardUrl = snapshot.board;
+		boardRecord.apiUrl = self.getApiUrl(snapshot.board);
+		boardRecord.genericItemUrl = snapshot.genericItemUrl;
+		return boardRecord;
+	};
+
+	self.registerBoard = function(snapshot){
+		var registeredBoards  = storage.getRegisteredBoards();
+		var boardRecord = self.createBoardRecord(snapshot);
+		if(registeredBoards[boardRecord.apiUrl]){
+			return;
+		}else{
+			registeredBoards[boardRecord.apiUrl] = boardRecord;
+			console.log("Register board " + boardRecord.boardUrl);
+			storage.setRegisteredBoards(registeredBoards);
+		}
+	};
+
+	self.getApiSnapshot = function(boardRecord){
+		var api;
+		console.log("Fetch snapshot from api "+boardRecord.apiUrl );
+		api = new ApiSnapshot(boardRecord.apiUrl,boardRecord.boardUrl,boardRecord.genericItemUrl);
+
+		api.getSnapshot( function(snapshot){
+			console.log ("apiSnapshot built");
+			saveSnapshot(snapshot);
+
+		});
+	};
+
+	self.getApiSnapshots = function (){
+		_.forEach (storage.getRegisteredBoards(),function(boardRecord){
+			self.getApiSnapshot(boardRecord);
+		});
+	};
+
+
+	return self;
+
+}
+
+

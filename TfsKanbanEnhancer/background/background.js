@@ -9,6 +9,7 @@ var GET_TASK_BOARD_DESCRIPTION_MAPPING = "get-task-description-map";
 var SET_KANBAN_BOARD_DESCRIPTION_MAPPING = "set-description-map";
 var SET_TASK_BOARD_DESCRIPTION_MAPPING = "set-task-description-map";
 var tfsKanbanBuddy = {};
+
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     var data,settings,key;
     console.log ("Incomming request type = " + request.type);
@@ -115,9 +116,8 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             break;
         
         case "save-snapshot"://Incoming data from kanban board
-            
-            var snapshot = request.snapshot;
-            saveSnapshot(snapshot);
+            saveSnapshot(request.snapshot);
+            apiUtil().registerBoard(request.snapshot);
             sendResponse("Saved");
             break;
         

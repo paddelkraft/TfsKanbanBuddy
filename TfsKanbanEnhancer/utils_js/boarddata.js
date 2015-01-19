@@ -2,6 +2,9 @@ function log(msg){
     console.log ("BoardData | "+ msg);
 }
 
+//Entry point for all saved data from a kanban board
+//the constructor takes the saved data structures and recreates it with added functions
+
 function BoardData(data){
     var self = this;
     if(!data){
@@ -15,7 +18,10 @@ function BoardData(data){
     self.board = (data.board)?data.board:null;
     self.storageKey = "snapshots_" + self.board;
     self.genericItemUrl = (data.genericItemUrl)? data.genericItemUrl:"";
+    // records of individual board states holds times for when it was first and last seen every time theboard changes
+    // there is a new record generated 
     self.snapshotRecords = (data.snapshotRecords) ? data.snapshotRecords : [];//remove in later version
+    // storage for historical and current board designs with firstSeen and lastSeen
     self.boardDesignHistory = (data.boardDesignHistory)? new BoardDesignHistory(data.boardDesignHistory):
                                                          new BoardDesignHistory();
     self.flowData = (data.flowData) ? new FlowData(data.flowData,self.genericItemUrl) : new FlowData() ;
@@ -23,10 +29,12 @@ function BoardData(data){
     var blockedPrefix=null;
     //functions
 
+    //set new lastseen if snapshot is identical to last one 
     function updateSnapshotRecord(milliseconds){
         _.last(self.snapshotRecords).lastSeen=milliseconds;
     }
 
+    //generates new snapshot record when the board state has changed sinse last snapshot
     function newSnapshotRecord(milliseconds){
         self.snapshotRecords.push({"firstSeen":milliseconds,"lastSeen":milliseconds});
     }
@@ -34,12 +42,13 @@ function BoardData(data){
     
 
     
-
+    // used to see if the snapshot new snapshot is identical to the one last added
     self.boardHasNotChanged = function (snapshot){
         var latestSnapshot = self.getLatestSnapshot();
         return latestSnapshot && snapshot.equals(latestSnapshot);
     };
    
+    //sets blocked for blocked tickets in snapshots before adding the snapshpt to flowdata
     function setBlocked (snapshot){
         _.forEach(snapshot.lanes,function(lane){
             _.forEach(lane.tickets,function(ticket){
@@ -51,6 +60,13 @@ function BoardData(data){
         return snapshot;
     }
 
+    //utility to set the blocked prefix. for setBlocked to work this function needs to be called with
+    //the blocked prefix before you add a new snapshot to boarddata
+    self.setBlockedPrefix = function (prefix){
+        blockedPrefix = prefix;
+    };
+
+    // New incomming snapshot of kanban board is added to boardData
     self.addSnapshot = function(snapshot){
         if(blockedPrefix){
             snapshot = setBlocked(snapshot);
@@ -80,8 +96,9 @@ function BoardData(data){
         return null;
     };
 
+    //returns all snapshots needed to recreate all data in this boarddata
     self.getSnapshots = function(){
-        var boardObservationTimes = getBoardObservationTimes();
+        var boardObservationTimes = getBoardTransisionTimes();
         var snapshots = [];
         var observationIndex;
         for(observationIndex in boardObservationTimes){
@@ -90,7 +107,8 @@ function BoardData(data){
         return snapshots;
     };
 
-    function getBoardObservationTimes(){
+    // util function that finds all transition times for recorded data
+    function getBoardTransisionTimes(){
         var boardObservationTimes = [];
         _.forEach(self.snapshotRecords,function(record){
             boardObservationTimes.push(record.firstSeen);
@@ -101,7 +119,8 @@ function BoardData(data){
         return boardObservationTimes;
     }
 
-    self.getBoardState = function(milliseconds){
+    //util  to recreates the state the board had at the given time in milliseconds
+    var getBoardState = function(milliseconds){
         var boardDesignRecord = self.findBoardDesignRecord(milliseconds);
         var boardState = boardDesignRecord.getBoardDesignForSnapshot();
         for(var index in boardState){
@@ -111,18 +130,19 @@ function BoardData(data){
         }
         return boardState;
     };
-
+    //recreates a full snapshot of the board as it looked  at the given time in milliseconds
     self.getSnapshot = function(milliseconds){
         var snapshot = {};
         if( self.findBoardDesignRecord(milliseconds)!==null){
            snapshot.milliseconds = milliseconds;
             snapshot.board = self.board;
             snapshot.genericItemUrl = self.genericItemUrl;
-            snapshot.lanes = self.getBoardState(milliseconds);
+            snapshot.lanes = getBoardState(milliseconds);
         }
         return new Snapshot(snapshot);
     };
 
+    //get the current board design at the given time in milliseconds
     self.findBoardDesignRecord = function(milliseconds){
         var designRecordIndex;
         var snapshotTime;
@@ -145,7 +165,7 @@ function BoardData(data){
 
 
     
-
+    //get a list of all historical lane names (used for reporting) 
     self.getLaneHeaders = function (){
         var lanes = newLaneNode("");
         var lanesArray = [];
@@ -165,7 +185,7 @@ function BoardData(data){
         return lanes.toArray().reverse() ;
     };
 
-    //util
+    //a linked list used to get the lane headers in a good order for the reports
     function newLaneNode(name ){
         var header = {};
         header.name = name;
@@ -209,39 +229,46 @@ function BoardData(data){
         return header;
     }
 
+    //how much data is in this boardData object
     self.size = function(){
         return jsonEncode(self).length * 2;
     };
 
-    self.setBlockedPrefix = function (prefix){
-        blockedPrefix = prefix;
-    }
+    
 
     
 }//BoardData
 
 
+
+//kanban board snapshot object
+//takes the snapshot data structure as imput 
 function Snapshot(snapshot){
     var self = this;
+    //link to board
     self.board =  snapshot.board;
+    //time of napshot capture
     self.milliseconds = snapshot.milliseconds;
+    //generic link to item details used to 
+    //link direct into tfs items from reports 
     self.genericItemUrl = snapshot.genericItemUrl;
+    //board state
     self.lanes = [];
     _.forEach(snapshot.lanes,function(lane){
         self.lanes.push( new SnapshotLane(snapshot.genericItemUrl,lane));
     });
     self.lanes = fixWip(self.lanes);
 
+    //makes sure that the wip information is uniform and correct 
     function fixWip(lanes){
         var current = 0;
         for(var index in lanes){
             var tickets = lanes[index].tickets;
             
             if(lanes[index].wip){
-               // console.log("limit = "+lanes[index].wip.limit);
                 if( lanes[index].wip.limit===0){
                     current =lanes[index].wip.current;
-                    
+                    //lanes with wip.limit ===0 is counted as done column if previous lane had wip.limit !==0
                     if (lanes[index-1] && lanes[index-1].wip && lanes[index-1].wip.limit>0){
                         lanes[index-1].wip.current += current;
                         lanes[index].wip.current = 0;
@@ -254,8 +281,12 @@ function Snapshot(snapshot){
 
     }
 
+    self.getBoardApiUrl = function(){
+        var apiUrl = self.board.split("_backlogs")[0]+"_api/_backlog/GetBoard?__v=3";
+        return apiUrl;
+    };
 
-    
+    //extract the board design from snapshot
     self.getBoardDesign = function (){
         var boardLayout = [];
         var lane;
@@ -270,14 +301,7 @@ function Snapshot(snapshot){
         return  boardLayout;
     };
 
-    /*self.getLaneNames =function(){
-        var laneNames = [];
-        _.forEach(self.lanes,function(lane){
-            laneNames.push(lane.name );
-        });
-        console.log("laneNames = "+ jsonEncode(laneNames));
-        return laneNames;
-    };*/
+    
 
     self.getLaneNames = function (){
         var lanes = [];
@@ -297,6 +321,7 @@ function Snapshot(snapshot){
         return lanes;
     }
 
+    //compare snapshots
     self.equals = function(comp){
         
         var isEqual = arraysAreIdentical(self.getLaneNames() , comp.getLaneNames());
@@ -322,10 +347,12 @@ function Snapshot(snapshot){
     return self;
 }
 
+//lane object used in snapshots
 function SnapshotLane (genericItemUrl,lane){
     
     var self = this;
     self.name = lane.name;
+    // information on wip limit and ongoing work for lane
     if(lane.wip){
         if(lane.wip.limit === ""){
             lane.wip.limit = 0;
@@ -340,7 +367,7 @@ function SnapshotLane (genericItemUrl,lane){
         }
     });
 
-
+    //compare snapshot lanes
     self.equals = function(comp){
         var same = true;
         if(comp.tickets.length != self.tickets.length){
@@ -362,6 +389,7 @@ function SnapshotLane (genericItemUrl,lane){
     return self;
 }
 
+//Ticket object used in snapshots
 function SnapshotTicket(genericItemUrl,data){
     var self = this;
     self.id = data.id;
@@ -369,15 +397,17 @@ function SnapshotTicket(genericItemUrl,data){
     if (data.blocked){
         self.blocked = data.blocked;
     }
+    //returns a direct link to tfs item this tickets represents
     self.url = function(){
         return snapshot.genericItemUrl+self.id;
     };
 
+    //Compare snapshot Tickets
     self.equals = function(comp){
         var same = true;
         if(!(self.id === comp.id && self.title === comp.title)){
             return false;
-        } 
+        }
         
         return(self.blocked === comp.blocked);
     };
@@ -385,16 +415,17 @@ function SnapshotTicket(genericItemUrl,data){
 }
 
 
-
+// this is where all the data on what tiskets has been on the board and what state they have been at what time
 function FlowData(flowData, genericItemUrl){
     var self = this;
 
 
+    //when did ticket first appear on the board
     self.getEnterMilliseconds = function (id,lane){
         return self[id].lanes[lane][0].firstSeen;
     };
 
-    
+    //tickets in lane at given time in milliseconds
     self.getTicketsInLane = function (lane, time){
         var tickets = [];
         for(var id in self){
@@ -415,17 +446,8 @@ function FlowData(flowData, genericItemUrl){
         return tickets;
     };
 
-    self.merge = function(flowData){
-        for(var id in flowData){
-            if(!self[id]){
-                self[id]=flowData[id];
-            } else if(self[id].merge) {
-                self[id].merge(flowData[id]);
-            }
-        }
-    };
-
     
+    //update flow ticket with the latest data
     function createOrUpdateFlowTicket (ticket,lane,snapshot){
         var flowTicket;
         
@@ -439,8 +461,9 @@ function FlowData(flowData, genericItemUrl){
         flowTicket.setLane(lane.name,snapshot.milliseconds);
         self[ticket.id]=flowTicket;
         return flowTicket;
-    };
+    }
 
+    //add data from a new snapshot
     self.addSnapshot = function (snapshot){
         log("add snapshot millisecond = " + snapshot.milliseconds);
         var index, laneIndex ;
@@ -476,6 +499,7 @@ function FlowTicket(flowItemData, genericItemUrl){
     self.blockedRecords = (flowItemData.blockedRecords)?flowItemData.blockedRecords:[];
     self.inLane = (flowItemData.inLane)? flowItemData.inLane : null;
     //internal util functions
+    //readable versions fo firstSeen and lastSeen is attached to object
     function addEnterAndExitFunctions(item){
         item.enter = function(){
             return timeUtil.dateFormat(item.firstSeen);
@@ -486,7 +510,7 @@ function FlowTicket(flowItemData, genericItemUrl){
         return item;
     }
 
-    //
+    //ticket has entered a new lane
     function createLaneRecord(laneName,milliseconds){
         var laneRecord={};
         console.log("ID = " + this.id +" Create lane record for lane "+laneName);
@@ -504,11 +528,12 @@ function FlowTicket(flowItemData, genericItemUrl){
     });
     
     
-
+    //direct link to tfs item
     self.url = function(){
         return genericItemUrl + self.id;
     };
 
+    //time when ticket entered board
     self.enteredBoard = function () {
         var firstSeen = timeUtil.now();
         var laneName;
@@ -523,10 +548,11 @@ function FlowTicket(flowItemData, genericItemUrl){
         return firstSeen;
     };
 
+    //update ticket with new data from  a new snapshot
     self.setLane = function(laneName,milliseconds){
         console.log("Set lane lane for ticket " + self.id +" = " + laneName);
         if(self.inLane!==laneName){
-          self.addLaneIfMissing(laneName);
+          addLaneIfMissing(laneName);
           self.lanes[laneName].push(createLaneRecord(laneName,milliseconds));
           console.log("After createLaneRecord "+ laneName + " has " + self.lanes[laneName].length + " records");
         }
@@ -534,6 +560,7 @@ function FlowTicket(flowItemData, genericItemUrl){
         self.inLane = laneName;
     };
 
+    //where was this ticket at the given time
     self.wasInLane = function(milliseconds){
         var inLane=null;
         _.forEach(self.lanes, function(lane){
@@ -551,18 +578,20 @@ function FlowTicket(flowItemData, genericItemUrl){
         return inLane;
     };
 
-    self.addLaneIfMissing = function (laneName){
+    //create a lane objet if none exist for the given lane
+    var addLaneIfMissing = function (laneName){
         if(!self.lanes[laneName]){
             console.log("Creating lane record for "+ laneName);
             self.lanes[laneName]=[];
         }
-        console.log("lane record added " + jsonEncode(self));
     };
 
+    //get the lane racord for the tickets current location
     self.getCurrentLaneRecord = function (){
         return self.lanes[self.inLane][self.lanes[self.inLane].length-1];
     };
 
+    
     self.getTotalTimeInLane = function(laneName){
         var timeInLane = 0;
         _.forEach(self.lanes[laneName],function(item){
@@ -571,6 +600,7 @@ function FlowTicket(flowItemData, genericItemUrl){
         return timeInLane;
     };
 
+    //update blockage status with new data from snapshot
     self.setBlockStatus = function (snapshotTicket, milliseconds){
         if(snapshotTicket.blocked){
             if(!self.blockedRecords){
@@ -592,6 +622,7 @@ function FlowTicket(flowItemData, genericItemUrl){
         return totalBlockedTime;
     };
 
+    //was the ticket blocked at this time ?
     self.wasBlocked = function(milliseconds){
         var blockIndex ;
         for(blockIndex in self.blockedRecords){
@@ -602,6 +633,7 @@ function FlowTicket(flowItemData, genericItemUrl){
         return false;
     };
 
+    //for how long has the current blockage been running?
     self.blockedSince = function(){
         if(!self.isBlocked){
             return null;
@@ -648,12 +680,12 @@ function convertTo050(boardData, logger){
         _.forEach(flowData, function(flowTicket){
             var oldRecord;
             for(var laneIndex in flowTicket.lanes){
-                oldRecord  = flowTicket.lanes[laneIndex]
+                oldRecord  = flowTicket.lanes[laneIndex];
                 var newRecord = [];
                 newRecord.push({"firstSeen" : oldRecord.enterMilliseconds,
                                 "lastSeen"  : oldRecord.exitMilliseconds});
                 newRecord[0].name = laneIndex;
-                flowTicket.inLane = laneIndex; 
+                flowTicket.inLane = laneIndex;
                 flowTicket.lanes[laneIndex] = newRecord;
             }
         });
@@ -690,6 +722,7 @@ function convertTo050(boardData, logger){
     
 }
 
+//Merge data from two datasources
 function mergeBoardData(boardData,mergeData){
     var boardSnapshots = boardData.getSnapshots();
     var snapshotIndex;
@@ -718,6 +751,7 @@ function BoardDesignHistory(boardDesignHistoryObject){
        boardDesignHistory.boardDesignRecords[index]= boardDesignRecord;
     }
     
+    //update records with data from new snapshot
     boardDesignHistory.reportBoardDesign = function(boardDesign,milliseconds){
         var numberOfRecords = this.boardDesignRecords.length;
         var boardDesignRecord;

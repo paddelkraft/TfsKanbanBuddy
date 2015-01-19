@@ -91,27 +91,55 @@ var prettydiff=function prettydiff(api){"use strict";var startTime=(function sta
 beforeEach(function(){
   jasmine.addMatchers({
     approve: function() {
-    return {
-      compare: function(actual, expected) {
-        var result;
-        var actualString = actual;
-        var expectedString = expected;
+        return {
+          compare: function(actual, expected) {
+            var result;
+            var actualString = actual;
+            var expectedString = expected;
 
-        if(typeof actual !== "string"){
-            actualString = jsonEncode(actual);
-        }
-        
-        if(typeof expected !== "string"){
-            expectedString = jsonEncode(expectedString);
-        }
-        result  = {pass:actualString===expectedString};
-        result. message = "Result   = "+ actualString + "\nApproved = " +expectedString;
-        return result;
-      }
-    };
+            if(typeof actual !== "string"){
+                actualString = jsonEncode(actual);
+            }
+            
+            if(typeof expected !== "string"){
+                expectedString = jsonEncode(expectedString);
+            }
+            result  = {pass:actualString===expectedString};
+            result.message = "Result   = "+ actualString + "\nApproved = " +expectedString;
+            return result;
+          }
+        };
+    },
+    jsonToBe: function() {
+        return {
+          compare: function(actual, expected) {
+            var result;
+            var actualString = actual;
+            var expectedString = expected;
+            var div = document.createElement("div");
+
+            if(typeof actual !== "string"){
+                actualString = jsonEncode(actual);
+            }
+            
+            if(typeof expected !== "string"){
+                expectedString = jsonEncode(expectedString);
+            }
+            result  = {pass:actualString===expectedString};
+            var diffArgs   = {
+              source: expectedString,
+              diff  : actualString,
+              lang  : "JavaScript"
+            };
+            div.innerHTML = prettydiff(diffArgs) + "<br>Result   = "+ actualString + "<br>Expected = " +expectedString;
+            result.message = div;
+            return result;
+          }
+        };
     }
   });
 });
+
 function avoidCache(){
     
     return "?"+new Date().getTime();

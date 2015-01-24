@@ -136,8 +136,12 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             break;
 
         case "show-flow-data"://board triggering flowData page opening
+            var page = "flowData.html";
             console.log("flowdata for"  + request.board + " requested");
-            var newURL = "pages/flowData.html?"+encodeURIComponent(request.board);
+            if(request.page){
+                page = request.page;
+            }
+            var newURL = "pages/"+page+"?"+encodeURIComponent(request.board);
             chrome.tabs.create({ url: newURL });
             sendResponse("OK");
             console.log("show-flow-data handled flowdata.html opened");

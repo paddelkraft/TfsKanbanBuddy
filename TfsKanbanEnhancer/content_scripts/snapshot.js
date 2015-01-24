@@ -82,6 +82,17 @@
         });
     }
 
+    function openPage(page){
+         var message = {};
+        message.type = "show-flow-data";
+        message.page = page;
+        message.board = getProjectUrl();
+        message.snapshot = getBoardSnapshot();
+        chrome.runtime.sendMessage(message, function(response){
+            log(response);
+        });
+    }
+
     function getBoardSnapshot(){
         var snapshot = {};
         var i;
@@ -133,6 +144,7 @@
 
     //addProductBacklogViewTabsLink("Take board Snapshot", "#","takeSnapshot", takeSnapshot);
     addProductBacklogViewTabsLink("flow data", "#","showFlowData", showFlowData);
+    addProductBacklogViewTabsLink("CFD", "#","cfd", function(){openPage("cfd.html")});
     var genericItemUrl = getGenericItemUrl();
     onloadSnapshot();
 

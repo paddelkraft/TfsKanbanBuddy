@@ -54,7 +54,11 @@ function testSnapshot(milliseconds){
   }
 
   function simpleSnapshot(milliseconds,toDo,devIP,devDone,inProd){
-    var currentWip = devIP.length+devDone.length;
+    var currentWip = 0;
+    if(devIP && devDone){
+      currentWip = devIP.length+devDone.length;
+    }
+    
     
     return new Snapshot({
         "milliseconds": milliseconds,
@@ -258,6 +262,13 @@ describe("BoardData", function() {
     return ticket;
   });
 
+  it("ticket should have left the board",function(){
+    var flowData = new FlowData();
+    boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
+    boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY));
+    expect(boardData.flowData[1].inLane).toBe("In production");
+  });
+
   approveIt("should create first snapshot from boardData", function() {
     boardData.addSnapshot(snapshot);
     boardData.addSnapshot(testSnapshot(snapshot.milliseconds+10));
@@ -274,6 +285,23 @@ describe("BoardData", function() {
   });
 });
 
+describe("FlowData",function(){
+
+  approveIt("should return cfd data", function(){
+    var flowData = new FlowData();
+    flowData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","Title")],
+                                          [createSnapshotTicket("2","Title2")]));
+    flowData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY,[createSnapshotTicket("3","Title3")],
+                                                                  [createSnapshotTicket("1","Title")],
+                                                                  [createSnapshotTicket("2","Title2")]));
+     return flowData.getCfdData();
+  });
+
+  // Ticket has left board
+
+  
+});
+
 describe("FlowTicket", function() {
   var testValues ;
   var expectedResults ;
@@ -283,12 +311,18 @@ describe("FlowTicket", function() {
   var flowTicket;
   
   function flowticketWithTwoRecordsInLaneA10milliseconds(){
+    return flowticketWithTwoRecordsInLane(10);
+  }
+
+  
+
+  function flowticketWithTwoRecordsInLane(milliseconds){
     var laneName = "lane";
-    flowTicket.setLane(laneName,10);
-    flowTicket.setLane(laneName,20);
-    flowTicket.setLane("other lane",25);
-    flowTicket.setLane(laneName,30);
-    flowTicket.setLane(laneName,40);
+    flowTicket.setLane(laneName,1 * milliseconds);
+    flowTicket.setLane(laneName,2 * milliseconds);
+    flowTicket.setLane("other lane",2.5 * milliseconds);
+    flowTicket.setLane(laneName,3 * milliseconds);
+    flowTicket.setLane(laneName,4 * milliseconds);
     return flowTicket;
   }
 
@@ -360,6 +394,7 @@ describe("FlowTicket", function() {
       });
     })(testValues[i],expectedResults[i]);
   }
+
 
 //Blockages
 
@@ -437,7 +472,38 @@ describe("FlowTicket", function() {
     })(testValues[i]);
     
   }
+
+  
+
+  // CFD
+  approveIt("ticket should return cfdData", function() {
+    flowTicket = flowticketWithTwoRecordsInLane(1.1 * timeUtil.MILLISECONDS_DAY);
+    return flowTicket.cfdData();
+  });
 });
+
+describe("CFD",function(){
+
+  approveIt("CFD for ticket moving across board", function(){
+    var boardData = new BoardData();
+    boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
+    boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY,[],[createSnapshotTicket("1","TestTicket")]));
+    boardData.addSnapshot(simpleSnapshot(2*timeUtil.MILLISECONDS_DAY,[],[],[createSnapshotTicket("1","TestTicket")]));
+    boardData.addSnapshot(simpleSnapshot(3*timeUtil.MILLISECONDS_DAY,[],[],[],[createSnapshotTicket("1","TestTicket")]));
+    return boardData.getCfdData();
+  });
+
+  approveIt("CFD chart data for ticket moving across board", function(){
+    var boardData = new BoardData();
+    boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
+    boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY,[],[createSnapshotTicket("1","TestTicket")]));
+    boardData.addSnapshot(simpleSnapshot(2*timeUtil.MILLISECONDS_DAY,[],[],[createSnapshotTicket("1","TestTicket")]));
+    boardData.addSnapshot(simpleSnapshot(3*timeUtil.MILLISECONDS_DAY,[],[],[],[createSnapshotTicket("1","TestTicket")]));
+    return boardData.buildCfdChartData(boardData.getCfdData());
+  });
+
+});
+
 
 
  

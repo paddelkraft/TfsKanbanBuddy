@@ -34,7 +34,7 @@
 
 function TimeUtil(){
     this.MILLISECONDS_DAY = 86400000; //24*60*60*1000=86400000 
-    this.MILLISECONDS_HOUR = this.MILLISECONDS_DAY/24; 
+    this.MILLISECONDS_HOUR = this.MILLISECONDS_DAY/24;
     this.now = function(){
         return new Date();
     };
@@ -59,12 +59,28 @@ function TimeUtil(){
         return days;
     };
 
+    this.dayStart  = function(milliseconds){
+        return this.daysSinceEpoc(milliseconds)*this.MILLISECONDS_DAY;
+    };
+
+    this.daysSinceEpoc = function(milliseconds){
+        return Math.floor(milliseconds/this.MILLISECONDS_DAY);
+    };
+
+
     this.dateFormat = function ( milliseconds ){
-        time = new Date(milliseconds);
+        var time = new Date(milliseconds);
         var formatedDate = "" + time.getFullYear() + "-" + twoDigits(time.getMonth() +1) +
                                                   "-" + twoDigits(time.getDate()) +
                                                   " " + twoDigits(time.getHours()) +
                                                   ":" + twoDigits(time.getMinutes());
+        return formatedDate;
+    };
+
+    this.isoDateFormat = function(milliseconds){
+        var time = new Date(milliseconds);
+        var formatedDate = "" + time.getFullYear() + "-" + twoDigits(time.getMonth() +1) +
+                                                  "-" + twoDigits(time.getDate());
         return formatedDate;
     };
 
@@ -117,7 +133,7 @@ timeUtil = new TimeUtil();
             self[i]=null;
         }
 
-        return self
+        return self;
     }
 
     function arraysAreIdentical(arr1,arr2){
@@ -136,12 +152,12 @@ timeUtil = new TimeUtil();
                     return false;
                 }
                            
-            }           
-            else if (arr1[i] !== arr2[i]) { 
+            }
+            else if (arr1[i] !== arr2[i]) {
                 // Warning - two different object instances will never be equal: {x:20} != {x:20}
-                return false;   
-            }           
-        }       
+                return false;
+            }
+        }
         return true;
     }
 
@@ -181,8 +197,20 @@ timeUtil = new TimeUtil();
       return csv;
     }
 
+    function arrayOf(value,length){
+        var arr = [];
+        for (var i = 0; i < length; i++) {
+          arr[i]=value;
+        }
+        return arr;
+    }
 
-
-    
+    function gridOf(value, rows, columns){
+        var grid = [];
+        for (var i = 0; i < rows; i++) {
+          grid[i]=arrayOf(value,columns);
+        }
+        return grid;
+    }
 
     

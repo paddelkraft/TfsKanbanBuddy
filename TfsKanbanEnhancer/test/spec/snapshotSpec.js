@@ -100,7 +100,7 @@ describe("http.get apiSnapshot", function (){
 	});
 });
 
-discribe("API snapshots",function(){
+describe("API snapshots",function(){
 
 	it("boardSnapshot and apiSnapshot should be same",function(){
 		var apiSnapshot = new Snapshot({"milliseconds":1420066405840,"board":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection","genericItemUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=","lanes":[{"name":"ToDo","wip":{"limit":0,"current":0},"tickets":[]},{"name":"Req IP","wip":{"limit":1,"current":0},"tickets":[]},{"name":"Req DONE","wip":{"limit":0,"current":1},"tickets":[{"id":"10","title":"SPIKE spike 1 |project"}]},{"name":"Architecture IP","wip":{"limit":3,"current":0},"tickets":[]},{"name":"Architecture DONE","wip":{"limit":0,"current":1},"tickets":[{"id":"7","title":"MAINT #111 fixa"}]},{"name":"Dev IP","wip":{"limit":5,"current":1},"tickets":[{"id":"8","title":"TEST testing"}]},{"name":"Dev DONE","wip":{"limit":0,"current":1},"tickets":[{"id":"9","title":"FD 2014-10-10 #123 bla bla bla |maint"}]},{"name":"Test IP","wip":{"limit":5,"current":5},"tickets":[{"id":"5","title":"BUG #3587 critical"},{"id":"4","title":"AT #111 Test4"},{"id":"3","title":"* CR #113 Test3"},{"id":"1","title":"CR #111 Test1"},{"id":"2","title":"! CR #112 Test 2"}]},{"name":"Test DONE","wip":{"limit":0,"current":1},"tickets":[{"id":"6","title":"SUPPORT #not support"}]},{"name":"Approval","wip":{"limit":5,"current":0},"tickets":[]},{"name":"Redy for production","wip":{"limit":5,"current":0},"tickets":[]},{"name":"In production","wip":{"limit":0,"current":0},"tickets":[]}]}) ;

@@ -129,7 +129,7 @@ beforeEach(function(){
             var diffArgs   = {
               source: expectedString,
               diff  : actualString,
-              lang  : "JavaScript"
+              lang  : "json"
             };
             div.innerHTML = prettydiff(diffArgs) + "<br>Result   = "+ actualString + "<br>Expected = " +expectedString;
             result.message = div;

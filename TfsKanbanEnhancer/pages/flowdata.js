@@ -153,9 +153,10 @@ var app = angular.module("flowData", []);
 			$scope.snapshot = buildSnapshot(boardData);
 			$scope.dataSize = "Data size = " +parseInt( boardData.size()/1024) +"KB";
 			$scope.board = boardData.board;
+			$scope.showSnapshot = false;
+			$scope.showFlowDataGrid = false;
+			$scope.showFlowReport = false;	
 			$scope.snapshotAction = function (){
-				
-				
 					
 					$scope.exportAsJson = function(){
 						downloadAsJson($scope.snapshot,"boardSnapshot");
@@ -166,8 +167,7 @@ var app = angular.module("flowData", []);
 					
 					$scope.showSnapshot = true;
 					$scope.showFlowDataGrid = false;
-					$scope.showFlowReport = false;
-					//$scope.$apply();	
+					$scope.showFlowReport = false;	
 			};
 			$scope.snapshotAction();
 			$scope.exportRawData = function (){
@@ -179,7 +179,7 @@ var app = angular.module("flowData", []);
 				if(answer){
 					chrome.runtime.sendMessage({type : "delete-flow-data",
 												board : $scope.board}
-											  );
+											);
 					location.reload();
 				}
 			};
@@ -198,7 +198,6 @@ var app = angular.module("flowData", []);
 						$scope.exportAsCsv = function(){
 							downloadAsCSV($scope.flowReport,"flowReport")
 						};
-						
 						
 						$scope.showSnapshot = false;
 						$scope.showFlowDataGrid = false;
@@ -227,9 +226,6 @@ var app = angular.module("flowData", []);
 						$scope.showFlowReport = false;
 						//$scope.$apply();
 				};
-
-				
-				
 				
 				$scope.$apply();
 			} 

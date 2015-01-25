@@ -229,7 +229,7 @@ function BoardData(data){
     var getCfdGrid = function(){
         var laneHeaders = self.getLaneHeaders().reverse();
         var start = timeUtil.dayStart(self.snapshotRecords[0].firstSeen);
-        var end = self.snapshotRecords[self.snapshotRecords.length-1].lastSeen;
+        var end = timeUtil.dayStart(self.snapshotRecords[self.snapshotRecords.length-1].lastSeen + timeUtil.MILLISECONDS_DAY);
         var days = Math.floor((end - start)/timeUtil.MILLISECONDS_DAY +1);
         var grid = gridOf(0,days+1,laneHeaders.length+1);
         var row = 0;
@@ -804,7 +804,7 @@ function FlowTicket(flowItemData, genericItemUrl){
         var ticketData = [];
         var time ;
         var dayRecord;
-        for (time = start; time <= end; time += timeUtil.MILLISECONDS_DAY){
+        for (time = start; time < timeUtil.dayStart(end+2*timeUtil.MILLISECONDS_DAY); time = timeUtil.dayStart(time+timeUtil.MILLISECONDS_DAY)){
             dayRecord = {"lane":self.wasInLaneContinous(time),milliseconds : time};
             ticketData.push(dayRecord);
         }

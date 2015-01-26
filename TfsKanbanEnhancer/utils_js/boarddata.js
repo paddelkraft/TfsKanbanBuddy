@@ -189,11 +189,9 @@ function BoardData(data){
         var rowIndexes = getCfdRowIndexes(cfdGrid);
         _.forEach(cfdData,function(ticket){
             //console.log(jsonEncode(ticket));
-            console.log("ticket");
             _.forEach(ticket,function(day){
                 var isoDate,row,column;
                 //console.log(jsonEncode(day));
-                console.log("lane " + day.lane);
                 //isoDate = timeUtil.isoDateFormat(day.milliseconds);
                 isoDate = ""+timeUtil.dayStart(day.milliseconds);
                 row = rowIndexes[isoDate];
@@ -713,12 +711,7 @@ function FlowTicket(flowItemData, genericItemUrl){
                     return false;
                 }
 
-                console.log ("lastSeen         = " + laneRecord.lastSeen);
-                console.log ("milliseconds     = " + milliseconds);
-                console.log ("lastObsservation = " + closestEarlierObservation);
-                console.log ("lane name = " + laneRecord.name);
                 if (laneRecord.lastSeen > closestEarlierObservation && laneRecord.lastSeen < milliseconds){
-                    console.log("uppdaterar lastSeen in line");
                     closestEarlierObservation = laneRecord.lastSeen;
                     lastSeenInLane = laneRecord.name;
                 }
@@ -726,10 +719,8 @@ function FlowTicket(flowItemData, genericItemUrl){
             
         });
         if(inLane){
-            console.log("return inLane " + inLane);
             return inLane;
         }
-        console.log("return last seen in lane " + lastSeenInLane + " at " + closestEarlierObservation);
         return lastSeenInLane;
     };
 

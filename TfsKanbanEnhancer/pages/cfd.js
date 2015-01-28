@@ -10,7 +10,8 @@ chrome.runtime.sendMessage(message, function(response){
 	var chart;
 	nv.addGraph(function() {
 		chart = nv.models.stackedAreaChart()
-						// .width(600).height(500)
+						// .width(600)
+						//.height(800)
 						.useInteractiveGuideline(true)
 						.x(function(d) { return d[0]; })
 						.y(function(d) { return d[1]; })

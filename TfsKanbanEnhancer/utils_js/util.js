@@ -10,7 +10,7 @@
             }
         }
     }
-    
+
     function jsonEncode(obj) {
         try {
             return JSON.stringify(obj);
@@ -20,7 +20,7 @@
             }catch(e2){
                 return "{}";
             }
-            
+
         }
     }
 
@@ -33,14 +33,14 @@
     }
 
 function TimeUtil(){
-    this.MILLISECONDS_DAY = 86400000; //24*60*60*1000=86400000 
+    this.MILLISECONDS_DAY = 86400000; //24*60*60*1000=86400000
     this.MILLISECONDS_HOUR = this.MILLISECONDS_DAY/24;
     this.now = function(){
         return new Date();
     };
 
     this.timestamp = function(){
-        return this.timeFormat(this.now().getTime);
+        return this.dateFormat(this.now().getTime());
     };
 
     this.daysSince = function(date){
@@ -99,8 +99,8 @@ function TimeUtil(){
 }
 
 timeUtil = new TimeUtil();
-    
-    
+
+
     function saveObjectToStorage(key, toSave){
         var content = jsonEncode(toSave);
         localStorage.setItem(key,content);
@@ -112,17 +112,17 @@ timeUtil = new TimeUtil();
           content = "{}";
         }
         return jsonDecode(content);
-        
+
     }
 
     function getStringFromStorage(key){
         return localStorage.getItem(key);
-        
+
     }
 
     function saveStringToStorage(key, content){
         localStorage.setItem(key, content);
-        
+
     }
 
 
@@ -140,7 +140,7 @@ timeUtil = new TimeUtil();
         if (!arr1 || !arr2)
         return false;
 
-        // compare lengths - can save a lot of time 
+        // compare lengths - can save a lot of time
         if (arr1.length != arr2.length)
             return false;
 
@@ -151,7 +151,7 @@ timeUtil = new TimeUtil();
                 if (!arraysAreIdentical(arr1,arr2[i])){
                     return false;
                 }
-                           
+
             }
             else if (arr1[i] !== arr2[i]) {
                 // Warning - two different object instances will never be equal: {x:20} != {x:20}
@@ -173,10 +173,10 @@ timeUtil = new TimeUtil();
 
     function downloadAsCSV(data, filePrefix){
         var blob = new Blob([jsonGridToCSV(data)], {type: "data:application/csv;charset=utf-8"});
-        saveAs(blob, filePrefix + timestamp()+".csv");
+        saveAs(blob, filePrefix + timeUtil.timestamp()+".csv");
     }
 
-    
+
     function jsonGridToCSV(grid){
       var i;
       var j;
@@ -212,5 +212,3 @@ timeUtil = new TimeUtil();
         }
         return grid;
     }
-
-    

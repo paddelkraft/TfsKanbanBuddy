@@ -77,6 +77,7 @@ function updateBoard(settings) {
         var $tiles = getTiles(board);
         console.log($tiles.length + " tiles on board");
         setTileColors($tiles,colorMap);
+        highlightDates($tiles);
         //console.log("tile colors set");
         if (board.relations){
             setLargeCards($tiles);
@@ -222,13 +223,28 @@ function setColumnColor( color){
         } else{
             setClass($itemElm, "standard");
         }
-        
     }
  
     function setTileColors($tiles, colorMap){
         $tiles.each(function () {
             var $itemElm = $(this);
             setTileColor($itemElm,colorMap);
+        });
+    }
+
+    function highlightDate($itemElm,colorMap){
+        var itemClassification = "";
+        var tileData = $itemElm.html();
+        var date = tileData.match(/\d{4}-\d{2}-\d{2}/);
+        if(date !== ""){
+            $itemElm.html(tileData.replace(date, "<strong style='background:black;color:white;'>" + date + "</strong>"));
+        }
+    }
+
+    function highlightDates($tiles){
+        $tiles.each(function () {
+            var $itemElm = $(this);
+            highlightDate($itemElm);
         });
     }
  

@@ -236,8 +236,18 @@ function setColumnColor( color){
         var itemClassification = "";
         var tileData = $itemElm.html();
         var date = tileData.match(/\d{4}-\d{2}-\d{2}/);
-        if(date !== ""){
-            $itemElm.html(tileData.replace(date, "<strong style='background:black;color:white;'>" + date + "</strong>"));
+        var color = "white";
+        var dateObject;
+        var daysUntil;
+        if(date){
+            dateObject = new Date(date);
+            daysUntil = timeUtil.daysUntil(dateObject.getTime());
+            if(daysUntil<2){
+                color = "red";
+            }else if (daysUntil < 7){
+                color = "yellow";
+            }
+            $itemElm.html(tileData.replace(date, "<strong style='background:black;color:"+color+";'>" + date + "</strong>"));
         }
     }
 

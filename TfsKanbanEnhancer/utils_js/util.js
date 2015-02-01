@@ -47,6 +47,10 @@ function TimeUtil(){
         return Math.floor((this.now()-date)/this.MILLISECONDS_DAY);
     };
 
+    this.daysUntil = function(date){
+        return Math.floor((date - this.now())/this.MILLISECONDS_DAY);
+    };
+
     this.highlightTime = function (days,old){
         if(!old){
             old = 50;

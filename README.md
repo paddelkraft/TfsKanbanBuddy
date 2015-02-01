@@ -13,6 +13,7 @@ features
  8. when has cards been blocked?
  9. CFD diagram
  10. Add 10 custom links to your board
+ 11. Highlight Due dates on cards
  
 find in Chrome store
 https://chrome.google.com/webstore/detail/tfs-kanban-buddy/bnkanimchogkpkjbabhoficohanbhalp

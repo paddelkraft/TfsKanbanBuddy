@@ -181,6 +181,19 @@ describe("BoardData", function() {
     return new BoardData(jsonDecode(boardDataJson));
   });
 
+  it("should have itemUrl ",function(){
+    var boardDataJson;
+    boardData.addSnapshot(snapshot);
+   expect(boardData.flowData["4"].url()).toBe("https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=4");
+  });
+
+  it("created from data should have itemUrl ",function(){
+    var boardDataJson;
+    boardData.addSnapshot(snapshot);
+    boardData = new BoardData(boardData);
+    expect(boardData.flowData["4"].url()).toBe("https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=4");
+  });
+
   approveIt("should contain added Snapshot", function() {
     boardData.addSnapshot(snapshot);
     
@@ -285,6 +298,14 @@ describe("BoardData", function() {
   });
 });
 
+describe("Snapshot",function(){
+  it("ticket should have url",function(){
+    var snapshot = new Snapshot(simpleSnapshot(1000,[createSnapshotTicket(1,"Test")]));
+    var snapshotTicket = snapshot.lanes[0].tickets[0];
+    expect(snapshotTicket.url()).toBe("https://collectionUrl/_workitems#_a=edit&id=1");
+  });
+});
+
 describe("FlowData",function(){
 
   approveIt("should return cfd data", function(){
@@ -297,6 +318,19 @@ describe("FlowData",function(){
      return flowData.getCfdData();
   });
 
+  it("should have item url", function(){
+    var flowData = new FlowData();
+    flowData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","Title")]));
+    
+    expect(flowData[1].url()).toBe("https://collectionUrl/_workitems#_a=edit&id=1");
+  });
+
+  it("created from data should have item url", function(){
+    var flowData = new FlowData();
+    flowData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","Title")]));
+    flowData = new FlowData(flowData,"genericItemUrl=");
+    expect(flowData[1].url()).toBe("genericItemUrl=1");
+  });
   // Ticket has left board
 
   
@@ -337,6 +371,12 @@ describe("FlowTicket", function() {
 
   beforeEach(function() {
     flowTicket = new FlowTicket({},"url");
+  });
+
+//Functions
+  it("should have itemUrl", function(){
+    flowTicket = new FlowTicket({"id":"10"},"url=");
+    expect(flowTicket.url()).toBe("url=10");
   });
 
 //lane location

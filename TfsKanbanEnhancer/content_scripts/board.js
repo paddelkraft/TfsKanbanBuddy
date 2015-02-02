@@ -77,6 +77,7 @@ function updateBoard(settings) {
         var $tiles = getTiles(board);
         console.log($tiles.length + " tiles on board");
         setTileColors($tiles,colorMap);
+        highlightDates($tiles);
         //console.log("tile colors set");
         if (board.relations){
             setLargeCards($tiles);
@@ -222,13 +223,38 @@ function setColumnColor( color){
         } else{
             setClass($itemElm, "standard");
         }
-        
     }
  
     function setTileColors($tiles, colorMap){
         $tiles.each(function () {
             var $itemElm = $(this);
             setTileColor($itemElm,colorMap);
+        });
+    }
+
+    function highlightDate($itemElm,colorMap){
+        var itemClassification = "";
+        var tileData = $itemElm.html();
+        var date = tileData.match(/\d{4}-\d{2}-\d{2}/);
+        var color = "white";
+        var dateObject;
+        var daysUntil;
+        if(date){
+            dateObject = new Date(date);
+            daysUntil = timeUtil.daysUntil(dateObject.getTime());
+            if(daysUntil<2){
+                color = "red";
+            }else if (daysUntil < 7){
+                color = "yellow";
+            }
+            $itemElm.html(tileData.replace(date, "<strong style='background:black;color:"+color+";'>" + date + "</strong>"));
+        }
+    }
+
+    function highlightDates($tiles){
+        $tiles.each(function () {
+            var $itemElm = $(this);
+            highlightDate($itemElm);
         });
     }
  

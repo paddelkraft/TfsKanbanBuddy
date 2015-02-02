@@ -189,11 +189,9 @@ function BoardData(data){
         var rowIndexes = getCfdRowIndexes(cfdGrid);
         _.forEach(cfdData,function(ticket){
             //console.log(jsonEncode(ticket));
-            console.log("ticket");
             _.forEach(ticket,function(day){
                 var isoDate,row,column;
                 //console.log(jsonEncode(day));
-                console.log("lane " + day.lane);
                 //isoDate = timeUtil.isoDateFormat(day.milliseconds);
                 isoDate = ""+timeUtil.dayStart(day.milliseconds);
                 row = rowIndexes[isoDate];
@@ -229,7 +227,7 @@ function BoardData(data){
     var getCfdGrid = function(){
         var laneHeaders = self.getLaneHeaders().reverse();
         var start = timeUtil.dayStart(self.snapshotRecords[0].firstSeen);
-        var end = self.snapshotRecords[self.snapshotRecords.length-1].lastSeen;
+        var end = timeUtil.dayStart(self.snapshotRecords[self.snapshotRecords.length-1].lastSeen + timeUtil.MILLISECONDS_DAY);
         var days = Math.floor((end - start)/timeUtil.MILLISECONDS_DAY +1);
         var grid = gridOf(0,days+1,laneHeaders.length+1);
         var row = 0;
@@ -476,7 +474,7 @@ function SnapshotTicket(genericItemUrl,data){
     }
     //returns a direct link to tfs item this tickets represents
     self.url = function(){
-        return snapshot.genericItemUrl+self.id;
+        return genericItemUrl+self.id;
     };
 
     //Compare snapshot Tickets
@@ -566,7 +564,7 @@ function FlowData(flowData, genericItemUrl){
                     ticket.setLane(lastLaneOnBoard,milliseconds);
                 }
             }
-        });   
+        });
     }
 
     self.getCfdData = function(){
@@ -713,12 +711,7 @@ function FlowTicket(flowItemData, genericItemUrl){
                     return false;
                 }
 
-                console.log ("lastSeen         = " + laneRecord.lastSeen);
-                console.log ("milliseconds     = " + milliseconds);
-                console.log ("lastObsservation = " + closestEarlierObservation);
-                console.log ("lane name = " + laneRecord.name);
                 if (laneRecord.lastSeen > closestEarlierObservation && laneRecord.lastSeen < milliseconds){
-                    console.log("uppdaterar lastSeen in line");
                     closestEarlierObservation = laneRecord.lastSeen;
                     lastSeenInLane = laneRecord.name;
                 }
@@ -726,10 +719,8 @@ function FlowTicket(flowItemData, genericItemUrl){
             
         });
         if(inLane){
-            console.log("return inLane " + inLane);
             return inLane;
         }
-        console.log("return last seen in lane " + lastSeenInLane + " at " + closestEarlierObservation);
         return lastSeenInLane;
     };
 
@@ -804,7 +795,7 @@ function FlowTicket(flowItemData, genericItemUrl){
         var ticketData = [];
         var time ;
         var dayRecord;
-        for (time = start; time <= end; time += timeUtil.MILLISECONDS_DAY){
+        for (time = start; time < timeUtil.dayStart(end+2*timeUtil.MILLISECONDS_DAY); time = timeUtil.dayStart(time+timeUtil.MILLISECONDS_DAY)){
             dayRecord = {"lane":self.wasInLaneContinous(time),milliseconds : time};
             ticketData.push(dayRecord);
         }

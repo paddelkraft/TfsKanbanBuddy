@@ -10,7 +10,8 @@ chrome.runtime.sendMessage(message, function(response){
 	var chart;
 	nv.addGraph(function() {
 		chart = nv.models.stackedAreaChart()
-						// .width(600).height(500)
+						// .width(600)
+						//.height(800)
 						.useInteractiveGuideline(true)
 						.x(function(d) { return d[0]; })
 						.y(function(d) { return d[1]; })
@@ -26,7 +27,7 @@ chrome.runtime.sendMessage(message, function(response){
 			.tickFormat(d3.format(',.2f'));
 	
 	d3.select('#chart1')
-		.datum(cfd)//histcatexplong)
+		.datum(cfd)
 		.transition().duration(1000)
 		.call(chart)
 		// .transition().duration(0)
@@ -47,4 +48,3 @@ chrome.runtime.sendMessage(message, function(response){
 		return chart;
 	});
 });
-//var cfd = [{"key":"In production","values":[[0,0],[86400000,0],[172800000,0],[259200000,1]]},{"key":"Dev DONE","values":[[0,0],[86400000,0],[172800000,1],[259200000,1]]},{"key":"Dev IP","values":[[0,0],[86400000,1],[172800000,1],[259200000,1]]},{"key":"ToDo","values":[[0,1],[86400000,1],[172800000,1],[259200000,1]]}]

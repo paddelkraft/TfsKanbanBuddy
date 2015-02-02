@@ -474,7 +474,7 @@ function SnapshotTicket(genericItemUrl,data){
     }
     //returns a direct link to tfs item this tickets represents
     self.url = function(){
-        return snapshot.genericItemUrl+self.id;
+        return genericItemUrl+self.id;
     };
 
     //Compare snapshot Tickets
@@ -564,7 +564,7 @@ function FlowData(flowData, genericItemUrl){
                     ticket.setLane(lastLaneOnBoard,milliseconds);
                 }
             }
-        });   
+        });
     }
 
     self.getCfdData = function(){

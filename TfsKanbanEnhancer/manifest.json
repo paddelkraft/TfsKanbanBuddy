@@ -1,6 +1,6 @@
 {
     "name": "TFS kanban buddy",
-    "version": "0.5.0",
+    "version": "0.5.3",
 
     "manifest_version": 2,
     "browser_action": {

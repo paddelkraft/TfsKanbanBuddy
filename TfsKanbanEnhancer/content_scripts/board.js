@@ -86,6 +86,7 @@ function updateBoard(settings) {
             if (! jQuery.isEmptyObject(filters)) {
                 addFilterDropdown(filters);
             }
+			addFilterTextbox();
         }
         
         
@@ -101,7 +102,16 @@ function updateBoard(settings) {
         
         $("#filter-select").change(function(){
             applyFilter($("#filter-select").val(),board);
+			applyTextFilter($("#filter-text").val(),board);
         })
+
+        $("#filter-text").change(function(){
+            //applyFilter($("#filter-select").val(),board);
+			//applyTextFilter("Fix",board);
+			applyFilter($("#filter-select").val(),board);
+			applyTextFilter($("#filter-text").val(),board);
+        })
+
 
         if (board.wip) {
             checkWip();
@@ -335,6 +345,22 @@ function setColumnColor( color){
             }
         });
     }
+
+
+    function applyTextFilter(filter, board){
+		console.log("applyTextFilter: " + filter);
+        getTiles(board)
+        .each(function () {
+            var $itemElm = $(this);
+			//var title=$itemElm.find(".title").text().toUpperCase();
+			var title=$itemElm.text().toUpperCase();
+			console.log("Title: " + title);
+			
+            if (title.indexOf(filter.toUpperCase()) === -1){
+                $itemElm.attr("style","display:none;");
+            }
+		});
+    }
  
     function addFilterDropdown(filters) {
         var select = document.createElement('select');
@@ -347,7 +373,12 @@ function setColumnColor( color){
         $('.hub-title').append(select);
     }
  
- 
+    function addFilterTextbox() {
+        var textbox = document.createElement('input');
+		textbox.type = 'text';
+		textbox.setAttribute("id","filter-text");
+        $('.hub-title').append(textbox);
+    }
  
     
     function setClass($elm, className) {

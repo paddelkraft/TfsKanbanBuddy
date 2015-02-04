@@ -41,6 +41,7 @@ function updateBoard(settings) {
         ".$tileClass.lightgreen.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.gray.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.standard.pale {background-color: transparent; border-color: #ddd; color: #ddd}"
+        
     ;
     
     var customStyleColor =
@@ -57,7 +58,11 @@ function updateBoard(settings) {
         ".$tileClass.red {background-color: #d2322d; border-color: #ac2925; color: white} " +
         ".$tileClass.lightgreen {background-color: #C3FCD4; border-color: #00FF80; color: black} " +
         ".$tileClass.gray {background-color: #A1A19F; border-color:black; color: white} " +
-        ".$tileClass.standard {border-left-color: rgb(0, 156, 204); background-color: rgb(214, 236, 242) color = black}"
+        ".$tileClass.standard {border-left-color: rgb(0, 156, 204); background-color: rgb(214, 236, 242) color = black}"+
+        ".duedate.white {background-color: black; color: white} "+
+        ".duedate.yellow {background-color: black; color: yellow} "+
+        ".duedate.red {background-color: black; color: red} "
+        
     ;
     
    
@@ -106,9 +111,7 @@ function updateBoard(settings) {
         })
 
         $("#filter-text").change(function(){
-            //applyFilter($("#filter-select").val(),board);
-			//applyTextFilter("Fix",board);
-			applyFilter($("#filter-select").val(),board);
+            applyFilter($("#filter-select").val(),board);
 			applyTextFilter($("#filter-text").val(),board);
         })
 
@@ -257,7 +260,7 @@ function setColumnColor( color){
             }else if (daysUntil < 7){
                 color = "yellow";
             }
-            $itemElm.html(tileData.replace(date, "<strong style='background:black;color:"+color+";'>" + date + "</strong>"));
+            $itemElm.html(tileData.replace(date, "<strong class='duedate "+color+"'>" + date + "</strong>"));
         }
     }
 
@@ -367,17 +370,32 @@ function setColumnColor( color){
         select.setAttribute("id","filter-select");
         var html = "<option value='show all'>Show all </option><option value=''>Unfiltered</option>";
         for(var filter in filters){
-            html += "<option value='"+ filter + "'>"+filter.replace(FILTER_IDENTIFIER,"") + "</option>"; 
+            html += "<option value='"+ filter + "'>"+filter.replace(FILTER_IDENTIFIER,"") + "</option>";
         }
         select.innerHTML = html;
         $('.hub-title').append(select);
     }
+
+    function watermark(inputId,watermarkText) {
+     $('#'+inputId).blur(function(){
+      if ($(this).val().length === 0){
+        $(this).val(watermarkText).addClass('watermark');
+      }
+        
+     }).focus(function(){
+      if ($(this).val() === watermarkText){
+        $(this).val('').removeClass('watermark');
+      }
+     }).val(watermarkText).addClass('watermark');
+    }
+
  
     function addFilterTextbox() {
         var textbox = document.createElement('input');
 		textbox.type = 'text';
 		textbox.setAttribute("id","filter-text");
         $('.hub-title').append(textbox);
+        watermark("filter-text","Filter cards");
     }
  
     
@@ -411,6 +429,7 @@ function setColumnColor( color){
             setTimeout(function(){
                 if (hovered === ""){
                     $("[data-case-id]").removeClass('pale');
+
                 }
             },200);
             

@@ -1,6 +1,6 @@
 function updateBoard(settings) {
   
-    
+    var textFilter;
     var GET_KANBAN_BOARD_MAPPING = "get-color-map";
     var GET_TASK_BOARD_MAPPING = "get-task-color-map";
     var FILTER_IDENTIFIER ="|";
@@ -40,7 +40,10 @@ function updateBoard(settings) {
         ".$tileClass.red.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.lightgreen.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.gray.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.standard.pale {background-color: transparent; border-color: #ddd; color: #ddd}"
+        ".$tileClass.standard.pale {background-color: transparent; border-color: #ddd; color: #ddd}"+
+        ".duedate.white.pale {background-color: transparent; color: #ddd}"+
+        ".duedate.yellow.pale {background-color: transparent; color: #ddd}"+
+        ".duedate.red.pale {background-color: transparent; color: #ddd}"
         
     ;
     
@@ -105,16 +108,14 @@ function updateBoard(settings) {
             });
         }
         
-        $("#filter-select").change(function(){
+        function filterBoard(){
             applyFilter($("#filter-select").val(),board);
-			applyTextFilter($("#filter-text").val(),board);
-        })
+            applyTextFilter(textFilter(),board);
+        }
+        
+        $("#filter-select").change(filterBoard);
 
-        $("#filter-text").change(function(){
-            applyFilter($("#filter-select").val(),board);
-			applyTextFilter($("#filter-text").val(),board);
-        })
-
+        $("#filter-text").change(filterBoard);
 
         if (board.wip) {
             checkWip();
@@ -396,7 +397,16 @@ function setColumnColor( color){
 		textbox.setAttribute("id","filter-text");
         $('.hub-title').append(textbox);
         watermark("filter-text","Filter cards");
+        textFilter = function(){
+            var filter = "";
+            if(!$(textbox).hasClass(watermark)){
+                filter = $(textbox).val();
+            }
+            return filter;
+        };
     }
+
+
  
     
     function setClass($elm, className) {
@@ -412,6 +422,16 @@ function setColumnColor( color){
             return;
         }
         
+        function pale(){
+            $(this).addClass("pale");
+            $(this).find(".duedate").addClass("pale");
+        }
+
+        function normal(){
+            $(this).removeClass("pale");
+            $(this).find(".duedate").removeClass("pale");
+        }
+
         $('[data-case-id]')
         .mouseenter(function (evt) {
             var caseId = $(evt.target).attr('data-case-id') || $(evt.target).closest('[data-case-id]').attr('data-case-id');
@@ -419,8 +439,10 @@ function setColumnColor( color){
            
             if(caseId !== ""){
               console.log('Mouse enter... case #:' + caseId);
-              $("[data-case-id!='" + caseId + "']").addClass('pale');
-              $("[data-case-id='" + caseId + "']").removeClass('pale');
+              //$("[data-case-id!='" + caseId + "']").addClass('pale');
+              $("[data-case-id!='" + caseId + "']").each(pale);
+              //$("[data-case-id='" + caseId + "']").removeClass('pale');
+              $("[data-case-id='" + caseId + "']").each(normal);
             }
             
         })
@@ -428,7 +450,8 @@ function setColumnColor( color){
             hovered = "";
             setTimeout(function(){
                 if (hovered === ""){
-                    $("[data-case-id]").removeClass('pale');
+                    //$("[data-case-id]").removeClass('pale');
+                    $("[data-case-id]").each(normal);
 
                 }
             },200);

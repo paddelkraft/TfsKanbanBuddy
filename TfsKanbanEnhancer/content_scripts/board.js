@@ -109,7 +109,12 @@ function updateBoard(settings) {
         }
         
         function filterBoard(){
-            applyFilter($("#filter-select").val(),board);
+            if($("#filter-select").length !== 0){
+                applyFilter($("#filter-select").val(),board);
+            }else{
+                applyFilter('show all',board);
+            }
+            
             applyTextFilter(textFilter(),board);
         }
         

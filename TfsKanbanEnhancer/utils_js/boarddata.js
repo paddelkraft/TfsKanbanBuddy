@@ -180,12 +180,12 @@ function BoardData(data){
         return chartData;
     };
 
-    self.getCfdData = function(){
+    self.getCfdData = function(filter){
         var columnIndexes = getCfdColumnIndexes(self.getLaneHeaders().reverse());
-        var cfdData = self.flowData.getCfdData();
+        var cfdData = self.flowData.getCfdData(filter);
         console.log("getCfdData");
         //console.log(jsonEncode(cfdData));
-        var cfdGrid = getCfdGrid();
+        var cfdGrid = getCfdGrid(filter);
         var rowIndexes = getCfdRowIndexes(cfdGrid);
         _.forEach(cfdData,function(ticket){
             //console.log(jsonEncode(ticket));
@@ -196,7 +196,9 @@ function BoardData(data){
                 isoDate = ""+timeUtil.dayStart(day.milliseconds);
                 row = rowIndexes[isoDate];
                 column = columnIndexes[day.lane];
-                cfdGrid[row][column]++;
+                if(cfdGrid[row]){
+                    cfdGrid[row][column]++;
+                }
             });
         });
 
@@ -224,13 +226,28 @@ function BoardData(data){
         return indexes;
     }
 
-    var getCfdGrid = function(){
+    var getCfdGrid = function(filter){
         var laneHeaders = self.getLaneHeaders().reverse();
         var start = timeUtil.dayStart(self.snapshotRecords[0].firstSeen);
         var end = timeUtil.dayStart(self.snapshotRecords[self.snapshotRecords.length-1].lastSeen + timeUtil.MILLISECONDS_DAY);
-        var days = Math.floor((end - start)/timeUtil.MILLISECONDS_DAY +1);
-        var grid = gridOf(0,days+1,laneHeaders.length+1);
-        var row = 0;
+        var days;
+        var grid;
+        var row ;
+        
+        if(filter){
+            if(filter.startMilliseconds){
+                start = filter.startMilliseconds;
+            }
+            if(filter.endMilliseconds){
+                 end = filter.endMilliseconds;
+            }
+        }
+
+        days = Math.floor((end - start)/timeUtil.MILLISECONDS_DAY +1);
+        grid = gridOf(0,days+1,laneHeaders.length+1);
+        row = 0;
+        
+        
         console.log("getCfdGrid");
         grid[row] = ["Date"].concat(laneHeaders);
         for(row = 0 ; row < days; row++){
@@ -567,13 +584,22 @@ function FlowData(flowData, genericItemUrl){
         });
     }
 
-    self.getCfdData = function(){
+    self.getCfdData = function(filter){
         var cfdData = [];
         var ticketData;
         _.forEach(self, function(ticket ){
             if(ticket instanceof FlowTicket){
-                ticketData = ticket.cfdData();
-                cfdData.push(ticketData);
+                if(filter && filter.text){
+                    if(-1 < ticket.title.toUpperCase().indexOf(filter.text.toUpperCase())){
+                        ticketData = ticket.cfdData(filter);
+                        cfdData.push(ticketData);
+                    }
+                } else{
+                    ticketData = ticket.cfdData(filter);
+                    cfdData.push(ticketData);
+                }
+
+                
                 //console.log(jsonEncode(cfdData));
             }
         });
@@ -789,12 +815,21 @@ function FlowTicket(flowItemData, genericItemUrl){
         return self.blockedRecords[self.blockedRecords.length-1].firstSeen;
     };
 
-    self.cfdData = function(){
+    self.cfdData = function(filter){
         var start = self.enteredBoard();
         var end = self.lastSeen();
         var ticketData = [];
         var time ;
         var dayRecord;
+
+        if (filter){
+            if (filter.startMilliseconds && (filter.startMilliseconds>start)){
+                start = filter.startMilliseconds;
+            }
+            if (filter.endMilliseconds && (filter.endMilliseconds<end)){
+                end = filter.endMilliseconds;
+            }
+        }
         for (time = start; time < timeUtil.dayStart(end+2*timeUtil.MILLISECONDS_DAY); time = timeUtil.dayStart(time+timeUtil.MILLISECONDS_DAY)){
             dayRecord = {"lane":self.wasInLaneContinous(time),milliseconds : time};
             ticketData.push(dayRecord);

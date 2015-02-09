@@ -399,7 +399,7 @@ function setColumnColor( color){
         watermark("filter-text","Filter cards");
         textFilter = function(){
             var filter = "";
-            if(!$(textbox).hasClass(watermark)){
+            if(!$(textbox).hasClass("watermark")){
                 filter = $(textbox).val();
             }
             return filter;

@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap 101 Template</title>
+
+    <!-- Bootstrap -->
+    <link href="../utils_js/bootstrap.min.css" rel="stylesheet">
+	<link href="../utils_js/src/nv.d3.css" rel="stylesheet" type="text/css">
+
+
+  </head>
+  <body ng-app="kanban">
+  	<div class="container">
+  		<ul class="nav nav-tabs">
+		    <li class="active"><a href="#snapshot">Snapshot</a></li>
+		    <li><a href="#flowreport">FlowReport</a></li>
+		    <li><a href="#flowdatagrid">Flow data grid</a></li>
+		    <li><a href="#cfd">CFD</a></li>
+		</ul>
+  	</div>
+  	<div ng-view></div>
+  	
+    
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="../utils_js/jquery-2.1.1.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../utils_js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../utils_js/d3.min.js"></script>
+	<script type="text/javascript" src="../utils_js/nv.d3.min.js"></script>
+	<script type="text/javascript" src="../utils_js/src/utils.js"></script>
+	<script type="text/javascript" src="../utils_js/src/models/axis.js"></script>
+	<script type="text/javascript" src="../utils_js/src/tooltip.js"></script>
+	<script type="text/javascript" src="../utils_js/src/interactiveLayer.js"></script>
+	<script type="text/javascript" src="../utils_js/src/models/legend.js"></script>
+	<script type="text/javascript" src="../utils_js/src/models/axis.js"></script>
+	<script type="text/javascript" src="../utils_js/src/models/scatter.js"></script>
+	<script type="text/javascript" src="../utils_js/src/models/stackedArea.js"></script>
+	<script type="text/javascript" src="../utils_js/src/models/stackedAreaChart.js"></script>
+	<script type="text/javascript" src="../utils_js/lodash.js"></script>
+	<script type="text/javascript" src="../utils_js/util.js"></script>
+	<script type="text/javascript" src="../utils_js/boarddata.js"></script>
+	
+	<script type="text/javascript" src="../utils_js/angular.min.js"></script>
+	<script type="text/javascript" src="../utils_js/angular-route.js"></script>
+	
+	<script type="text/javascript" src="spa.js"></script>
+  </body>
+</html>

@@ -163,6 +163,7 @@ function BoardData(data){
         return boardDesign;
     };
 
+    //Remove this one moved to presentation parts
     self.buildCfdChartData = function(cfdData){
         var chartData = [];
         var lane,day;

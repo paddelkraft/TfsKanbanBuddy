@@ -216,3 +216,34 @@ timeUtil = new TimeUtil();
         }
         return grid;
     }
+
+    
+
+function sendExtensionMessage(message) {
+  // Return a new promise.
+  return new Promise(function(resolve, reject) {
+    chrome.runtime.sendMessage(message, function(response){
+        resolve(response);
+    });
+  });
+}
+
+function decodeUrl(encoded){
+    return encoded.replace(/\(_\)/g, ':').replace(/\(-\)/g, '/');
+}
+
+function encodeUrl(url){
+    var withoutColons = url.replace(/:/g,"(_)");
+    var withoutSlashes = url.replace(/\//g,"(-)");
+    return url.replace(/:/g,"(_)").replace(/\//g,"(-)");
+}
+function filterArray(arr, filterFunc){
+    var filteredArray = [];
+    _.forEach(arr, function(item){
+        if(filterFunc(item)){
+            filteredArray.push(item);
+        }
+    });
+
+    return filteredArray;
+}

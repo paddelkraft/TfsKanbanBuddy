@@ -17,7 +17,8 @@
         var isBlocked = (element.getAttribute("class").indexOf("blocked")> -1);
         var ticketObject = {
             id : element.getAttribute("data-item-id"),
-            title : element.textContent,
+            //$itemElm.find(".title").text()
+            title : element.getElementsByClassName("title")[0].textContent,
             
         };
         if(isBlocked){
@@ -75,8 +76,7 @@
     function showFlowData(){
          var message = {};
         message.type = "show-flow-data";
-        message.board = getProjectUrl();
-        message.snapshot = getBoardSnapshot();
+        message.board = document.URL;
         chrome.runtime.sendMessage(message, function(response){
             log(response);
         });
@@ -86,8 +86,8 @@
          var message = {};
         message.type = "show-flow-data";
         message.page = page;
-        message.board = getProjectUrl();
-        message.snapshot = getBoardSnapshot();
+        message.board = document.URL;
+        message.boardUrl =
         chrome.runtime.sendMessage(message, function(response){
             log(response);
         });
@@ -97,11 +97,24 @@
         var message = {};
         message.type = "open-data-page";
         message.page = page;
-        message.board = getProjectUrl();
-        message.snapshot = getBoardSnapshot();
+        message.board = document.URL;
         chrome.runtime.sendMessage(message, function(response){
             log(response);
         });
+    }
+
+    function getCardCategory(){
+        var cfdImgContainer; 
+        var imageSrc;
+        var parameters;
+        var cardCategory = null;
+        try{
+            cfdImgContainer = document.getElementsByClassName("cumulative-flow-chart small-chart-container")[0];
+            imageSrc = cfdImgContainer.getElementsByTagName('img')[0].getAttribute("src");
+            parameters = imageSrc.split("hubCategoryRefName=")[1].split("&");
+            cardCategory = parameters[0];
+        }catch(e){}
+        return cardCategory;
     }
 
     function getBoardSnapshot(){
@@ -111,6 +124,7 @@
         snapshot.milliseconds = new Date().getTime();
         var url =getProjectUrl();
         snapshot.board=url;
+        snapshot.boardUrl = document.URL;
         snapshot.genericItemUrl = genericItemUrl;
         var headerContainer = document.getElementsByClassName("header-container")[0];
         var headers = headerContainer.getElementsByClassName("member-header-content");
@@ -150,6 +164,7 @@
             }
 
         }
+        snapshot.cardCategory = getCardCategory();
         return snapshot;
     }
 

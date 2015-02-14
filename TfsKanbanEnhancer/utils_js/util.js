@@ -217,7 +217,9 @@ timeUtil = new TimeUtil();
         return grid;
     }
 
-    
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
 
 function sendExtensionMessage(message) {
   // Return a new promise.
@@ -229,7 +231,7 @@ function sendExtensionMessage(message) {
 }
 
 function decodeUrl(encoded){
-    return encoded.replace(/\(_\)/g, ':').replace(/\(-\)/g, '/');
+    return encoded.replace(/\(_\)/g, ':').replace(/\(-\)/g, '/').replace(/ /g,"%20");
 }
 
 function encodeUrl(url){

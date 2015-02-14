@@ -16,6 +16,7 @@ function BoardData(data){
     }
     self.ver="0.5.0";
     self.board = (data.board)?data.board:null;
+    self.boardUrl = (data.boardUrl) ? data.boardUrl : null;
     self.storageKey = "snapshots_" + self.board;
     self.genericItemUrl = (data.genericItemUrl)? data.genericItemUrl:"";
     // records of individual board states holds times for when it was first and last seen every time theboard changes
@@ -83,6 +84,7 @@ function BoardData(data){
         self.flowData.addSnapshot(snapshot);
         self.genericItemUrl = snapshot.genericItemUrl;
         self.board = snapshot.board;
+        self.boardUrl = snapshot.boardUrl
         //console.log("genericItemUrl " + self.genericItemUrl);
         
         
@@ -136,6 +138,7 @@ function BoardData(data){
         if( self.findBoardDesignRecord(milliseconds)!==null){
            snapshot.milliseconds = milliseconds;
             snapshot.board = self.board;
+            snapshot.boardUrl = self.boardUrl;
             snapshot.genericItemUrl = self.genericItemUrl;
             snapshot.lanes = getBoardState(milliseconds);
         }
@@ -340,11 +343,13 @@ function Snapshot(snapshot){
     var self = this;
     //link to board
     self.board =  snapshot.board;
+    self.boardUrl= snapshot.boardUrl;
     //time of napshot capture
     self.milliseconds = snapshot.milliseconds;
     //generic link to item details used to 
     //link direct into tfs items from reports 
     self.genericItemUrl = snapshot.genericItemUrl;
+    self.cardCategory = snapshot.cardCategory;
     //board state
     self.lanes = [];
     _.forEach(snapshot.lanes,function(lane){

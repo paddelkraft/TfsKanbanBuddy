@@ -1,11 +1,12 @@
 //apisnapshot.js
 
 
-function ApiSnapshot(apiUrl,boardUrl,genericItemUrl){
+function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl){
 	var self = this;
 	self.apiUrl = apiUrl;
 	self.boardUrl = boardUrl;
 	self.genericItemUrl= genericItemUrl;
+	self.projectUrl = projectUrl
 	self.snapshot = null;
 	self.status = 0
 	self.get = function(callback){
@@ -29,7 +30,8 @@ function ApiSnapshot(apiUrl,boardUrl,genericItemUrl){
 			var tickets = self.getTickets(apiResponse);
 			var snapshot = {};
 			snapshot.milliseconds = new Date().getTime();
-			snapshot.board = boardUrl;
+			snapshot.boardUrl = boardUrl;
+			snapshot.board = projectUrl; 
 			snapshot.genericItemUrl = self.genericItemUrl;
 			_.forEach(lanes,function(lane){
 				lane.tickets = self.ticketsInlane(tickets,lane.name);
@@ -38,6 +40,7 @@ function ApiSnapshot(apiUrl,boardUrl,genericItemUrl){
 				
 			});
 			snapshot.lanes = lanes;
+
 			return snapshot;
 		};
 
@@ -95,10 +98,28 @@ function ApiSnapshot(apiUrl,boardUrl,genericItemUrl){
 function Storage(){
 	self = {};
 
+	
 	self.getRegisteredBoards = function(){
 		var registeredBoards = getObjectFromStorage("registered-boards") ;
 		console.log("registered boards read from local storage");
+		//Remove
+		registeredBoards = self.removeOldRegistrys(registeredBoards);
 		return registeredBoards;
+	};
+
+	
+	//Remove
+	self.removeOldRegistrys = function(registeredBoards){
+		var apiUrl;
+		var registry;
+		var newRegistry = {};
+		for(apiUrl in registeredBoards){
+			registry = registeredBoards[apiUrl];
+			if(registry.boardUrl.indexOf("_backlogs/board")!== -1){
+				newRegistry[apiUrl] = registry;
+			}
+		}
+		return newRegistry;
 	};
 
 	self.setRegisteredBoards = function(registeredBoards){
@@ -116,36 +137,65 @@ function apiUtil(storage){
 	}
 	
 
-	self.getApiUrl = function(boardUrl){
+	self.getApiUrl = function(boardUrl, cardCategory){
 		var projName = boardUrl.split("/_backlogs")[0];
-		return projName + "/_api/_backlog/GetBoard?__v=3";
+		if(!cardCategory){
+			return projName + "/_api/_backlog/GetBoard?__v=3";
+		}
+		return projName + "/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName="+cardCategory;
+		
 	};
 
 	
 	self.createBoardRecord = function (snapshot){
 		var boardRecord = {};
-		boardRecord.boardUrl = snapshot.board;
-		boardRecord.apiUrl = self.getApiUrl(snapshot.board);
+		boardRecord.boardUrl = self.getBoardUrl(snapshot.boardUrl,snapshot.board,snapshot.cardCategory);
+		boardRecord.projectUrl = snapshot.board;
+		boardRecord.apiUrl = self.getApiUrl(snapshot.board,snapshot.cardCategory);
 		boardRecord.genericItemUrl = snapshot.genericItemUrl;
+		boardRecord.cardCategory= snapshot.cardCategory;
 		return boardRecord;
 	};
 
 	self.registerBoard = function(snapshot){
 		var registeredBoards  = storage.getRegisteredBoards();
 		var boardRecord = self.createBoardRecord(snapshot);
-		if(registeredBoards[boardRecord.apiUrl]){
-			return;
-		}else{
-			registeredBoards[boardRecord.apiUrl] = boardRecord;
-			console.log("Register board " + boardRecord.boardUrl);
-			storage.setRegisteredBoards(registeredBoards);
-		}
+		registeredBoards[boardRecord.apiUrl] = boardRecord;
+		console.log("Register board " + boardRecord.boardUrl);
+		storage.setRegisteredBoards(registeredBoards);
+		
 	};
 
+	self.getBoardUrl = function(boardUrl,projectUrl,cardCategory){
+		var registeredBoards  = storage.getRegisteredBoards();
+		var url = boardUrl;
+			_.forEach(registeredBoards,function(board){
+				if(board.projectUrl===projectUrl && board.cardCategory === cardCategory){
+					if (endsWith(boardUrl,"board") || endsWith(boardUrl,"board/")){
+						url = board.boardUrl;
+					}
+					
+					return false;
+				}
+			});
+		return url;
+	};
+
+	self.getRegisteredBoardUrl = function(projectUrl,cardCategory){
+		var registeredBoards  = storage.getRegisteredBoards();
+		var boardUrl = null;
+		var apiUrl = self.getApiUrl(projectUrl,cardCategory);
+		if(registeredBoards[apiUrl]){
+			boardUrl = registeredBoards[apiUrl].boardUrl;
+		}
+
+		return boardUrl;
+	};
+	
 	self.getApiSnapshot = function(boardRecord){
 		var api;
 		console.log("Fetch snapshot from api "+boardRecord.apiUrl );
-		api = new ApiSnapshot(boardRecord.apiUrl,boardRecord.boardUrl,boardRecord.genericItemUrl);
+		api = new ApiSnapshot(boardRecord.apiUrl,boardRecord.boardUrl,boardRecord.genericItemUrl,boardRecord.projectUrl);
 
 		api.getSnapshot( function(snapshot){
 			console.log ("apiSnapshot built");

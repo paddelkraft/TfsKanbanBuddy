@@ -4,6 +4,7 @@ function testSnapshot(milliseconds){
     return {
         "milliseconds": milliseconds,
         "board": "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection",
+        "boardUrl": "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/boardName",
         "genericItemUrl" : "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=",
         "lanes": [
           {

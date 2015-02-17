@@ -1,6 +1,6 @@
 {
     "name": "TFS kanban buddy",
-    "version": "0.5.7",
+    "version": "0.5.9",
     "manifest_version": 2,
     "browser_action": {
         "default_title": "TFS kanban board enhancer",
@@ -39,13 +39,9 @@
     	{
         	"matches": ["http://*/*/*/_backlogs/board*",
                         "https://*/*/*/_backlogs/board*",
-                        "http://*/*/*/_backlogs/TaskBoard*",
-                        "https://*/*/*/_backlogs/TaskBoard*",
-                        "http://*/*/*/_backlogs/taskboard*",
-                        "https://*/*/*/_backlogs/taskboard*",
                         "http://*/*/*/_boards*"
                         ],
-        	"js": [
+            "js": [
                     "utils_js/util.js",
                     "utils_js/jquery-2.1.1.min.js",
                     "content_scripts/tfsBoardInit.js",
@@ -53,6 +49,21 @@
                     "content_scripts/projectUrl.js"
                   ]
     	},
+        {
+            "matches": [
+                        "http://*/*/*/_backlogs/TaskBoard*",
+                        "https://*/*/*/_backlogs/TaskBoard*",
+                        "http://*/*/*/_backlogs/taskboard*",
+                        "https://*/*/*/_backlogs/taskboard*"
+                        ],
+            "js": [
+                    "utils_js/util.js",
+                    "utils_js/jquery-2.1.1.min.js",
+                    "content_scripts/tfsBoardInit.js",
+                    "content_scripts/taskboard.js",
+                    "content_scripts/projectUrl.js"
+                  ]
+        },
         {
             "matches": [
                         "http://*/*/*/_backlogs/board*",

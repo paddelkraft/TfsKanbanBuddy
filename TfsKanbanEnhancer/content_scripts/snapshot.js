@@ -45,18 +45,22 @@
         log("link with caption " + caption + "created" );
     }
 
-    
-
-    function getProjectUrl(){
-        return document.URL.split("/_backlogs/")[0];
+    function boardUrl(){
+        return decodeUrlKeepEncodedSpaces(document.URL);
     }
+   
+    
+    function getProjectUrl(){
+        return boardUrl().split("/_backlogs/")[0];
+    }
+
 
     
 
     function getGenericItemUrl(){
         var projectName = document.getElementsByClassName("project-name")[0].textContent;
-        log("Url = "+document.URL);
-        return document.URL.split(projectName)[0] + projectName + "/_workitems#_a=edit&id=";
+        log("Url = "+boardUrl());
+        return  boardUrl().split(projectName)[0] + projectName + "/_workitems#_a=edit&id=";
     }
 
     
@@ -76,7 +80,7 @@
     function showFlowData(){
          var message = {};
         message.type = "show-flow-data";
-        message.board = document.URL;
+        message.board = boardUrl();
         chrome.runtime.sendMessage(message, function(response){
             log(response);
         });
@@ -86,7 +90,7 @@
          var message = {};
         message.type = "show-flow-data";
         message.page = page;
-        message.board = document.URL;
+        message.board = boardUrl();
         message.boardUrl =
         chrome.runtime.sendMessage(message, function(response){
             log(response);
@@ -97,7 +101,7 @@
         var message = {};
         message.type = "open-data-page";
         message.page = page;
-        message.board = document.URL;
+        message.board = boardUrl();
         chrome.runtime.sendMessage(message, function(response){
             log(response);
         });
@@ -124,7 +128,7 @@
         snapshot.milliseconds = new Date().getTime();
         var url =getProjectUrl();
         snapshot.board=url;
-        snapshot.boardUrl = document.URL;
+        snapshot.boardUrl = decodeUrlKeepEncodedSpaces( document.URL);
         snapshot.genericItemUrl = genericItemUrl;
         var headerContainer = document.getElementsByClassName("header-container")[0];
         var headers = headerContainer.getElementsByClassName("member-header-content");
@@ -175,3 +179,4 @@
     onloadSnapshot();
 
 })();
+

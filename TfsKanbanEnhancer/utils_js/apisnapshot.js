@@ -108,7 +108,7 @@ function Storage(){
 	};
 
 	
-	//Remove
+	//Remove 0.6
 	self.removeOldRegistrys = function(registeredBoards){
 		var apiUrl;
 		var registry;
@@ -162,6 +162,7 @@ function apiUtil(storage){
 		var boardRecord = self.createBoardRecord(snapshot);
 		registeredBoards[boardRecord.apiUrl] = boardRecord;
 		console.log("Register board " + boardRecord.boardUrl);
+		
 		storage.setRegisteredBoards(registeredBoards);
 		
 	};
@@ -170,8 +171,9 @@ function apiUtil(storage){
 		var registeredBoards  = storage.getRegisteredBoards();
 		var url = boardUrl;
 			_.forEach(registeredBoards,function(board){
+				
 				if(board.projectUrl===projectUrl && board.cardCategory === cardCategory){
-					if (endsWith(boardUrl,"board") || endsWith(boardUrl,"board/")){
+					if (boardUrl.length < board.boardUrl.length && (endsWith(boardUrl,"board") || endsWith(boardUrl,"board/"))){
 						url = board.boardUrl;
 					}
 					

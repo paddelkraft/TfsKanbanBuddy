@@ -164,6 +164,35 @@ app.factory("boardDataFactory",function(){
 	return factory;
 });
 
+app.controller("TabController",[
+                                '$scope',
+                                '$location',
+                                function($scope,$location){
+      $scope.tabs = [];
+      $scope.tabs.push({"caption": "CFD", "active":false, "route":"/cfd/"});
+      $scope.tabs.push({"caption": "Snapshot", "active":false, "route":"/snapshot/"});
+      $scope.tabs.push({"caption": "FlowGrid", "active":true, "route":"/flowgrid/"});
+      $scope.tabs.push({"caption": "FlowReport", "active":true, "route":"/flowreport/"});
+      $scope.boardUrl = _.last($location.url().split("/"));
+      
+      $scope.setActiveTab = function(url){
+        _.forEach($scope.tabs,function(tab){
+          if(url.indexOf(tab.route)>-1){
+            tab.active=true;
+          }
+          tab.active = false;
+        });
+      };
+
+      $scope.goTo = function(route){
+        $location.url(route + $scope.boardUrl);
+      };
+
+      $scope.setActiveTab($location.url());
+    }
+  ]
+);
+
 app.controller("CfdController", ['$scope','$route', '$routeParams', 'boardDataFactory','cfdFactory',function( $scope, $route, $routeParams, boardDataFactory,cfd){
       
   $scope.cfdData = [];
@@ -239,6 +268,9 @@ app.config(['$routeProvider',
     function($routeProvider) {
             $routeProvider.
       when('/cfd/:board', {
+        templateUrl: 'templates/cumulative-flow-diagram.html',
+        controller: 'CfdController'
+      }).when('/flowreport/:board', {
         templateUrl: 'templates/cumulative-flow-diagram.html',
         controller: 'CfdController'
       }).otherwise({

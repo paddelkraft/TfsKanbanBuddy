@@ -128,7 +128,25 @@ describe("Converters", function() {
     return boardData;
   });
 
+
   var smallerConversion = {"ver":"0.4.5","board":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection","storageKey":"snapshots_https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection","genericItemUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=","snapshots":null,"boardDesignHistory":{"boardDesignRecords":[{"seen":[1410293597175,1417355741960],"design":[{"name":"ToDo"},{"name":"Req IP","wip":{"limit":"1"}},{"name":"Req DONE","wip":{"limit":""}},{"name":"Architecture IP","wip":{"limit":"3"}},{"name":"Architecture DONE","wip":{"limit":""}},{"name":"Dev IP","wip":{"limit":"5"}},{"name":"Dev DONE","wip":{"limit":""}},{"name":"Test IP","wip":{"limit":"5"}},{"name":"Test DONE","wip":{"limit":""}},{"name":"Approval","wip":{"limit":"5"}},{"name":"Redy for production","wip":{"limit":"5"}},{"name":"In production"}]},{"seen":[1419885408160,1419889962039],"design":[{"name":"ToDo"},{"name":"Req IP","wip":{"limit":"1"}},{"name":"Req DONE","wip":{"limit":"0"}},{"name":"Architecture IP","wip":{"limit":"3"}},{"name":"Architecture DONE","wip":{"limit":"0"}},{"name":"Dev IP","wip":{"limit":"5"}},{"name":"Dev DONE","wip":{"limit":"0"}},{"name":"Test IP","wip":{"limit":"5"}},{"name":"Test DONE","wip":{"limit":"0"}},{"name":"Approval","wip":{"limit":"5"}},{"name":"Redy for production","wip":{"limit":"5"}},{"name":"In production"}]}]},"flowData":{"3":{"title":"* CR #113 Test3","id":"3","lanes":{"Dev DONE":{"enterMilliseconds":1410293597175,"exitMilliseconds":1410458955392},"Test IP":{"enterMilliseconds":1417355741960,"exitMilliseconds":1419889962039}}},"7":{"title":"MAINT #111 fixa","id":"7","lanes":{"Req DONE":{"enterMilliseconds":1410293597175,"exitMilliseconds":1410458955392},"Architecture IP":{"enterMilliseconds":1417355741960,"exitMilliseconds":1419885408160},"Architecture DONE":{"enterMilliseconds":1419889962039,"exitMilliseconds":1419889962039}}}}};
+});
+
+describe("url conversions",function(){
+  it("decode url keep encoded spaces",function(){
+    expect(decodeUrlKeepEncodedSpaces("http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%204%20%E2%80%93%20BICT/_backlogs/board/Features")).
+    jsonToBe("http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%204%20–%20BICT/_backlogs/board/Features");
+  });
+
+  it("convert to Spa Url", function(){
+    expect(encodeUrl("http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%204%20%-%20BICT/_backlogs/board/Features")).
+    jsonToBe("http(_)(-)(-)tfs.it.volvo.net(_)8080(-)tfs(-)Global(-)SEGOT-GDP(-)Team%204%20%-%20BICT(-)_backlogs(-)board(-)Features");
+  })
+
+  it("convert from Spa Url", function(){
+    expect(decodeUrl("http(_)(-)(-)tfs.it.volvo.net(_)8080(-)tfs(-)Global(-)SEGOT-GDP(-)Team%204%20%-%20BICT(-)_backlogs(-)board(-)Features")).
+    jsonToBe("http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%204%20%-%20BICT/_backlogs/board/Features");
+  })
 });
 
  

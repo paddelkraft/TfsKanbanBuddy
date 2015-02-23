@@ -230,6 +230,10 @@ function sendExtensionMessage(message) {
   });
 }
 
+function decodeUrlKeepEncodedSpaces(url){
+    return decodeURIComponent(url).replace(/ /g,"%20");
+}
+
 function decodeUrl(encoded){
     return encoded.replace(/\(_\)/g, ':').replace(/\(-\)/g, '/').replace(/ /g,"%20");
 }

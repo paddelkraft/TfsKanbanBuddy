@@ -234,7 +234,7 @@ function setColumnColor( color){
  
     function setTileColor($itemElm,colorMap){
         var itemClassification = "";
-        var tileData = $itemElm.text().split(" ");
+        var tileData = $itemElm.find(".title").text().split(" ");
         itemClassification = tileData[0];
         // set woorktype
         if(colorMap[itemClassification]!="undefined"){

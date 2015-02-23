@@ -118,6 +118,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
         case "save-snapshot"://Incoming data from kanban board
             saveSnapshot(request.snapshot);
             apiUtil().registerBoard(request.snapshot);
+            //Todo Remove (cleaning up old data)
+            localStorage.removeItem("snapshots_"+ request.snapshot.board);
+            //end remove
             sendResponse("Saved");
             break;
         
@@ -137,7 +140,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
         case "open-data-page"://board triggering flowData page opening
             var page = "spa.html";
-            var url = request.board;
+            var url = decodeUrlKeepEncodedSpaces(request.board);
             console.log("flowdata for"  + request.board + " requested");
             if(endsWith(request.board,"board")|| endsWith(request.board,"board/")){
               url = apiUtil().getRegisteredBoardUrl(request.board,"Microsoft.RequirementCategory");  
@@ -213,7 +216,8 @@ function saveSnapshot(snapshot){
     if(registeredUrl && boardUrl!==registeredUrl){
         if(registeredUrl === largestBoardDataStore(boardUrl,registeredUrl)){
             data = getObjectFromStorage("snapshots_"+registeredUrl);
-            saveObjectToStorage("snapshots_" + registeredUrl,null);
+            localStorage.removeItem("snapshots_" + registeredUrl);
+            //saveObjectToStorage("snapshots_" + registeredUrl,null);
         }
 
     }

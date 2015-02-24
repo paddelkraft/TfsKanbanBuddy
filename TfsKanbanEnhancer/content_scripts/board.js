@@ -64,7 +64,10 @@ function updateBoard(settings) {
         ".$tileClass.standard {border-left-color: rgb(0, 156, 204); background-color: rgb(214, 236, 242) color = black}"+
         ".duedate.white {background-color: black; color: white} "+
         ".duedate.yellow {background-color: black; color: yellow} "+
-        ".duedate.red {background-color: black; color: red} "
+        ".duedate.red {background-color: black; color: red} "+
+        ".inprogress.on-wip{background-color: #FBFBEF;}"+
+        ".inprogress.above-wip{background-color: #FBEFEF;}"+
+        ".inprogress.below-wip{background-color: #FFFFFF;}"
         
     ;
     
@@ -123,7 +126,7 @@ function updateBoard(settings) {
         $("#filter-text").change(filterBoard);
 
         if (board.wip) {
-            //checkWip();
+            checkWip();
         }
  
         if(board.update){
@@ -157,21 +160,21 @@ function checkWip(){
  
                 if(wip > wipLimit){
                     //console.log("wipLimit broken");
-                    thisColumn .setColumnColor("#FBEFEF");
+                    thisColumn .setColumnColor("above-wip");
                     if(useNext){
-                        nextColumn.setColumnColor("#FBEFEF");
+                        nextColumn.setColumnColor("above-wip");
                     }
                 }else if(wip == wipLimit){
                     //console.log("on wiplimit");
-                    thisColumn.setColumnColor("#FBFBEF");
+                    thisColumn.setColumnColor("on-wip");
                     if(useNext){
-                        nextColumn.setColumnColor("#FBFBEF");
+                        nextColumn.setColumnColor("on-wip");
                     }
                 }else{
-                    //console.log("on wiplimit");
-                    thisColumn.setColumnColor("#FFFFFF");
+                    //console.log("below wiplimit");
+                    thisColumn.setColumnColor("below-wip");
                     if(useNext){
-                        nextColumn.setColumnColor("#FFFFFF");
+                        nextColumn.setColumnColor("below-wip");
                     }
                 }
             }
@@ -194,6 +197,7 @@ function getColumns(){
             column.title = headers[i].getAttribute("title");
             column.header = headers[i];
             column.container = columnContainers[i];
+            column.removeColumnColor = removeColumnColor;
             column.setColumnColor = setColumnColor;
             column.setCurrentWip = setCurrentWip;
             column.getCurrentWip = getCurrentWip;
@@ -221,14 +225,21 @@ function getCurrentWip(){
     return this.container.getElementsByClassName(kanbanBoard.tileClass).length;
 }
  
-function setColumnColor( color){
-    var style = "background-color:"+color;
-    //console.log("setColumnColor");
-    this.container.setAttribute("style",style);
-    
-    this.header.parentNode.setAttribute("style",style);
-    //console.log(this.title + " style = " + this.container.getAttribute("style"));
+function setColumnColor( aClass){
+    this.removeColumnColor();
+    $(this.container).addClass(aClass);
+    $(this.header.parentNode).addClass(aClass);
 }
+
+function removeColumnColor(){
+    $(this.container).removeClass("on-wip");
+    $(this.header.parentNode).removeClass("on-wip");
+    $(this.container).removeClass("below-wip");
+    $(this.header.parentNode).removeClass("below-wip");
+    $(this.container).removeClass("above-wip");
+    $(this.header.parentNode).removeClass("above-wip");
+}
+
  
  
  

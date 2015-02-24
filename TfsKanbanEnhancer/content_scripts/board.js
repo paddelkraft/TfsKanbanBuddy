@@ -88,7 +88,7 @@ function updateBoard(settings) {
         highlightDates($tiles);
         //console.log("tile colors set");
         if (board.relations){
-            setLargeCards($tiles);
+            //setLargeCards($tiles);
             setRelationAttributes($tiles);
             var filters = setFilrerAttributes($tiles);
             if (! jQuery.isEmptyObject(filters)) {
@@ -123,7 +123,7 @@ function updateBoard(settings) {
         $("#filter-text").change(filterBoard);
 
         if (board.wip) {
-            checkWip();
+            //checkWip();
         }
  
         if(board.update){
@@ -532,9 +532,9 @@ function setColumnColor( color){
       
       if(settings){
           console.log("Settings.colormap");
-          var type = getMessageType();  
+          var type = getMessageType();
           if (settings.kanbanBoardColorMap){
-            colorMap = settings.kanbanBoardColorMap;
+            colorMap = splitColors(settings.kanbanBoardColorMap);
           }
           
           if(type === GET_TASK_BOARD_MAPPING){
@@ -546,16 +546,26 @@ function setColumnColor( color){
        
       
     }
+
+    function splitColors(colorMap){
+        var splittedColorMap ={};
+        var prefix;
+        var spit;
+        var index;
+        for (prefix in colorMap ){
+            split = prefix.split(";");
+            for(index = 0;index<split.length;index++){
+                splittedColorMap[split[index]] = colorMap[prefix];
+            }
+
+        }
+        return splittedColorMap;
+    }
     
-    
-    
-   
-     
-  
     function userscript () {
         
         console.log("content-script board.js Starting");
-        getSettings( function(response) {  
+        getSettings( function(response) {
             var board = getBoardType();
             console.log("Board data " + jsonEncode(board) );
             console.log("colorMap " + jsonEncode(response));

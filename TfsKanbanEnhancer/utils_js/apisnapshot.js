@@ -146,6 +146,17 @@ function apiUtil(storage){
 		
 	};
 
+	//remove 0.6.0
+	function removeUrlsWithEncodedDash(registeredBoards){
+		var cleanedRegistry = {};
+		_.forEach(registeredBoards,function (board){
+			if(!(board.boardUrl.indexOf("E2%80%93")>-1)){
+				cleanedRegistry[board.apiUrl] = board;
+			}
+		});
+
+		return cleanedRegistry;
+	}
 	
 	self.createBoardRecord = function (snapshot){
 		var boardRecord = {};
@@ -158,7 +169,7 @@ function apiUtil(storage){
 	};
 
 	self.registerBoard = function(snapshot){
-		var registeredBoards  = storage.getRegisteredBoards();
+		var registeredBoards  = removeUrlsWithEncodedDash(storage.getRegisteredBoards()); //storage.getRegisteredBoards();
 		var boardRecord = self.createBoardRecord(snapshot);
 		registeredBoards[boardRecord.apiUrl] = boardRecord;
 		console.log("Register board " + boardRecord.boardUrl);

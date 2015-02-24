@@ -83,6 +83,37 @@ describe("TFS API ", function() {
 		expect(boardRegistry).jsonToBe(boardRegistryWithLongBoardUrl);
 	});
 
+	//Remove 0.6.0
+	approveIt("should remove boardUrl with encoded - in storage",function(){
+		 var registeredBoards ={
+		 
+		  "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20%E2%80%93%20Dev%20Gothenburg/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Microsoft.RequirementCategory": {
+		    "boardUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20%E2%80%93%20Dev%20Gothenburg/_backlogs/board/Acceptance%20Tests",
+		    "projectUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20%E2%80%93%20Dev%20Gothenburg",
+		    "apiUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20%E2%80%93%20Dev%20Gothenburg/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Microsoft.RequirementCategory",
+		    "genericItemUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/_workitems#_a=edit&id=",
+		    "cardCategory": "Microsoft.RequirementCategory"
+		  },
+		  
+		  "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20–%20Dev%20Gothenburg/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Microsoft.RequirementCategory": {
+		    "boardUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20–%20Dev%20Gothenburg/_backlogs/board/Acceptance%20Tests",
+		    "projectUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20–%20Dev%20Gothenburg",
+		    "apiUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20–%20Dev%20Gothenburg/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Microsoft.RequirementCategory",
+		    "genericItemUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/_workitems#_a=edit&id=",
+		    "cardCategory": "Microsoft.RequirementCategory"
+		  }
+		};
+		var storageMock = Storage();
+		var boardRegistry = {};
+		var setRegisteredBoards = spyOn(storageMock,"setRegisteredBoards").and.callFake(function(input){
+			boardRegistry = input;
+		});
+		var getRegisteredBoards = spyOn(storageMock,"getRegisteredBoards")
+			.and.returnValue(registeredBoards);
+		apiUtil(storageMock).registerBoard(snapshot);
+		return boardRegistry;
+	});//end remove
+
 	it("should use long boardUrl in storage",function(){
 		var storageMock = Storage();
 		var boardRegistry = {};

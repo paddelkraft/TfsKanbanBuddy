@@ -17,7 +17,7 @@ function BoardData(data){
     self.ver="0.5.0";
     self.board = (data.board)?data.board:null;
     self.boardUrl = (data.boardUrl) ? data.boardUrl : null;
-    self.storageKey = "snapshots_" + self.board;
+    self.storageKey = "snapshots_" + self.boardUrl;
     self.genericItemUrl = (data.genericItemUrl)? data.genericItemUrl:"";
     // records of individual board states holds times for when it was first and last seen every time theboard changes
     // there is a new record generated 

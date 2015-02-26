@@ -112,6 +112,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             if(settings.kanbanBoardDescriptionMap){
                 setKanbanBoardDescriptionMap(settings.kanbanBoardDescriptionMap);
             }
+            saveStringToStorage("settings-updated",timeUtil.dateFormat(timeUtil.now()));
             sendResponse("Settings saved");
             break;
         

@@ -33,6 +33,15 @@
 	<div ng-show="tab === 1" id="kanbanboardsettings" class="settingssection">
 		<div class="table">
 			<div class="header">Kanban Board Color Map</div>
+			<div class="row" >
+				<div class="column">Color</div>
+				<div class="column">
+					Prefix
+				</div>
+				<div class="column">
+					Description
+				</div>
+			</div>
 			<div class="row" ng-repeat="maping in kanbanBoardColorMap">
 				<div class="column">{{maping.color}}</div>
 				<div class="column">

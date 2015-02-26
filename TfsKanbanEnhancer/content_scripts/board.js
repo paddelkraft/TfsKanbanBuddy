@@ -1,6 +1,6 @@
 function updateBoard(settings) {
   
-    
+    var textFilter;
     var GET_KANBAN_BOARD_MAPPING = "get-color-map";
     var GET_TASK_BOARD_MAPPING = "get-task-color-map";
     var FILTER_IDENTIFIER ="|";
@@ -40,7 +40,11 @@ function updateBoard(settings) {
         ".$tileClass.red.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.lightgreen.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.gray.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.standard.pale {background-color: transparent; border-color: #ddd; color: #ddd}"
+        ".$tileClass.standard.pale {background-color: transparent; border-color: #ddd; color: #ddd}"+
+        ".duedate.white.pale {background-color: transparent; color: #ddd}"+
+        ".duedate.yellow.pale {background-color: transparent; color: #ddd}"+
+        ".duedate.red.pale {background-color: transparent; color: #ddd}"
+        
     ;
     
     var customStyleColor =
@@ -57,7 +61,14 @@ function updateBoard(settings) {
         ".$tileClass.red {background-color: #d2322d; border-color: #ac2925; color: white} " +
         ".$tileClass.lightgreen {background-color: #C3FCD4; border-color: #00FF80; color: black} " +
         ".$tileClass.gray {background-color: #A1A19F; border-color:black; color: white} " +
-        ".$tileClass.standard {border-left-color: rgb(0, 156, 204); background-color: rgb(214, 236, 242) color = black}"
+        ".$tileClass.standard {border-left-color: rgb(0, 156, 204); background-color: rgb(214, 236, 242) color = black}"+
+        ".duedate.white {background-color: black; color: white} "+
+        ".duedate.yellow {background-color: black; color: yellow} "+
+        ".duedate.red {background-color: black; color: red} "+
+        ".inprogress.on-wip{background-color: #FBFBEF;}"+
+        ".inprogress.above-wip{background-color: #FBEFEF;}"+
+        ".inprogress.below-wip{background-color: #FFFFFF;}"
+        
     ;
     
    
@@ -80,12 +91,13 @@ function updateBoard(settings) {
         highlightDates($tiles);
         //console.log("tile colors set");
         if (board.relations){
-            setLargeCards($tiles);
+            //setLargeCards($tiles);
             setRelationAttributes($tiles);
             var filters = setFilrerAttributes($tiles);
             if (! jQuery.isEmptyObject(filters)) {
                 addFilterDropdown(filters);
             }
+			addFilterTextbox();
         }
         
         
@@ -99,9 +111,19 @@ function updateBoard(settings) {
             });
         }
         
-        $("#filter-select").change(function(){
-            applyFilter($("#filter-select").val(),board);
-        })
+        function filterBoard(){
+            if($("#filter-select").length !== 0){
+                applyFilter($("#filter-select").val(),board);
+            }else{
+                applyFilter('show all',board);
+            }
+            
+            applyTextFilter(textFilter(),board);
+        }
+        
+        $("#filter-select").change(filterBoard);
+
+        $("#filter-text").change(filterBoard);
 
         if (board.wip) {
             checkWip();
@@ -138,21 +160,21 @@ function checkWip(){
  
                 if(wip > wipLimit){
                     //console.log("wipLimit broken");
-                    thisColumn .setColumnColor("#FBEFEF");
+                    thisColumn .setColumnColor("above-wip");
                     if(useNext){
-                        nextColumn.setColumnColor("#FBEFEF");
+                        nextColumn.setColumnColor("above-wip");
                     }
                 }else if(wip == wipLimit){
                     //console.log("on wiplimit");
-                    thisColumn.setColumnColor("#FBFBEF");
+                    thisColumn.setColumnColor("on-wip");
                     if(useNext){
-                        nextColumn.setColumnColor("#FBFBEF");
+                        nextColumn.setColumnColor("on-wip");
                     }
                 }else{
-                    //console.log("on wiplimit");
-                    thisColumn.setColumnColor("#FFFFFF");
+                    //console.log("below wiplimit");
+                    thisColumn.setColumnColor("below-wip");
                     if(useNext){
-                        nextColumn.setColumnColor("#FFFFFF");
+                        nextColumn.setColumnColor("below-wip");
                     }
                 }
             }
@@ -175,6 +197,7 @@ function getColumns(){
             column.title = headers[i].getAttribute("title");
             column.header = headers[i];
             column.container = columnContainers[i];
+            column.removeColumnColor = removeColumnColor;
             column.setColumnColor = setColumnColor;
             column.setCurrentWip = setCurrentWip;
             column.getCurrentWip = getCurrentWip;
@@ -202,20 +225,27 @@ function getCurrentWip(){
     return this.container.getElementsByClassName(kanbanBoard.tileClass).length;
 }
  
-function setColumnColor( color){
-    var style = "background-color:"+color;
-    //console.log("setColumnColor");
-    this.container.setAttribute("style",style);
-    
-    this.header.parentNode.setAttribute("style",style);
-    //console.log(this.title + " style = " + this.container.getAttribute("style"));
+function setColumnColor( aClass){
+    this.removeColumnColor();
+    $(this.container).addClass(aClass);
+    $(this.header.parentNode).addClass(aClass);
 }
+
+function removeColumnColor(){
+    $(this.container).removeClass("on-wip");
+    $(this.header.parentNode).removeClass("on-wip");
+    $(this.container).removeClass("below-wip");
+    $(this.header.parentNode).removeClass("below-wip");
+    $(this.container).removeClass("above-wip");
+    $(this.header.parentNode).removeClass("above-wip");
+}
+
  
  
  
     function setTileColor($itemElm,colorMap){
         var itemClassification = "";
-        var tileData = $itemElm.text().split(" ");
+        var tileData = $itemElm.find(".title").text().split(" ");
         itemClassification = tileData[0];
         // set woorktype
         if(colorMap[itemClassification]!="undefined"){
@@ -247,7 +277,7 @@ function setColumnColor( color){
             }else if (daysUntil < 7){
                 color = "yellow";
             }
-            $itemElm.html(tileData.replace(date, "<strong style='background:black;color:"+color+";'>" + date + "</strong>"));
+            $itemElm.html(tileData.replace(date, "<strong class='duedate "+color+"'>" + date + "</strong>"));
         }
     }
 
@@ -335,19 +365,64 @@ function setColumnColor( color){
             }
         });
     }
+
+
+    function applyTextFilter(filter, board){
+		console.log("applyTextFilter: " + filter);
+        getTiles(board)
+        .each(function () {
+            var $itemElm = $(this);
+			//var title=$itemElm.find(".title").text().toUpperCase();
+			var title=$itemElm.text().toUpperCase();
+			console.log("Title: " + title);
+			
+            if (title.indexOf(filter.toUpperCase()) === -1){
+                $itemElm.attr("style","display:none;");
+            }
+		});
+    }
  
     function addFilterDropdown(filters) {
         var select = document.createElement('select');
         select.setAttribute("id","filter-select");
         var html = "<option value='show all'>Show all </option><option value=''>Unfiltered</option>";
         for(var filter in filters){
-            html += "<option value='"+ filter + "'>"+filter.replace(FILTER_IDENTIFIER,"") + "</option>"; 
+            html += "<option value='"+ filter + "'>"+filter.replace(FILTER_IDENTIFIER,"") + "</option>";
         }
         select.innerHTML = html;
         $('.hub-title').append(select);
     }
+
+    function watermark(inputId,watermarkText) {
+     $('#'+inputId).blur(function(){
+      if ($(this).val().length === 0){
+        $(this).val(watermarkText).addClass('watermark');
+      }
+        
+     }).focus(function(){
+      if ($(this).val() === watermarkText){
+        $(this).val('').removeClass('watermark');
+      }
+     }).val(watermarkText).addClass('watermark');
+    }
+
  
- 
+    function addFilterTextbox() {
+        var textbox = document.createElement('input');
+		textbox.type = 'text';
+		textbox.setAttribute("id","filter-text");
+        $('.hub-title').append(textbox);
+        watermark("filter-text","Filter cards");
+        textFilter = function(){
+            var filter = "";
+            if(!$(textbox).hasClass("watermark")){
+                filter = $(textbox).val();
+            }
+            return filter;
+        };
+    }
+
+
  
     
     function setClass($elm, className) {
@@ -363,6 +438,16 @@ function setColumnColor( color){
             return;
         }
         
+        function pale(){
+            $(this).addClass("pale");
+            $(this).find(".duedate").addClass("pale");
+        }
+
+        function normal(){
+            $(this).removeClass("pale");
+            $(this).find(".duedate").removeClass("pale");
+        }
+
         $('[data-case-id]')
         .mouseenter(function (evt) {
             var caseId = $(evt.target).attr('data-case-id') || $(evt.target).closest('[data-case-id]').attr('data-case-id');
@@ -370,8 +455,10 @@ function setColumnColor( color){
            
             if(caseId !== ""){
               console.log('Mouse enter... case #:' + caseId);
-              $("[data-case-id!='" + caseId + "']").addClass('pale');
-              $("[data-case-id='" + caseId + "']").removeClass('pale');
+              //$("[data-case-id!='" + caseId + "']").addClass('pale');
+              $("[data-case-id!='" + caseId + "']").each(pale);
+              //$("[data-case-id='" + caseId + "']").removeClass('pale');
+              $("[data-case-id='" + caseId + "']").each(normal);
             }
             
         })
@@ -379,7 +466,9 @@ function setColumnColor( color){
             hovered = "";
             setTimeout(function(){
                 if (hovered === ""){
-                    $("[data-case-id]").removeClass('pale');
+                    //$("[data-case-id]").removeClass('pale');
+                    $("[data-case-id]").each(normal);
+
                 }
             },200);
             
@@ -454,9 +543,9 @@ function setColumnColor( color){
       
       if(settings){
           console.log("Settings.colormap");
-          var type = getMessageType();  
+          var type = getMessageType();
           if (settings.kanbanBoardColorMap){
-            colorMap = settings.kanbanBoardColorMap;
+            colorMap = splitColors(settings.kanbanBoardColorMap);
           }
           
           if(type === GET_TASK_BOARD_MAPPING){
@@ -468,16 +557,26 @@ function setColumnColor( color){
        
       
     }
+
+    function splitColors(colorMap){
+        var splittedColorMap ={};
+        var prefix;
+        var spit;
+        var index;
+        for (prefix in colorMap ){
+            split = prefix.split(";");
+            for(index = 0;index<split.length;index++){
+                splittedColorMap[split[index]] = colorMap[prefix];
+            }
+
+        }
+        return splittedColorMap;
+    }
     
-    
-    
-   
-     
-  
     function userscript () {
         
         console.log("content-script board.js Starting");
-        getSettings( function(response) {  
+        getSettings( function(response) {
             var board = getBoardType();
             console.log("Board data " + jsonEncode(board) );
             console.log("colorMap " + jsonEncode(response));

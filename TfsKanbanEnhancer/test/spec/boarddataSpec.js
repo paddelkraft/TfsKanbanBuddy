@@ -4,6 +4,7 @@ function testSnapshot(milliseconds){
     return {
         "milliseconds": milliseconds,
         "board": "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection",
+        "boardUrl": "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/boardName",
         "genericItemUrl" : "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=",
         "lanes": [
           {
@@ -196,7 +197,6 @@ describe("BoardData", function() {
 
   approveIt("should contain added Snapshot", function() {
     boardData.addSnapshot(snapshot);
-    
     return boardData.getLatestSnapshot();
   });
 
@@ -256,7 +256,6 @@ describe("BoardData", function() {
     boardData = mergeBoardData(boardData,mergeData);
     console.log(jsonEncode(boardData));
     var mergedBoardDesign = boardData.boardDesignHistory.boardDesignRecords[0].getBoardDesignForSnapshot();
-    //expect(mergedBoardDesign).approve(boardDesign);
     return boardData.boardDesignHistory.boardDesignRecords;
   });
 
@@ -270,8 +269,6 @@ describe("BoardData", function() {
     boardData = mergeBoardData(boardData,mergeData);
     var ticket = boardData.flowData["3"];
     var lane = ticket.lanes["Dev DONE"];
-    //expect(lane[0].firstSeen).toEqual(snapshot.milliseconds);
-    //expect(lane[0].lastSeen).toEqual(snapshot.milliseconds+10);
     return ticket;
   });
 
@@ -293,7 +290,6 @@ describe("BoardData", function() {
     boardData.addSnapshot(snapshot);
     snapshot2 = testSnapshot(snapshot.milliseconds+10);
     boardData.addSnapshot(snapshot2);
-    //expect(boardData.getSnapshots()).approve([snapshot,snapshot2]);
     return boardData.getSnapshots();
   });
 });
@@ -524,25 +520,52 @@ describe("FlowTicket", function() {
 
 describe("CFD",function(){
 
+  function ticketMovingAcrossTheBoard1ColumnPerDay(boardData,arrayWithTickets){
+    boardData.addSnapshot(simpleSnapshot(0,arrayWithTickets));
+    boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY,[],arrayWithTickets));
+    boardData.addSnapshot(simpleSnapshot(2*timeUtil.MILLISECONDS_DAY,[],[],arrayWithTickets));
+    boardData.addSnapshot(simpleSnapshot(3*timeUtil.MILLISECONDS_DAY,[],[],[],arrayWithTickets));
+    return boardData;
+  }
+  
   approveIt("CFD for ticket moving across board", function(){
-    var boardData = new BoardData();
-    boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
-    boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY,[],[createSnapshotTicket("1","TestTicket")]));
-    boardData.addSnapshot(simpleSnapshot(2*timeUtil.MILLISECONDS_DAY,[],[],[createSnapshotTicket("1","TestTicket")]));
-    boardData.addSnapshot(simpleSnapshot(3*timeUtil.MILLISECONDS_DAY,[],[],[],[createSnapshotTicket("1","TestTicket")]));
+    var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket")]);
     return boardData.getCfdData();
   });
 
+  //nvD3 data format
   approveIt("CFD chart data for ticket moving across board", function(){
-    var boardData = new BoardData();
-    boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
-    boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY,[],[createSnapshotTicket("1","TestTicket")]));
-    boardData.addSnapshot(simpleSnapshot(2*timeUtil.MILLISECONDS_DAY,[],[],[createSnapshotTicket("1","TestTicket")]));
-    boardData.addSnapshot(simpleSnapshot(3*timeUtil.MILLISECONDS_DAY,[],[],[],[createSnapshotTicket("1","TestTicket")]));
+    var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket")]);
     return boardData.buildCfdChartData(boardData.getCfdData());
   });
 
+  approveIt("CFD for tickets last two days moving across the board", function(){
+    var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket")]);
+    var filter = {"startMilliseconds" : 2*timeUtil.MILLISECONDS_DAY};
+    return boardData.getCfdData(filter);
+  });
+
+  approveIt("CFD for tickets first two days moving across the board", function(){
+    var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket")]);
+    var filter = {"endMilliseconds" : 1*timeUtil.MILLISECONDS_DAY};
+    return boardData.getCfdData(filter);
+  });
+
+  approveIt("CFD for tickets filtered by CR", function(){
+    var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket"),createSnapshotTicket("2"," CR TestTicket")]);
+    var filter = {"text" : "cR"};
+    return boardData.getCfdData(filter);
+  });
+
+  approveIt("CFD for tickets filtered no tickets found", function(){
+    var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket"),createSnapshotTicket("2"," CR TestTicket")]);
+    var filter = {"text" : "_"};
+    return boardData.getCfdData(filter);
+  });
+
 });
+
+
 
 
 

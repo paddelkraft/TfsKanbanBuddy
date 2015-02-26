@@ -1,7 +1,7 @@
 {
     "name": "TFS kanban buddy",
-    "version": "0.5.3",
 
+    "version": "0.5.10",
     "manifest_version": 2,
     "browser_action": {
         "default_title": "TFS kanban board enhancer",
@@ -9,22 +9,22 @@
         "default_popup": "pages/popup.html"
     },
 
-    "icons": 
-    { 
+    "icons":
+    {
         "16": "icons/icon16.png",
         "48": "icons/icon48.png",
         "32": "icons/icon32.png",
-        "128": "icons/icon128.png" 
+        "128": "icons/icon128.png"
     },
 
     "permissions": [
         "unlimitedStorage"
     ],
-    
-     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-    
 
-    "background": 
+     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+
+
+    "background":
     {
     	"scripts": ["/utils_js/jquery-2.1.1.min.js",
                     "/utils_js/lodash.js",
@@ -38,15 +38,11 @@
 
 	"content_scripts": [
     	{
-        	"matches": ["http://*/*/*/_backlogs/board*", 
+        	"matches": ["http://*/*/*/_backlogs/board*",
                         "https://*/*/*/_backlogs/board*",
-                        "http://*/*/*/_backlogs/TaskBoard*", 
-                        "https://*/*/*/_backlogs/TaskBoard*",
-                        "http://*/*/*/_backlogs/taskboard*", 
-                        "https://*/*/*/_backlogs/taskboard*",
                         "http://*/*/*/_boards*"
                         ],
-        	"js": [
+            "js": [
                     "utils_js/util.js",
                     "utils_js/jquery-2.1.1.min.js",
                     "content_scripts/tfsBoardInit.js",
@@ -56,7 +52,22 @@
     	},
         {
             "matches": [
-                        "http://*/*/*/_backlogs/board*", 
+                        "http://*/*/*/_backlogs/TaskBoard*",
+                        "https://*/*/*/_backlogs/TaskBoard*",
+                        "http://*/*/*/_backlogs/taskboard*",
+                        "https://*/*/*/_backlogs/taskboard*"
+                        ],
+            "js": [
+                    "utils_js/util.js",
+                    "utils_js/jquery-2.1.1.min.js",
+                    "content_scripts/tfsBoardInit.js",
+                    "content_scripts/taskboard.js",
+                    "content_scripts/projectUrl.js"
+                  ]
+        },
+        {
+            "matches": [
+                        "http://*/*/*/_backlogs/board*",
                         "https://*/*/*/_backlogs/board*"
                        ],
             "js": ["utils_js/util.js","utils_js/jquery-2.1.1.min.js","content_scripts/snapshot.js"]

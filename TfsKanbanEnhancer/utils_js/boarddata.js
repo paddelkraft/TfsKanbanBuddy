@@ -11,16 +11,14 @@ function BoardData(data){
         data = {};
     }
     
-    if (data.ver === "0.4.5"){
-        data = convertTo050(data);
-    }
     self.ver="0.5.0";
     self.board = (data.board)?data.board:null;
-    self.storageKey = "snapshots_" + self.board;
+    self.boardUrl = (data.boardUrl) ? data.boardUrl : null;
+    self.storageKey = "snapshots_" + self.boardUrl;
     self.genericItemUrl = (data.genericItemUrl)? data.genericItemUrl:"";
     // records of individual board states holds times for when it was first and last seen every time theboard changes
     // there is a new record generated 
-    self.snapshotRecords = (data.snapshotRecords) ? data.snapshotRecords : [];//remove in later version
+    self.snapshotRecords = (data.snapshotRecords) ? data.snapshotRecords : [];
     // storage for historical and current board designs with firstSeen and lastSeen
     self.boardDesignHistory = (data.boardDesignHistory)? new BoardDesignHistory(data.boardDesignHistory):
                                                          new BoardDesignHistory();
@@ -83,6 +81,7 @@ function BoardData(data){
         self.flowData.addSnapshot(snapshot);
         self.genericItemUrl = snapshot.genericItemUrl;
         self.board = snapshot.board;
+        self.boardUrl = snapshot.boardUrl
         //console.log("genericItemUrl " + self.genericItemUrl);
         
         
@@ -136,6 +135,7 @@ function BoardData(data){
         if( self.findBoardDesignRecord(milliseconds)!==null){
            snapshot.milliseconds = milliseconds;
             snapshot.board = self.board;
+            snapshot.boardUrl = self.boardUrl;
             snapshot.genericItemUrl = self.genericItemUrl;
             snapshot.lanes = getBoardState(milliseconds);
         }
@@ -163,6 +163,7 @@ function BoardData(data){
         return boardDesign;
     };
 
+    //Remove this one moved to presentation parts
     self.buildCfdChartData = function(cfdData){
         var chartData = [];
         var lane,day;
@@ -180,23 +181,24 @@ function BoardData(data){
         return chartData;
     };
 
-    self.getCfdData = function(){
+    self.getCfdData = function(filter){
         var columnIndexes = getCfdColumnIndexes(self.getLaneHeaders().reverse());
-        var cfdData = self.flowData.getCfdData();
+        var cfdData = self.flowData.getCfdData(filter);
         console.log("getCfdData");
         //console.log(jsonEncode(cfdData));
-        var cfdGrid = getCfdGrid();
+        var cfdGrid = getCfdGrid(filter);
         var rowIndexes = getCfdRowIndexes(cfdGrid);
         _.forEach(cfdData,function(ticket){
             //console.log(jsonEncode(ticket));
             _.forEach(ticket,function(day){
                 var isoDate,row,column;
                 //console.log(jsonEncode(day));
-                //isoDate = timeUtil.isoDateFormat(day.milliseconds);
                 isoDate = ""+timeUtil.dayStart(day.milliseconds);
                 row = rowIndexes[isoDate];
                 column = columnIndexes[day.lane];
-                cfdGrid[row][column]++;
+                if(cfdGrid[row]){
+                    cfdGrid[row][column]++;
+                }
             });
         });
 
@@ -224,13 +226,28 @@ function BoardData(data){
         return indexes;
     }
 
-    var getCfdGrid = function(){
+    var getCfdGrid = function(filter){
         var laneHeaders = self.getLaneHeaders().reverse();
         var start = timeUtil.dayStart(self.snapshotRecords[0].firstSeen);
         var end = timeUtil.dayStart(self.snapshotRecords[self.snapshotRecords.length-1].lastSeen + timeUtil.MILLISECONDS_DAY);
-        var days = Math.floor((end - start)/timeUtil.MILLISECONDS_DAY +1);
-        var grid = gridOf(0,days+1,laneHeaders.length+1);
-        var row = 0;
+        var days;
+        var grid;
+        var row ;
+        
+        if(filter){
+            if(filter.startMilliseconds){
+                start = filter.startMilliseconds;
+            }
+            if(filter.endMilliseconds){
+                 end = filter.endMilliseconds;
+            }
+        }
+
+        days = Math.floor((end - start)/timeUtil.MILLISECONDS_DAY +1);
+        grid = gridOf(0,days+1,laneHeaders.length+1);
+        row = 0;
+        
+        
         console.log("getCfdGrid");
         grid[row] = ["Date"].concat(laneHeaders);
         for(row = 0 ; row < days; row++){
@@ -308,10 +325,6 @@ function BoardData(data){
     self.size = function(){
         return jsonEncode(self).length * 2;
     };
-
-    
-
-    
 }//BoardData
 
 
@@ -322,11 +335,13 @@ function Snapshot(snapshot){
     var self = this;
     //link to board
     self.board =  snapshot.board;
+    self.boardUrl= snapshot.boardUrl;
     //time of napshot capture
     self.milliseconds = snapshot.milliseconds;
     //generic link to item details used to 
     //link direct into tfs items from reports 
     self.genericItemUrl = snapshot.genericItemUrl;
+    self.cardCategory = snapshot.cardCategory;
     //board state
     self.lanes = [];
     _.forEach(snapshot.lanes,function(lane){
@@ -567,13 +582,22 @@ function FlowData(flowData, genericItemUrl){
         });
     }
 
-    self.getCfdData = function(){
+    self.getCfdData = function(filter){
         var cfdData = [];
         var ticketData;
         _.forEach(self, function(ticket ){
             if(ticket instanceof FlowTicket){
-                ticketData = ticket.cfdData();
-                cfdData.push(ticketData);
+                if(filter && filter.text){
+                    if(-1 < ticket.title.toUpperCase().indexOf(filter.text.toUpperCase())){
+                        ticketData = ticket.cfdData(filter);
+                        cfdData.push(ticketData);
+                    }
+                } else{
+                    ticketData = ticket.cfdData(filter);
+                    cfdData.push(ticketData);
+                }
+
+                
                 //console.log(jsonEncode(cfdData));
             }
         });
@@ -789,12 +813,21 @@ function FlowTicket(flowItemData, genericItemUrl){
         return self.blockedRecords[self.blockedRecords.length-1].firstSeen;
     };
 
-    self.cfdData = function(){
+    self.cfdData = function(filter){
         var start = self.enteredBoard();
         var end = self.lastSeen();
         var ticketData = [];
         var time ;
         var dayRecord;
+
+        if (filter){
+            if (filter.startMilliseconds && (filter.startMilliseconds>start)){
+                start = filter.startMilliseconds;
+            }
+            if (filter.endMilliseconds && (filter.endMilliseconds<end)){
+                end = filter.endMilliseconds;
+            }
+        }
         for (time = start; time < timeUtil.dayStart(end+2*timeUtil.MILLISECONDS_DAY); time = timeUtil.dayStart(time+timeUtil.MILLISECONDS_DAY)){
             dayRecord = {"lane":self.wasInLaneContinous(time),milliseconds : time};
             ticketData.push(dayRecord);
@@ -808,82 +841,6 @@ function FlowTicket(flowItemData, genericItemUrl){
     return self;
 }
 
-function convertTo050(boardData, logger){
-    if(!logger){
-        logger = function (log){
-            console.log("ConvertTo050 | "+ log);
-        };
-    }
-    logger("Convert boardData from 0.4.5 to 0.5.0 = " );
-    var snapshots = [];
-    var converted = new BoardData();
-    logger("converted = " + jsonEncode(converted));
-    function getObservationTimes (boardDesignRecords){
-        var observationTimes = [];
-        _.forEach(boardDesignRecords,function(boardDesignRecord){
-            observationTimes = observationTimes.concat(boardDesignRecord.seen);
-        });
-        logger("Observation times = " + jsonEncode(observationTimes));
-        logger("Observation times length = " + observationTimes.length);
-        return observationTimes;
-    }
-    
-    function createSnapshotRecords(observationTimes){
-        var snapshotRecords = [];
-        _.forEach(observationTimes,function (observationTime){
-            snapshotRecords.push({"firstSeen" : observationTime,
-                                  "lastSeen" : observationTime });
-        });
-        logger ("snapshot records = " + jsonEncode(snapshotRecords) );
-        logger ("snapshot records length = "+ snapshotRecords.length );
-        return snapshotRecords;
-    }
-
-    function convertFlowTickets(flowData){
-        _.forEach(flowData, function(flowTicket){
-            var oldRecord;
-            for(var laneIndex in flowTicket.lanes){
-                oldRecord  = flowTicket.lanes[laneIndex];
-                var newRecord = [];
-                newRecord.push({"firstSeen" : oldRecord.enterMilliseconds,
-                                "lastSeen"  : oldRecord.exitMilliseconds});
-                newRecord[0].name = laneIndex;
-                flowTicket.inLane = laneIndex;
-                flowTicket.lanes[laneIndex] = newRecord;
-            }
-        });
-        
-    }
-
-    function setBoardDesignRecordsFirstAndLastSeen(boardDesignRecords){
-        _.forEach(boardDesignRecords,function(boardDesignRecord){
-            logger("Board design seen  = " + jsonEncode(boardDesignRecord.seen));
-            boardDesignRecord.firstSeen = _.first(boardDesignRecord.seen);
-            boardDesignRecord.lastSeen = _.last(boardDesignRecord.seen);
-            boardDesignRecord.seen = null;
-            logger("Board design firstSeen  = " + jsonEncode(boardDesignRecord.firstSeen));
-            logger("Board design lastSeen  = " + jsonEncode(boardDesignRecord.lastSeen));
-        });
-    }
-
-    if(boardData.ver === "0.4.5"){
-        boardData.snapshotRecords = createSnapshotRecords(getObservationTimes(boardData.boardDesignHistory.boardDesignRecords));
-        setBoardDesignRecordsFirstAndLastSeen(boardData.boardDesignHistory.boardDesignRecords);
-        convertFlowTickets(boardData.flowData);
-        boardData.ver = "0.5.0";
-        boardData = new BoardData(boardData);
-        snapshots = boardData.getSnapshots();
-        logger(snapshots.length + " Snapshots generated ");
-        _.forEach(snapshots,function(snapshot){
-            logger("Adding snapshot = "+jsonEncode(snapshot));
-            logger("snapshot time  = "+timeUtil.dateFormat(snapshot.milliseconds));
-            converted.addSnapshot(snapshot);
-        });
-    }
-
-    return converted;
-    
-}
 
 //Merge data from two datasources
 function mergeBoardData(boardData,mergeData){
@@ -931,14 +888,9 @@ function BoardDesignHistory(boardDesignHistoryObject){
         }
     };
 
-    
-
-
     boardDesignHistory.getLatestBoardDesign = function(){
        return this.boardDesignRecords[this.boardDesignRecords.length -1].getBoardDesignForSnapshot();
     };
-
-    
 
     boardDesignHistory.getLatestBoardObservationTime = function(){
         return this.boardDesignRecords[this.boardDesignRecords.length -1].lastSeen;
@@ -980,11 +932,6 @@ function BoardDesignRecord(boardDesign, milliseconds){
     }else{
         //existing record
         boardDesignRecord = boardDesign;
-        if(boardDesignRecord.seen){ //Convert between intermediate formats this should be removed 
-           boardDesignRecord.firstSeen = _.first(boardDesignRecord.seen);
-           boardDesignRecord.lastSeen  = _.last(boardDesignRecord.seen);
-           boardDesignRecord.seen = null;
-        }//end remove
     }
 
     

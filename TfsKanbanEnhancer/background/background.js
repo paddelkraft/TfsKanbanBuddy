@@ -112,12 +112,16 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             if(settings.kanbanBoardDescriptionMap){
                 setKanbanBoardDescriptionMap(settings.kanbanBoardDescriptionMap);
             }
+            saveStringToStorage("settings-updated",timeUtil.dateFormat(timeUtil.now()));
             sendResponse("Settings saved");
             break;
         
         case "save-snapshot"://Incoming data from kanban board
             saveSnapshot(request.snapshot);
             apiUtil().registerBoard(request.snapshot);
+            //Todo Remove (cleaning up old data)
+            localStorage.removeItem("snapshots_"+ request.snapshot.board);
+            //end remove
             sendResponse("Saved");
             break;
         
@@ -135,13 +139,34 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             setBoardData(request.boardData);
             break;
 
+        case "open-data-page"://board triggering flowData page opening
+            var page = "spa.html";
+            var url = decodeUrlKeepEncodedSpaces(request.board);
+            console.log("flowdata for"  + request.board + " requested");
+            if(endsWith(request.board,"board")|| endsWith(request.board,"board/")){
+              url = apiUtil().getRegisteredBoardUrl(request.board,"Microsoft.RequirementCategory");  
+            }
+
+            
+            if(request.page){
+                page = page+"#/"+ request.page +"/";
+            }
+            var newURL = "pages/"+page+encodeUrl(url);
+            chrome.tabs.create({ url: newURL });
+            sendResponse("OK");
+            console.log("open-data-page handled spa.html#/"+ request.page +" opened");
+            break;
         case "show-flow-data"://board triggering flowData page opening
             var page = "flowData.html";
+            var url = request.board;
             console.log("flowdata for"  + request.board + " requested");
+            if(endsWith(request.board,"board")|| endsWith(request.board,"board/")){
+              url = apiUtil().getRegisteredBoardUrl(request.board,"Microsoft.RequirementCategory");  
+            }
             if(request.page){
                 page = request.page;
             }
-            var newURL = "pages/"+page+"?"+encodeURIComponent(request.board);
+            var newURL = "pages/"+page+"?"+encodeURIComponent(url);
             chrome.tabs.create({ url: newURL });
             sendResponse("OK");
             console.log("show-flow-data handled flowdata.html opened");
@@ -182,10 +207,39 @@ function getBlockedPrefix(colorMap){
 function saveSnapshot(snapshot){
     var boardData;
     var key;
+    var data = null;
+    var boardUrl = apiUtil().getBoardUrl(snapshot.boardUrl,snapshot.board , snapshot.cardCategory);
+    var largest;
+    var registeredUrl = apiUtil().getRegisteredBoardUrl(snapshot.board,snapshot.cardCategory);
     console.log("Snapshot to save = "+jsonEncode(snapshot));
-    key = "snapshots_" + snapshot.board;
-    //var boardData = new BoardData();
-    boardData = new BoardData( getObjectFromStorage(key));
+    key = "snapshots_" + boardUrl;
+    //same board can have several shorter urls we only want to save the data once
+    if(registeredUrl && boardUrl!==registeredUrl){
+        if(registeredUrl === largestBoardDataStore(boardUrl,registeredUrl)){
+            data = getObjectFromStorage("snapshots_"+registeredUrl);
+            localStorage.removeItem("snapshots_" + registeredUrl);
+            //saveObjectToStorage("snapshots_" + registeredUrl,null);
+        }
+
+    }
+    if (data===null){
+      data = getObjectFromStorage(key);
+    }
+    
+    
+    
+    if(snapshot.boardUrl && snapshot.boardUrl.indexOf("_backlogs/board")>-1 && snapshot.cardCategory === "Microsoft.RequirementCategory"){
+        //old keys remove when safe
+        if (jsonEncode(data)==="{}"){
+            boardData = new BoardData( getObjectFromStorage("snapshots_" + snapshot.board));
+            //saveObjectToStorage("snapshots_" + snapshot.boardUrl,null);
+        }else {
+            //New data for
+            boardData = new BoardData(data);
+        }
+    } else {
+        boardData = new BoardData(data);
+    }
     
     boardData.setBlockedPrefix(tfsKanbanBuddy.blockedPrefix);
     
@@ -194,6 +248,19 @@ function saveSnapshot(snapshot){
     saveObjectToStorage(key, boardData);
     console.log("boardData updated key = " + key);
     
+}
+
+function largestBoardDataStore(boardUrl1,boardUrl2){
+    var data1 = getStringFromStorage("snapshots_"+boardUrl1);
+    var data2 = getStringFromStorage("snapshots_"+boardUrl2);
+    var largest = boardUrl1;
+    if(!data1){
+        largest = boardUrl2;
+    }else if(data2 && data2.length>data1.length){
+        largest = boardUrl2;
+    }
+
+    return largest;
 }
 
 function getBoardLinks(){

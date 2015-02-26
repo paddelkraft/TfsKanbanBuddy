@@ -150,9 +150,10 @@ var app = angular.module("flowData", []);
 		chrome.runtime.sendMessage(message, function(response){
 			var boardData = new BoardData(response);
 			var lanes = boardData.getLaneHeaders();
+			//console.log(jsonEncode(boardData));
 			$scope.snapshot = buildSnapshot(boardData);
 			$scope.dataSize = "Data size = " +parseInt( boardData.size()/1024) +"KB";
-			$scope.board = boardData.board;
+			$scope.board = boardData.boardUrl;
 			$scope.showSnapshot = false;
 			$scope.showFlowDataGrid = false;
 			$scope.showFlowReport = false;	

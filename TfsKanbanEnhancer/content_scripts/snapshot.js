@@ -17,7 +17,8 @@
         var isBlocked = (element.getAttribute("class").indexOf("blocked")> -1);
         var ticketObject = {
             id : element.getAttribute("data-item-id"),
-            title : element.textContent,
+            //$itemElm.find(".title").text()
+            title : element.getElementsByClassName("title")[0].textContent,
             
         };
         if(isBlocked){
@@ -44,18 +45,22 @@
         log("link with caption " + caption + "created" );
     }
 
-    
-
-    function getProjectUrl(){
-        return document.URL.split("/_backlogs/")[0];
+    function boardUrl(){
+        return decodeUrlKeepEncodedSpaces(document.URL);
     }
+   
+    
+    function getProjectUrl(){
+        return boardUrl().split("/_backlogs/")[0];
+    }
+
 
     
 
     function getGenericItemUrl(){
         var projectName = document.getElementsByClassName("project-name")[0].textContent;
-        log("Url = "+document.URL);
-        return document.URL.split(projectName)[0] + projectName + "/_workitems#_a=edit&id=";
+        log("Url = "+boardUrl());
+        return  boardUrl().split(projectName)[0] + projectName + "/_workitems#_a=edit&id=";
     }
 
     
@@ -75,8 +80,7 @@
     function showFlowData(){
          var message = {};
         message.type = "show-flow-data";
-        message.board = getProjectUrl();
-        message.snapshot = getBoardSnapshot();
+        message.board = boardUrl();
         chrome.runtime.sendMessage(message, function(response){
             log(response);
         });
@@ -86,11 +90,35 @@
          var message = {};
         message.type = "show-flow-data";
         message.page = page;
-        message.board = getProjectUrl();
-        message.snapshot = getBoardSnapshot();
+        message.board = boardUrl();
+        message.boardUrl =
         chrome.runtime.sendMessage(message, function(response){
             log(response);
         });
+    }
+
+    function openDataPage(page){
+        var message = {};
+        message.type = "open-data-page";
+        message.page = page;
+        message.board = boardUrl();
+        chrome.runtime.sendMessage(message, function(response){
+            log(response);
+        });
+    }
+
+    function getCardCategory(){
+        var cfdImgContainer; 
+        var imageSrc;
+        var parameters;
+        var cardCategory = null;
+        try{
+            cfdImgContainer = document.getElementsByClassName("cumulative-flow-chart small-chart-container")[0];
+            imageSrc = cfdImgContainer.getElementsByTagName('img')[0].getAttribute("src");
+            parameters = imageSrc.split("hubCategoryRefName=")[1].split("&");
+            cardCategory = parameters[0];
+        }catch(e){}
+        return cardCategory;
     }
 
     function getBoardSnapshot(){
@@ -100,6 +128,7 @@
         snapshot.milliseconds = new Date().getTime();
         var url =getProjectUrl();
         snapshot.board=url;
+        snapshot.boardUrl = decodeUrlKeepEncodedSpaces( document.URL);
         snapshot.genericItemUrl = genericItemUrl;
         var headerContainer = document.getElementsByClassName("header-container")[0];
         var headers = headerContainer.getElementsByClassName("member-header-content");
@@ -139,12 +168,13 @@
             }
 
         }
+        snapshot.cardCategory = getCardCategory();
         return snapshot;
     }
 
     //addProductBacklogViewTabsLink("Take board Snapshot", "#","takeSnapshot", takeSnapshot);
     addProductBacklogViewTabsLink("flow data", "#","showFlowData", showFlowData);
-    addProductBacklogViewTabsLink("CFD", "#","cfd", function(){openPage("cfd.html")});
+    addProductBacklogViewTabsLink("CFD", "#","cfd", function(){openDataPage("cfd")});
     var genericItemUrl = getGenericItemUrl();
     onloadSnapshot();
 

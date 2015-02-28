@@ -58,7 +58,12 @@
     
 
     function getGenericItemUrl(){
-        var projectName = document.getElementsByClassName("project-name")[0].textContent;
+        var projectName ;
+        if(document.getElementsByClassName("project-name")[0]){ //older version
+            projectName = document.getElementsByClassName("project-name")[0].textContent;
+        }else {
+            projectName =$("span[title~='Project']").text();
+        }
         log("Url = "+boardUrl());
         return  boardUrl().split(projectName)[0] + projectName + "/_workitems#_a=edit&id=";
     }

@@ -10,10 +10,5 @@ function tfsLinks(){
         console.log("Links recieved from background");
 
 }
+tfsLinks();
 
-chrome.extension.sendMessage({type: "get-url"},function(response){
-    console.log("response = " + response);
-	if(document.URL.indexOf(response)>=0){
-		tfsLinks();
-	}
-});

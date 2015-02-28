@@ -171,42 +171,40 @@ describe("BoardData", function() {
       boardDesign = testBoardDesign();
   });
 
-  approveIt("create empty object ",function(){
-    return boardData;
+  approveIt("create empty object ",function(approvals){
+    approvals.verify(boardData);
   });
 
-  approveIt("construction from existing data",function(){
+  approveIt("construction from existing data",function(approvals){
     var boardDataJson;
     boardData.addSnapshot(snapshot);
     boardDataJson = jsonEncode(boardData);
-    return new BoardData(jsonDecode(boardDataJson));
+    approvals.verify(new BoardData(jsonDecode(boardDataJson)));
   });
 
   it("should have itemUrl ",function(){
-    var boardDataJson;
     boardData.addSnapshot(snapshot);
    expect(boardData.flowData["4"].url()).toBe("https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=4");
   });
 
   it("created from data should have itemUrl ",function(){
-    var boardDataJson;
     boardData.addSnapshot(snapshot);
     boardData = new BoardData(boardData);
     expect(boardData.flowData["4"].url()).toBe("https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=4");
   });
 
-  approveIt("should contain added Snapshot", function() {
+  approveIt("should contain added Snapshot", function(approvals) {
     boardData.addSnapshot(snapshot);
-    return boardData.getLatestSnapshot();
+    approvals.verify(boardData.getLatestSnapshot());
   });
 
-  approveIt("boardData for 1 ticket moving back and forth",function(){
-    return jsonEncode(boardDataOneTicketMovingBackAndforth());
+  approveIt("boardData for 1 ticket moving back and forth",function(approvals){
+    approvals.verify(jsonEncode(boardDataOneTicketMovingBackAndforth()));
   });
 
-  approveIt("boardData for 1 ticket blocked 2 times",function(){
+  approveIt("boardData for 1 ticket blocked 2 times",function(approvals){
     
-    return jsonEncode(boardDataOneTicketBlocked2Times());
+    approvals.verify(jsonEncode(boardDataOneTicketBlocked2Times()));
   });
 
   it("should contain Board Design", function() {
@@ -246,7 +244,7 @@ describe("BoardData", function() {
     expect(lane[0].lastSeen).toEqual(snapshot.milliseconds);
   });
 
-  approveIt("boardDesign with earlier firstSeen should be first", function() {
+  approveIt("boardDesign with earlier firstSeen should be first", function(approvals) {
     boardData.addSnapshot(snapshot);
     var mergeData = new BoardData();
     snapshot = testSnapshot(snapshot.milliseconds - 10);
@@ -256,10 +254,10 @@ describe("BoardData", function() {
     boardData = mergeBoardData(boardData,mergeData);
     console.log(jsonEncode(boardData));
     var mergedBoardDesign = boardData.boardDesignHistory.boardDesignRecords[0].getBoardDesignForSnapshot();
-    return boardData.boardDesignHistory.boardDesignRecords;
+    approvals.verify(boardData.boardDesignHistory.boardDesignRecords);
   });
 
-  approveIt("flow Data ticket should have correct enter and exit time after merge", function() {
+  approveIt("flow Data ticket should have correct enter and exit time after merge", function(approvals) {
     boardData.addSnapshot(snapshot);
     var mergeData = new BoardData();
     snapshot = testSnapshot(snapshot.milliseconds -10);
@@ -269,7 +267,7 @@ describe("BoardData", function() {
     boardData = mergeBoardData(boardData,mergeData);
     var ticket = boardData.flowData["3"];
     var lane = ticket.lanes["Dev DONE"];
-    return ticket;
+    approvals.verify(ticket);
   });
 
   it("ticket should have left the board",function(){
@@ -279,18 +277,18 @@ describe("BoardData", function() {
     expect(boardData.flowData[1].inLane).toBe("In production");
   });
 
-  approveIt("should create first snapshot from boardData", function() {
+  approveIt("should create first snapshot from boardData", function(approvals) {
     boardData.addSnapshot(snapshot);
     boardData.addSnapshot(testSnapshot(snapshot.milliseconds+10));
-    return(jsonEncode(boardData.getSnapshot(snapshot.milliseconds)));
+    approvals.verify(jsonEncode(boardData.getSnapshot(snapshot.milliseconds)));
   });
 
-  approveIt("should return all added snapshots from boardData", function() {
+  approveIt("should return all added snapshots from boardData", function(approvals) {
     var snapshot2;
     boardData.addSnapshot(snapshot);
     snapshot2 = testSnapshot(snapshot.milliseconds+10);
     boardData.addSnapshot(snapshot2);
-    return boardData.getSnapshots();
+    approvals.verify(boardData.getSnapshots());
   });
 });
 
@@ -304,14 +302,14 @@ describe("Snapshot",function(){
 
 describe("FlowData",function(){
 
-  approveIt("should return cfd data", function(){
+  approveIt("should return cfd data", function(approvals){
     var flowData = new FlowData();
     flowData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","Title")],
                                           [createSnapshotTicket("2","Title2")]));
     flowData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY,[createSnapshotTicket("3","Title3")],
                                                                   [createSnapshotTicket("1","Title")],
                                                                   [createSnapshotTicket("2","Title2")]));
-     return flowData.getCfdData();
+    approvals.verify(flowData.getCfdData());
   });
 
   it("should have item url", function(){
@@ -512,9 +510,9 @@ describe("FlowTicket", function() {
   
 
   // CFD
-  approveIt("ticket should return cfdData", function() {
+  approveIt("ticket should return cfdData", function(approvals) {
     flowTicket = flowticketWithTwoRecordsInLane(1.1 * timeUtil.MILLISECONDS_DAY);
-    return flowTicket.cfdData();
+    approvals.verify(flowTicket.cfdData());
   });
 });
 
@@ -528,45 +526,39 @@ describe("CFD",function(){
     return boardData;
   }
   
-  approveIt("CFD for ticket moving across board", function(){
+  approveIt("CFD for ticket moving across board", function(approvals){
     var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket")]);
-    return boardData.getCfdData();
+    approvals.verify(boardData.getCfdData());
   });
 
   //nvD3 data format
-  approveIt("CFD chart data for ticket moving across board", function(){
+  approveIt("CFD chart data for ticket moving across board", function(approvals){
     var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket")]);
-    return boardData.buildCfdChartData(boardData.getCfdData());
+    approvals.verify(boardData.buildCfdChartData(boardData.getCfdData()));
   });
 
-  approveIt("CFD for tickets last two days moving across the board", function(){
+  approveIt("CFD for tickets last two days moving across the board", function(approvals){
     var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket")]);
     var filter = {"startMilliseconds" : 2*timeUtil.MILLISECONDS_DAY};
-    return boardData.getCfdData(filter);
+    approvals.verify(boardData.getCfdData(filter));
   });
 
-  approveIt("CFD for tickets first two days moving across the board", function(){
+  approveIt("CFD for tickets first two days moving across the board", function(approvals){
     var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket")]);
     var filter = {"endMilliseconds" : 1*timeUtil.MILLISECONDS_DAY};
-    return boardData.getCfdData(filter);
+    approvals.verify( boardData.getCfdData(filter));
   });
 
-  approveIt("CFD for tickets filtered by CR", function(){
+  approveIt("CFD for tickets filtered by CR", function(approvals){
     var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket"),createSnapshotTicket("2"," CR TestTicket")]);
     var filter = {"text" : "cR"};
-    return boardData.getCfdData(filter);
+    approvals.verify(boardData.getCfdData(filter));
   });
 
-  approveIt("CFD for tickets filtered no tickets found", function(){
+  approveIt("CFD for tickets filtered no tickets found", function(approvals){
     var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket"),createSnapshotTicket("2"," CR TestTicket")]);
     var filter = {"text" : "_"};
-    return boardData.getCfdData(filter);
+    approvals.verify(boardData.getCfdData(filter));
   });
 
 });
-
-
-
-
-
- 

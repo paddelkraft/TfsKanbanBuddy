@@ -1,6 +1,7 @@
 {
     "name": "TFS kanban buddy",
-    "version": "0.5.9",
+
+    "version": "0.5.10",
     "manifest_version": 2,
     "browser_action": {
         "default_title": "TFS kanban board enhancer",
@@ -29,7 +30,8 @@
                     "/utils_js/lodash.js",
                     "utils_js/util.js",
                     "utils_js/boarddata.js",
-                    "utils_js/apiSnapshot.js",
+                    "background/backgroundUtil.js",
+                    "background/apiSnapshot.js",
                     "background/background.js",
                     "background/api.js"],
     	"persistent": false

@@ -1,0 +1,216 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'install', 'http-server', '-g' ]
+2 info using npm@2.5.1
+3 info using node@v0.12.0
+4 silly cache add args [ 'http-server', null ]
+5 verbose cache add spec http-server
+6 silly cache add parsed spec { raw: 'http-server',
+6 silly cache add   scope: null,
+6 silly cache add   name: 'http-server',
+6 silly cache add   rawSpec: '',
+6 silly cache add   spec: '*',
+6 silly cache add   type: 'range' }
+7 verbose addNamed http-server@*
+8 silly addNamed semver.valid null
+9 silly addNamed semver.validRange *
+10 silly addNameRange { name: 'http-server', range: '*', hasData: false }
+11 silly mapToRegistry name http-server
+12 silly mapToRegistry using default registry
+13 silly mapToRegistry registry https://registry.npmjs.org/
+14 silly mapToRegistry uri https://registry.npmjs.org/http-server
+15 verbose addNameRange registry:https://registry.npmjs.org/http-server not in flight; fetching
+16 verbose request uri https://registry.npmjs.org/http-server
+17 verbose request no auth needed
+18 info attempt registry request try #1 at 11:33:21 PM
+19 verbose request id 7d52a6daeacda889
+20 http request GET https://registry.npmjs.org/http-server
+21 http 200 https://registry.npmjs.org/http-server
+22 silly get cb [ 200,
+22 silly get   { date: 'Sat, 28 Feb 2015 22:33:21 GMT',
+22 silly get     server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+22 silly get     etag: '"7JZTAC17V9JUOIW1YE7VG2JD2"',
+22 silly get     'content-type': 'application/json',
+22 silly get     'cache-control': 'max-age=60',
+22 silly get     'content-length': '42405',
+22 silly get     'accept-ranges': 'bytes',
+22 silly get     via: '1.1 varnish',
+22 silly get     age: '0',
+22 silly get     'x-served-by': 'cache-fra1236-FRA',
+22 silly get     'x-cache': 'HIT',
+22 silly get     'x-cache-hits': '1',
+22 silly get     'x-timer': 'S1425162801.472585,VS0,VE99',
+22 silly get     vary: 'Accept',
+22 silly get     'keep-alive': 'timeout=10, max=50',
+22 silly get     connection: 'Keep-Alive' } ]
+23 verbose get saving http-server to /Users/siven/.npm/registry.npmjs.org/http-server/.cache.json
+24 silly addNameRange number 2 { name: 'http-server', range: '*', hasData: true }
+25 silly addNameRange versions [ 'http-server',
+25 silly addNameRange   [ '0.1.0',
+25 silly addNameRange     '0.1.1',
+25 silly addNameRange     '0.1.3',
+25 silly addNameRange     '0.2.1',
+25 silly addNameRange     '0.2.2',
+25 silly addNameRange     '0.2.3',
+25 silly addNameRange     '0.2.4',
+25 silly addNameRange     '0.2.5',
+25 silly addNameRange     '0.2.6',
+25 silly addNameRange     '0.2.9',
+25 silly addNameRange     '0.3.0',
+25 silly addNameRange     '0.4.0',
+25 silly addNameRange     '0.4.1',
+25 silly addNameRange     '0.5.0',
+25 silly addNameRange     '0.5.1',
+25 silly addNameRange     '0.5.2',
+25 silly addNameRange     '0.5.3',
+25 silly addNameRange     '0.5.5',
+25 silly addNameRange     '0.6.0',
+25 silly addNameRange     '0.6.1',
+25 silly addNameRange     '0.7.0',
+25 silly addNameRange     '0.7.1',
+25 silly addNameRange     '0.7.2',
+25 silly addNameRange     '0.7.3',
+25 silly addNameRange     '0.7.4',
+25 silly addNameRange     '0.7.5' ] ]
+26 verbose addNamed http-server@0.7.5
+27 silly addNamed semver.valid 0.7.5
+28 silly addNamed semver.validRange 0.7.5
+29 silly mapToRegistry name http-server
+30 silly mapToRegistry using default registry
+31 silly mapToRegistry registry https://registry.npmjs.org/
+32 silly mapToRegistry uri https://registry.npmjs.org/http-server
+33 verbose addRemoteTarball https://registry.npmjs.org/http-server/-/http-server-0.7.5.tgz not in flight; adding
+34 verbose addRemoteTarball [ 'https://registry.npmjs.org/http-server/-/http-server-0.7.5.tgz',
+34 verbose addRemoteTarball   'b18bd1d838e78c30be8cf382e9342ebdd17a9fc3' ]
+35 info retry fetch attempt 1 at 11:33:21 PM
+36 info attempt registry request try #1 at 11:33:21 PM
+37 http fetch GET https://registry.npmjs.org/http-server/-/http-server-0.7.5.tgz
+38 http fetch 200 https://registry.npmjs.org/http-server/-/http-server-0.7.5.tgz
+39 silly fetchAndShaCheck shasum b18bd1d838e78c30be8cf382e9342ebdd17a9fc3
+40 verbose addTmpTarball /var/folders/xv/lrfbcbvs7g93by8tw8sqtj8r0000gn/T/npm-25749-551fae11/registry.npmjs.org/http-server/-/http-server-0.7.5.tgz not in flight; adding
+41 verbose addTmpTarball already have metadata; skipping unpack for http-server@0.7.5
+42 silly cache afterAdd http-server@0.7.5
+43 verbose afterAdd /Users/siven/.npm/http-server/0.7.5/package/package.json not in flight; writing
+44 verbose afterAdd /Users/siven/.npm/http-server/0.7.5/package/package.json written
+45 silly install resolved [ { name: 'http-server',
+45 silly install resolved     version: '0.7.5',
+45 silly install resolved     description: 'a simple zero-configuration command-line http server',
+45 silly install resolved     main: './lib/http-server',
+45 silly install resolved     repository:
+45 silly install resolved      { type: 'git',
+45 silly install resolved        url: 'git://github.com/nodeapps/http-server.git' },
+45 silly install resolved     keywords: [ 'cli', 'command' ],
+45 silly install resolved     scripts:
+45 silly install resolved      { start: 'node ./bin/http-server',
+45 silly install resolved        pretest: 'stylezero bin/ lib/ test',
+45 silly install resolved        test: 'vows --spec --isolate' },
+45 silly install resolved     contributors:
+45 silly install resolved      [ [Object],
+45 silly install resolved        [Object],
+45 silly install resolved        [Object],
+45 silly install resolved        [Object],
+45 silly install resolved        [Object],
+45 silly install resolved        [Object],
+45 silly install resolved        [Object],
+45 silly install resolved        [Object],
+45 silly install resolved        [Object],
+45 silly install resolved        [Object] ],
+45 silly install resolved     dependencies:
+45 silly install resolved      { colors: '1.0.3',
+45 silly install resolved        optimist: '0.6.x',
+45 silly install resolved        union: '~0.4.3',
+45 silly install resolved        ecstatic: '~0.6.0',
+45 silly install resolved        portfinder: '0.2.x',
+45 silly install resolved        opener: '~1.4.0' },
+45 silly install resolved     devDependencies: { vows: '0.7.x', request: '2.49.x', stylezero: '2.1.1' },
+45 silly install resolved     bugs: { url: 'https://github.com/nodeapps/http-server/issues' },
+45 silly install resolved     licenses: [ [Object] ],
+45 silly install resolved     analyze: false,
+45 silly install resolved     preferGlobal: 'true',
+45 silly install resolved     bin: { 'http-server': './bin/http-server', hs: './bin/http-server' },
+45 silly install resolved     gitHead: '120daa2b1bbca84bf1474bd757e147d95fdab3ed',
+45 silly install resolved     homepage: 'https://github.com/nodeapps/http-server',
+45 silly install resolved     _id: 'http-server@0.7.5',
+45 silly install resolved     _shasum: 'b18bd1d838e78c30be8cf382e9342ebdd17a9fc3',
+45 silly install resolved     _from: 'http-server@*',
+45 silly install resolved     _npmVersion: '2.2.0',
+45 silly install resolved     _nodeVersion: '0.10.33',
+45 silly install resolved     _npmUser: { name: 'indexzero', email: 'charlie.robbins@gmail.com' },
+45 silly install resolved     maintainers: [ [Object] ],
+45 silly install resolved     dist:
+45 silly install resolved      { shasum: 'b18bd1d838e78c30be8cf382e9342ebdd17a9fc3',
+45 silly install resolved        tarball: 'http://registry.npmjs.org/http-server/-/http-server-0.7.5.tgz' },
+45 silly install resolved     directories: {},
+45 silly install resolved     _resolved: 'https://registry.npmjs.org/http-server/-/http-server-0.7.5.tgz' } ]
+46 info install http-server@0.7.5 into /usr/local/lib
+47 info installOne http-server@0.7.5
+48 verbose installOne of http-server to /usr/local/lib not in flight; installing
+49 verbose lock using /Users/siven/.npm/_locks/http-server-ae30c9ae1f4c5eaa.lock for /usr/local/lib/node_modules/http-server
+50 silly install write writing http-server 0.7.5 to /usr/local/lib/node_modules/http-server
+51 silly cache addNamed cb http-server@0.7.5
+52 verbose unbuild lib/node_modules/http-server
+53 info preuninstall http-server@0.7.4
+54 info uninstall http-server@0.7.4
+55 verbose unbuild rmStuff http-server@0.7.4 from /usr/local/lib/node_modules
+56 verbose gentlyRm verifying that /usr/local is managed by npm
+57 verbose gentlyRm verifying that /usr/local is managed by npm
+58 silly isManaged /usr/local is not inside /usr/local/lib/node_modules
+59 silly isManaged /usr/local is not inside /usr/local/lib/node_modules
+60 silly isManaged /usr/local is not inside /usr/local/lib/node_modules
+61 silly isManaged /usr/local is not inside /usr/local/lib/node_modules
+62 silly isManaged /usr/local/bin is inside /usr/local
+63 silly gentlyRm /usr/local is managed by npm
+64 silly gentlyRm /usr/local/bin/http-server is under /usr/local
+65 verbose gentlyRm vacuuming /usr/local/bin/http-server up to /usr/local
+66 silly isManaged /usr/local/bin is inside /usr/local
+67 silly gentlyRm /usr/local is managed by npm
+68 silly gentlyRm /usr/local/bin/hs is under /usr/local
+69 verbose gentlyRm vacuuming /usr/local/bin/hs up to /usr/local
+70 silly gentlyRm removing /usr/local/bin/http-server
+71 silly gentlyRm removing /usr/local/bin/hs
+72 verbose unlock done using /Users/siven/.npm/_locks/http-server-ae30c9ae1f4c5eaa.lock for /usr/local/lib/node_modules/http-server
+73 verbose stack Error: EACCES, unlink '/usr/local/bin/http-server'
+73 verbose stack     at Error (native)
+74 verbose cwd /Users/siven/Development/JS/TfsKanbanBuddy/TfsKanbanEnhancer
+75 error Darwin 14.1.0
+76 error argv "node" "/usr/local/bin/npm" "install" "http-server" "-g"
+77 error node v0.12.0
+78 error npm  v2.5.1
+79 error path /usr/local/bin/http-server
+80 error code EACCES
+81 error errno -13
+82 error Error: EACCES, unlink '/usr/local/bin/http-server'
+82 error     at Error (native)
+82 error  { [Error: EACCES, unlink '/usr/local/bin/http-server']
+82 error   errno: -13,
+82 error   code: 'EACCES',
+82 error   path: '/usr/local/bin/http-server' }
+83 error Please try running this command again as root/Administrator.
+84 verbose exit [ -13, true ]
+85 verbose unbuild lib/node_modules/http-server
+86 info preuninstall http-server@0.7.4
+87 info uninstall http-server@0.7.4
+88 verbose unbuild rmStuff http-server@0.7.4 from /usr/local/lib/node_modules
+89 verbose gentlyRm verifying that /usr/local is managed by npm
+90 silly isManaged /usr/local is not inside /usr/local/lib/node_modules
+91 silly isManaged /usr/local is not inside /usr/local/lib/node_modules
+92 silly isManaged /usr/local is not inside /usr/local/bin
+93 silly isManaged /usr/local is inside /usr/local
+94 verbose gentlyRm verifying that /usr/local is managed by npm
+95 silly isManaged /usr/local is not inside /usr/local/lib/node_modules
+96 silly isManaged /usr/local is not inside /usr/local/lib/node_modules
+97 silly isManaged /usr/local is not inside /usr/local/bin
+98 silly isManaged /usr/local is inside /usr/local
+99 silly gentlyRm /usr/local is managed by npm
+100 silly gentlyRm /usr/local/bin/http-server is under /usr/local
+101 verbose gentlyRm vacuuming /usr/local/bin/http-server up to /usr/local
+102 silly gentlyRm /usr/local is managed by npm
+103 silly gentlyRm /usr/local/bin/hs is under /usr/local
+104 verbose gentlyRm vacuuming /usr/local/bin/hs up to /usr/local
+105 silly gentlyRm removing /usr/local/bin/http-server
+106 silly gentlyRm removing /usr/local/bin/hs
+107 error error rolling back Error: EACCES, unlink '/usr/local/bin/http-server'
+107 error error rolling back     at Error (native)
+107 error error rolling back  { [Error: EACCES, unlink '/usr/local/bin/http-server']
+107 error error rolling back   errno: -13,
+107 error error rolling back   code: 'EACCES',
+107 error error rolling back   path: '/usr/local/bin/http-server' }

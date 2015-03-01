@@ -14,14 +14,14 @@ describe("FlowReport", function() {
   });
 
 
-  approveIt("fr one ticket moving back and forth", function() {
+  approveIt("fr one ticket moving back and forth", function(approvals) {
     var flowReport = buildFlowReport(boardDataOneTicketMovingBackAndforth().flowData);
-    return flowReport;
+    approvals.verify(flowReport);
   });
 
-  approveIt("fr one ticket blocked 2 times", function() {
+  approveIt("fr one ticket blocked 2 times", function(approvals) {
     var flowReport = buildFlowReport(boardDataOneTicketBlocked2Times().flowData);
-    return flowReport;
+    approvals.verify(flowReport);
   });
 
 });
@@ -40,14 +40,14 @@ describe("FlowDataGrid", function() {
   });
 
 
-  approveIt("fdg one ticket moving back and forth", function() {
+  approveIt("fdg one ticket moving back and forth", function(approvals) {
     var flowGrid = new FlowDataGrid(boardDataOneTicketMovingBackAndforth());
-    return flowGrid;
+    approvals.verify(flowGrid);
   });
 
-  approveIt("fdg one ticket blocked 2 times", function() {
+  approveIt("fdg one ticket blocked 2 times", function(approvals) {
     var flowGrid = new FlowDataGrid(boardDataOneTicketBlocked2Times());
-    return flowGrid;
+    approvals.verify(flowGrid);
   });
 
 });
@@ -61,7 +61,7 @@ describe("Snapshot", function() {
   });
 
 
-  approveIt("mixed snapshot", function() {
+  approveIt("mixed snapshot", function(approvals) {
     var oldTicket = createSnapshotTicket("1","old Ticket",true);
     var tenDayTicket = createSnapshotTicket("2","10day Ticket");
     var twentyDayTicket = createSnapshotTicket("3","20day Ticket");
@@ -79,7 +79,7 @@ describe("Snapshot", function() {
     
     var snapshot = new buildSnapshot(boardData);
     snapshot.milliseconds = 0;
-    return snapshot;
+    approvals.verify(snapshot);
   });
 
   

@@ -12,14 +12,22 @@ function appendLiToUlByClass(matchClass, li) {
         }
     }
 }
- 
-function addLinks(settings){
-    if(settings.boardLinks){
+
+function hasHubGroup(){
+    return document.getElementsByClassName("hub-groups")[0];
+}
+function addLinks(settings,n){
+    if(!n){
+        n= 1
+    }
+    if( hasHubGroup() && settings.boardLinks){
         var links = settings.boardLinks;
         for(var key in links) {
             var value = links[key];
             addHubGroupLink(key,value);
         }
+    }else if (n<5){
+        setTimeout(function(){addLinks(settings,n+1);},1000)
     }
 }
 

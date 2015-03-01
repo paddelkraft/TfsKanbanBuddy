@@ -105,30 +105,6 @@ function TimeUtil(){
 timeUtil = new TimeUtil();
 
 
-    function saveObjectToStorage(key, toSave){
-        var content = jsonEncode(toSave);
-        localStorage.setItem(key,content);
-    }
-
-    function getObjectFromStorage(key){
-        var content = localStorage.getItem(key);
-        if(content === "" || content === null){
-          content = "{}";
-        }
-        return jsonDecode(content);
-
-    }
-
-    function getStringFromStorage(key){
-        return localStorage.getItem(key);
-
-    }
-
-    function saveStringToStorage(key, content){
-        localStorage.setItem(key, content);
-
-    }
-
 
     function arrayOfNulls(length){
         var self = [];

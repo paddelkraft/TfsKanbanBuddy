@@ -10,7 +10,11 @@
         </div>
     </div>
     <div class="row">
-
+        <div class="col-md-4">
+            <div class="text-input">
+                <input type="text" class="form-control" placeholder="filter" ng-model="filterText" >
+            </div>
+        </div>
         <div class="col-md-2">
             <button type="button" class="btn btn-default navbar-btn" ng-click="downloadAsJson()">JSON</button>
         </div>
@@ -21,7 +25,7 @@
         <table ng-if="lane.tickets.length!==0" class="presentationTable flowReportTable">
             <tbody>
             <tr><td>Id</td><td>Title</td><td "width:150px;">Days in lane</td><td "width:150px;">Days on board</td><td "width:150px;">Days blocked</td></tr>
-            <tr ng-repeat="ticket in lane.tickets">
+            <tr ng-repeat="ticket in lane.tickets | filter:filterText">
                 <td >{{ ticket.id }}</td>
                 <td ><a href="{{ticket.url()}}">{{ ticket.title }}</a></td>
                 <td class="timestamp">{{ ticket.daysInColumn }}</td>

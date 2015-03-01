@@ -1,0 +1,34 @@
+<div id="snapshot" class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well">
+                <h1>Board Snapshot! (BETA)</h1>
+                <a href="{{board}}">Source {{board}}</a>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-md-2">
+            <button type="button" class="btn btn-default navbar-btn" ng-click="downloadAsJson()">JSON</button>
+        </div>
+    </div>
+    <div ng-repeat="lane in snapshot.lanes">
+        <h2>{{lane.name}}</h2>
+        <h3 ng-if="lane.tickets.length===0">Lane is empty</h3>
+        <table ng-if="lane.tickets.length!==0" class="presentationTable flowReportTable">
+            <tbody>
+            <tr><td>Id</td><td>Title</td><td "width:150px;">Days in lane</td><td "width:150px;">Days on board</td><td "width:150px;">Days blocked</td></tr>
+            <tr ng-repeat="ticket in lane.tickets">
+                <td >{{ ticket.id }}</td>
+                <td ><a href="{{ticket.url()}}">{{ ticket.title }}</a></td>
+                <td class="timestamp">{{ ticket.daysInColumn }}</td>
+                <td class="timestamp">{{ ticket.daysOnBoard }}</td>
+                <td class="timestamp">{{ ticket.blockedSince }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

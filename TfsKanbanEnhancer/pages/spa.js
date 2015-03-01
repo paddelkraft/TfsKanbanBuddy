@@ -156,12 +156,54 @@ app.factory("cfdFactory", function(){
 app.factory("boardDataFactory",function(){
 	var factory = {};
 	factory.getBoardData = function(board){
-		var promise;
 		var message = {type:"get-flow-data"};
 		message.board = board;
 		return sendExtensionMessage(message);
 	};
 	return factory;
+});
+
+app.factory("snapshotFactory",function(){
+    var factory = {};
+    factory.buildSnapshot = function(boardData){
+        var laneIndex;
+        var snapshot = boardData.getLatestSnapshot();//snapshots[snapshots.length-1];
+        var flowData = boardData.flowData;
+
+        for(laneIndex in snapshot.lanes){
+            factory.buildSnapshotForColumn(snapshot,flowData,laneIndex);
+        }
+        return snapshot;
+    };
+
+    factory.buildSnapshotForColumn = function (snapshot, flowData,laneIndex){
+        var lane = snapshot.lanes[laneIndex];
+        var ticket;
+        var i;
+        for(i = 0 ; i < lane.tickets.length ; i++ ){
+            ticket = lane.tickets[i];
+            ticket.daysInColumn = factory.daysInColumn(flowData,ticket.id,lane.name);
+            ticket.daysOnBoard = factory.daysOnBoard(flowData,ticket.id);
+            ticket.blockedSince = factory.blockedDays(flowData[ticket.id]);
+        }
+    };
+
+    factory.blockedDays = function (ticket) {
+        if(! ticket.blockedSince()){
+            return "";
+        }
+        return timeUtil.highlightTime(timeUtil.daysSince(ticket.blockedSince()),7);
+    };
+
+    factory.daysInColumn = function (flowData,ticketId,laneName) {
+        return timeUtil.highlightTime(timeUtil.daysSince(flowData.getEnterMilliseconds(ticketId,laneName)),14);
+    };
+
+    factory.daysOnBoard = function (flowData,ticketId) {
+        return timeUtil.highlightTime(timeUtil.daysSince(flowData[ticketId].enteredBoard()),40);
+    };
+
+    return factory;
 });
 
 app.controller("TabController",[
@@ -192,6 +234,23 @@ app.controller("TabController",[
     }
   ]
 );
+
+app.controller("SnapshotController", ['$scope','$route', '$routeParams', 'boardDataFactory','snapshotFactory',function( $scope, $route, $routeParams, boardDataFactory,snapshot){
+    $scope.board = decodeUrl($routeParams.board);
+    var boardData;
+    $scope.snapshot;
+    boardDataFactory.getBoardData($scope.board).then(function(response){
+        boardData = new BoardData(response);
+        $scope.snapshot = snapshot.buildSnapshot(boardData);
+        $scope.$apply();
+    },function(error){
+        console.log("send message failed");
+    });
+
+    $scope.downloadAsJson = function(){
+        downloadAsJson($scope.snapshot,"Snapshot");
+    };
+}]);
 
 app.controller("CfdController", ['$scope','$route', '$routeParams', 'boardDataFactory','cfdFactory',function( $scope, $route, $routeParams, boardDataFactory,cfd){
       
@@ -270,6 +329,9 @@ app.config(['$routeProvider',
       when('/cfd/:board', {
         templateUrl: 'templates/cumulative-flow-diagram.html',
         controller: 'CfdController'
+      }).when('/snapshot/:board', {
+        templateUrl: 'templates/snapshot.html',
+        controller: 'SnapshotController'
       }).when('/flowreport/:board', {
         templateUrl: 'templates/cumulative-flow-diagram.html',
         controller: 'CfdController'

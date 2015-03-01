@@ -30,7 +30,7 @@
                     "/utils_js/lodash.js",
                     "utils_js/util.js",
                     "utils_js/boarddata.js",
-                    "background/backgroundUtils.js",
+                    "background/backgroundUtil.js",
                     "background/apiSnapshot.js",
                     "background/background.js",
                     "background/api.js"],

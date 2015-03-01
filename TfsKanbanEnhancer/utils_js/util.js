@@ -104,39 +104,7 @@ function TimeUtil(){
 
 timeUtil = new TimeUtil();
 
-function StorageUtil(storage){
-    var self = {};
-    if (!storage){
-        storage = localStorage;
-    }
-    self.localStorage = storage;
-    self.saveObjectToStorage = function(key, toSave){
-        var content = jsonEncode(toSave);
-        storage.setItem(key,content);
-    };
 
-    self.getObjectFromStorage = function (key){
-        var content = storage.getItem(key);
-        if(content === "" || content === null){
-          content = "{}";
-        }
-        return jsonDecode(content);
-
-    };
-
-    self.getStringFromStorage = function (key){
-        return storage.getItem(key);
-    };
-
-    self.saveStringToStorage = function (key, content){
-        storage.setItem(key, content);
-
-    };
-
-    return self;
-}
-
-var storageUtil = new StorageUtil();
 
     function arrayOfNulls(length){
         var self = [];

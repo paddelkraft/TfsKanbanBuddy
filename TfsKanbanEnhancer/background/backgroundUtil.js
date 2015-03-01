@@ -1,6 +1,17 @@
 /**
  * Created by siven on 28/02/15.
+ *
  */
+
+var GET_KANBAN_BOARD_COLOR_MAPPING = "get-color-map";
+var GET_TASK_BOARD_COLOR_MAPPING = "get-task-color-map";
+var SET_KANBAN_BOARD_COLOR_MAPPING = "set-color-map";
+var SET_TASK_BOARD_COLOR_MAPPING = "set-task-color-map";
+var GET_KANBAN_BOARD_DESCRIPTION_MAPPING = "get-description-map";
+var GET_TASK_BOARD_DESCRIPTION_MAPPING = "get-task-description-map";
+var SET_KANBAN_BOARD_DESCRIPTION_MAPPING = "set-description-map";
+var SET_TASK_BOARD_DESCRIPTION_MAPPING = "set-task-description-map";
+
 function messageHandler (_buddyDB ,request, sender, sendResponse) {
     var data,settings,key;
     console.log ("Incoming request type = " + request.type);
@@ -314,7 +325,7 @@ function BuddyDB(_storage){
             boardData = new BoardData(data);
         }
 
-        boardData.setBlockedPrefix(buddyDB.getBlockedPrefix());
+        boardData.setBlockedPrefix(self.getBlockedPrefix());
 
         boardData.addSnapshot(snapshot);
         //console.log(boardData.genericItemUrl);
@@ -347,7 +358,7 @@ function ApiStorage(_storage){
         var newRegistry = {};
         for(apiUrl in registeredBoards){
             registry = registeredBoards[apiUrl];
-            if(registry.boardUrl.indexOf("_backlogs/board")!== -1){
+            if(registry.boardUrl && registry.boardUrl.indexOf("_backlogs/board")!== -1){
                 newRegistry[apiUrl] = registry;
             }
         }
@@ -475,4 +486,38 @@ function autoImport(timeout){
         setTimeout(autoImport, timeout);
     }
 }
+
+function StorageUtil(storage){
+    var self = {};
+    if (!storage){
+        storage = localStorage;
+    }
+    self.localStorage = storage;
+    self.saveObjectToStorage = function(key, toSave){
+        var content = jsonEncode(toSave);
+        storage.setItem(key,content);
+    };
+
+    self.getObjectFromStorage = function (key){
+        var content = storage.getItem(key);
+        if(content === "" || content === null){
+            content = "{}";
+        }
+        return jsonDecode(content);
+
+    };
+
+    self.getStringFromStorage = function (key){
+        return storage.getItem(key);
+    };
+
+    self.saveStringToStorage = function (key, content){
+        storage.setItem(key, content);
+
+    };
+
+    return self;
+}
+
+var storageUtil = new StorageUtil();
 

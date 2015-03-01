@@ -22,18 +22,23 @@
     </div>
     <div ng-repeat="lane in snapshot.lanes">
         <h2>{{lane.name}} <span ng-if="lane.tickets.length===0">(empty)</span><span ng-if="lane.tickets.length!==0">(wip={{lane.tickets.length}})</span></h2>
+        <div class="table-responsive">
+            <table ng-if="lane.tickets.length!==0" class="table">
+                <thead>
+                <tr><th>Id</th><th>Title</th><th style="width:150px;">Days in lane</th><th style="width:150px;">Days on board</th><th style="width:150px;">Days blocked</th></tr>
+                </thead>
+                <tbody>
 
-        <table ng-if="lane.tickets.length!==0" class="presentationTable flowReportTable">
-            <tbody>
-            <tr><td>Id</td><td>Title</td><td "width:150px;">Days in lane</td><td "width:150px;">Days on board</td><td "width:150px;">Days blocked</td></tr>
-            <tr ng-repeat="ticket in lane.tickets | filter:showTicket(filterText)">
-                <td >{{ ticket.id }}</td>
-                <td ><a href="{{ticket.url()}}">{{ ticket.title }}</a></td>
-                <td class="timestamp">{{ ticket.daysInColumn }}</td>
-                <td class="timestamp">{{ ticket.daysOnBoard }}</td>
-                <td class="timestamp">{{ ticket.blockedSince }}</td>
-            </tr>
-            </tbody>
-        </table>
+                <tr ng-repeat="ticket in lane.tickets | filter:showTicket(filterText)">
+                    <td >{{ ticket.id }}</td>
+                    <td ><a href="{{ticket.url()}}">{{ ticket.title }}</a></td>
+                    <td class="timestamp">{{ ticket.daysInColumn }}</td>
+                    <td class="timestamp">{{ ticket.daysOnBoard }}</td>
+                    <td class="timestamp">{{ ticket.blockedSince }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 </div>

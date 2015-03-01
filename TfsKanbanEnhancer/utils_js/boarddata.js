@@ -588,7 +588,7 @@ function FlowData(flowData, genericItemUrl){
         _.forEach(self, function(ticket ){
             if(ticket instanceof FlowTicket){
                 if(filter && filter.text){
-                    if(-1 < ticket.title.toUpperCase().indexOf(filter.text.toUpperCase())){
+                    if(-1 < ticket.title.indexOf(filter.text)){
                         ticketData = ticket.cfdData(filter);
                         cfdData.push(ticketData);
                     }

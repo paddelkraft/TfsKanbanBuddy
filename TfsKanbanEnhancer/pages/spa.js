@@ -285,6 +285,19 @@ app.controller("SnapshotController", ['$scope','$route', '$routeParams', 'boardD
     $scope.downloadAsJson = function(){
         downloadAsJson($scope.snapshot,"Snapshot");
     };
+
+    $scope.showTicket = function(query) {
+        return function(ticket) {
+            var show = true;
+            if(!query || query===""){
+                return true;
+            }
+            if(ticket.id.indexOf(query)===-1 && ticket.title.indexOf(query)===-1){
+                show = false;
+            }
+            return show;
+        }
+    };
 }]);
 
 app.controller("FlowReportController", ['$scope','$route', '$routeParams', 'boardDataFactory','flowReportFactory',function( $scope, $route, $routeParams, boardDataFactory,flowReport){
@@ -294,6 +307,7 @@ app.controller("FlowReportController", ['$scope','$route', '$routeParams', 'boar
     boardDataFactory.getBoardData($scope.board).then(function(response){
         boardData = new BoardData(response);
         $scope.flowReport = flowReport.buildFlowReport(boardData.flowData);
+        $scope.header = $scope.flowReport[0];
         $scope.$apply();
     },function(error){
         console.log("send message failed");
@@ -305,6 +319,23 @@ app.controller("FlowReportController", ['$scope','$route', '$routeParams', 'boar
 
     $scope.downloadAsCSV = function(){
         downloadAsCSV($scope.flowReport,"FlowReport");
+    };
+
+    $scope.flowReportData = function(){
+        return _.rest($scope.flowReport);
+    }
+
+    $scope.showRow = function(query) {
+        return function(row) {
+            var show = true;
+            if(!query || query===""){
+                return true;
+            }
+            if(row[0].indexOf(query)===-1 && row[1].indexOf(query)===-1 && row[3].indexOf(query)===-1 ){
+                show = false;
+            }
+            return show;
+        }
     };
 }]);
 

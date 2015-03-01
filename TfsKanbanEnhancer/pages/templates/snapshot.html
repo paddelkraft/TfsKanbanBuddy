@@ -26,7 +26,7 @@
         <table ng-if="lane.tickets.length!==0" class="presentationTable flowReportTable">
             <tbody>
             <tr><td>Id</td><td>Title</td><td "width:150px;">Days in lane</td><td "width:150px;">Days on board</td><td "width:150px;">Days blocked</td></tr>
-            <tr ng-repeat="ticket in lane.tickets | filter:filterText">
+            <tr ng-repeat="ticket in lane.tickets | filter:showTicket(filterText)">
                 <td >{{ ticket.id }}</td>
                 <td ><a href="{{ticket.url()}}">{{ ticket.title }}</a></td>
                 <td class="timestamp">{{ ticket.daysInColumn }}</td>

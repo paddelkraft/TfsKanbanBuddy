@@ -19,7 +19,34 @@ beforeEach(function(){
                     return result;
                 }
             };
-        }
+        },
+        jsonToBe: function() {
+        return {
+            compare: function(actual, expected) {
+                var result;
+                var actualString = actual;
+                var expectedString = expected;
+                var div = document.createElement("div");
+
+                if(typeof actual !== "string"){
+                    actualString = jsonEncode(actual);
+                }
+
+                if(typeof expected !== "string"){
+                    expectedString = jsonEncode(expectedString);
+                }
+                result  = {pass:actualString===expectedString};
+                var diffArgs   = {
+                    source: expectedString,
+                    diff  : actualString,
+                    lang  : "json"
+                };
+                div.innerHTML = prettydiff(diffArgs) + "<br>Result   = "+ actualString + "<br>Expected = " +expectedString;
+                result.message = div;
+                return result;
+            }
+        };
+    }
     });
 });
 

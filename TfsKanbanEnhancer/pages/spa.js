@@ -206,6 +206,39 @@ app.factory("snapshotFactory",function(){
     return factory;
 });
 
+app.factory("flowReportFactory",function(){
+    var factory = {};
+    factory.buildFlowReport = function(flowData){
+        var flowReport = [];
+        var laneName;
+        var blockageIndex;
+        var blockage;
+        var lane;
+        var row = ["Id", "Title","URL","Lane", "First seen" , "Last seen"];
+        flowReport.push(row);
+
+        for (var id in flowData){
+            var flowTicket = flowData[id];
+            if(flowTicket.id){
+                for(laneName in flowTicket.lanes){
+                    _.forEach(flowTicket.lanes[laneName], function(laneRecord){
+                        lane = flowTicket.lanes[laneName];
+                        flowReport.push( [ flowTicket.id, flowTicket.title, flowTicket.url(), laneName, laneRecord.enter(), laneRecord.exit()] );
+                    });
+                }
+                for(blockageIndex in flowTicket.blockedRecords){
+                    blockage = flowTicket.blockedRecords[blockageIndex];
+                    flowReport.push([ flowTicket.id, flowTicket.title, flowTicket.url(), "Blocked", timeUtil.dateFormat(blockage.firstSeen), timeUtil.dateFormat(blockage.lastSeen)]);
+                }
+                //flowReport.push( ["","","","","",""] );
+            }
+        }
+
+        return flowReport;
+    }
+    return factory;
+});
+
 app.controller("TabController",[
                                 '$scope',
                                 '$location',
@@ -227,7 +260,9 @@ app.controller("TabController",[
       };
 
       $scope.goTo = function(route){
-        $location.url(route + $scope.boardUrl);
+          $location.url(route + $scope.boardUrl);
+          $scope.setActiveTab($location.url())
+          $scope.boardUrl = _.last($location.url().split("/"));
       };
 
       $scope.setActiveTab($location.url());
@@ -249,6 +284,27 @@ app.controller("SnapshotController", ['$scope','$route', '$routeParams', 'boardD
 
     $scope.downloadAsJson = function(){
         downloadAsJson($scope.snapshot,"Snapshot");
+    };
+}]);
+
+app.controller("FlowReportController", ['$scope','$route', '$routeParams', 'boardDataFactory','flowReportFactory',function( $scope, $route, $routeParams, boardDataFactory,flowReport){
+    $scope.board = decodeUrl($routeParams.board);
+    var boardData;
+    $scope.flowReport;
+    boardDataFactory.getBoardData($scope.board).then(function(response){
+        boardData = new BoardData(response);
+        $scope.flowReport = flowReport.buildFlowReport(boardData.flowData);
+        $scope.$apply();
+    },function(error){
+        console.log("send message failed");
+    });
+
+    $scope.downloadAsJson = function(){
+        downloadAsJson($scope.flowReport,"FlowReport");
+    };
+
+    $scope.downloadAsCSV = function(){
+        downloadAsCSV($scope.flowReport,"FlowReport");
     };
 }]);
 
@@ -333,8 +389,8 @@ app.config(['$routeProvider',
         templateUrl: 'templates/snapshot.html',
         controller: 'SnapshotController'
       }).when('/flowreport/:board', {
-        templateUrl: 'templates/cumulative-flow-diagram.html',
-        controller: 'CfdController'
+        templateUrl: 'templates/flowreport.html',
+        controller: 'FlowReportController'
       }).otherwise({
         redirectTo: '/cfd/:board'
       });

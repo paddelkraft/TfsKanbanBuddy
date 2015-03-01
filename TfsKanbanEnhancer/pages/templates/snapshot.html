@@ -17,11 +17,12 @@
         </div>
         <div class="col-md-2">
             <button type="button" class="btn btn-default navbar-btn" ng-click="downloadAsJson()">JSON</button>
+
         </div>
     </div>
     <div ng-repeat="lane in snapshot.lanes">
-        <h2>{{lane.name}}</h2>
-        <h3 ng-if="lane.tickets.length===0">Lane is empty</h3>
+        <h2>{{lane.name}} <span ng-if="lane.tickets.length===0">(empty)</span><span ng-if="lane.tickets.length!==0">(wip={{lane.tickets.length}})</span></h2>
+
         <table ng-if="lane.tickets.length!==0" class="presentationTable flowReportTable">
             <tbody>
             <tr><td>Id</td><td>Title</td><td "width:150px;">Days in lane</td><td "width:150px;">Days on board</td><td "width:150px;">Days blocked</td></tr>

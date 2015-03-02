@@ -551,7 +551,7 @@ describe("CFD",function(){
 
   approveIt("CFD for tickets filtered by CR", function(approvals){
     var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket"),createSnapshotTicket("2"," CR TestTicket")]);
-    var filter = {"text" : "cR"};
+    var filter = {"text" : "CR"};
     approvals.verify(boardData.getCfdData(filter));
   });
 

@@ -206,6 +206,78 @@ app.factory("snapshotFactory",function(){
     return factory;
 });
 
+app.factory("flowDataGridFactory", function(){
+    var factory = {};
+    factory.flowDataGrid = function(boardData){
+        var flowData = boardData.flowData;
+        var lanes = boardData.getLaneHeaders();
+        lanes.push("Blocked");
+        //internal helper functions
+        function flowDataLaneNamesHeader(lanes){
+            var columnIndexes = getLaneIndexes(lanes);
+            var columnsInRow = lanes.length+2;
+            var row = new Array(columnsInRow);
+            var columnName;
+            row[0] = "TFS Id";
+            row[1] = "Title";
+            for(columnName in columnIndexes){
+                row[columnIndexes[columnName]] = columnName;
+            }
+            return row;
+        }
+
+
+
+        function flowDataRow(flowTicket,columnIndexes,lanes){
+            var row = arrayOfNulls(lanes.length+ 2);
+            var laneName;
+            var lane;
+
+            row[0]=  flowTicket.id;
+            row[1] =  flowTicket.title;
+            for(laneName in flowTicket.lanes){
+                lane = flowTicket.lanes[laneName];
+                //_.forEach()
+                row[columnIndexes[laneName]] = timeUtil.timeFormat(flowTicket.getTotalTimeInLane(laneName));
+                //row[columnIndexes[laneName]] = timeUtil.timeFormat(lane[0].firstSeen-lane[lane.length-1].lastSeen);
+            }
+            if(flowTicket.getTotalBlockedTime()){
+                row[columnIndexes["Blocked"]] = timeUtil.timeFormat(flowTicket.getTotalBlockedTime());
+            }
+
+            return row;
+        }
+
+        function getLaneIndexes(lanes){
+            var indexes = {};
+            var lane;
+            for(lane = 0; lane<lanes.length; lane++){
+                indexes[lanes[lane]] = lane +2;
+            }
+            return indexes;
+        }
+
+        //construction
+        function bulidFlowDataGrid(flowData , lanes){
+            var columnIndexes = getLaneIndexes(lanes);
+            var grid = [];
+            var flowTicket;
+            grid.push(flowDataLaneNamesHeader(lanes));
+
+            for (var id in flowData){
+                flowTicket = flowData[id];
+                if(typeof flowTicket !== "function"){
+                    grid.push(flowDataRow(flowTicket,columnIndexes,lanes));
+                }
+            }
+            return grid;
+        }
+        return bulidFlowDataGrid(flowData , lanes);
+
+    }; //flowdataGrid
+    return factory;
+});
+
 app.factory("flowReportFactory",function(){
     var factory = {};
     factory.buildFlowReport = function(flowData){
@@ -246,7 +318,7 @@ app.controller("TabController",[
       $scope.tabs = [];
       $scope.tabs.push({"caption": "CFD", "active":false, "route":"/cfd/"});
       $scope.tabs.push({"caption": "Snapshot", "active":false, "route":"/snapshot/"});
-      $scope.tabs.push({"caption": "FlowGrid", "active":true, "route":"/flowgrid/"});
+      $scope.tabs.push({"caption": "FlowGrid", "active":true, "route":"/flowdatagrid/"});
       $scope.tabs.push({"caption": "FlowReport", "active":true, "route":"/flowreport/"});
       $scope.boardUrl = _.last($location.url().split("/"));
       
@@ -339,6 +411,46 @@ app.controller("FlowReportController", ['$scope','$route', '$routeParams', 'boar
     };
 }]);
 
+app.controller("FlowDataGridController", ['$scope','$route', '$routeParams', 'boardDataFactory','flowDataGridFactory',function( $scope, $route, $routeParams, boardDataFactory,flowDataGrid){
+    $scope.board = decodeUrl($routeParams.board);
+    var boardData;
+    $scope.flowDataGrid;
+    boardDataFactory.getBoardData($scope.board).then(function(response){
+        boardData = new BoardData(response);
+        $scope.flowDataGrid = flowDataGrid.flowDataGrid(boardData);
+        $scope.header = $scope.flowDataGrid[0];
+        $scope.$apply();
+    },function(error){
+        console.log("send message failed");
+    });
+
+    $scope.downloadAsJson = function(){
+        downloadAsJson($scope.flowDataGrid,"FlowReport");
+    };
+
+    $scope.downloadAsCSV = function(){
+        downloadAsCSV($scope.flowDataGrid,"FlowReport");
+    };
+
+    $scope.flowDataGridData = function(){
+        return _.rest($scope.flowDataGrid);
+    }
+
+    $scope.showRow = function(query) {
+        return function(row) {
+            var show = true;
+            if(!query || query===""){
+                return true;
+            }
+            if(row[0].indexOf(query)===-1 && row[1].indexOf(query)===-1){
+                show = false;
+            }
+            return show;
+        }
+    };
+}]);
+
+
 app.controller("CfdController", ['$scope','$route', '$routeParams', 'boardDataFactory','cfdFactory',function( $scope, $route, $routeParams, boardDataFactory,cfd){
       
   $scope.cfdData = [];
@@ -419,6 +531,9 @@ app.config(['$routeProvider',
       }).when('/snapshot/:board', {
         templateUrl: 'templates/snapshot.html',
         controller: 'SnapshotController'
+      }).when('/flowdatagrid/:board', {
+        templateUrl: 'templates/flowdataGrid.html',
+        controller: 'FlowDataGridController'
       }).when('/flowreport/:board', {
         templateUrl: 'templates/flowreport.html',
         controller: 'FlowReportController'

@@ -7,7 +7,7 @@ function updateBoard(settings) {
  
     var taskBoard   = {
         "type"      : "taskBoard",
-        "tileClass" : "tbTileContent",
+        "tileClass" : "tbTile",
         "removeClass" :"witTitle",
         "update"    : true,
         "relations" : false,
@@ -15,21 +15,22 @@ function updateBoard(settings) {
     };
  
     //border-left-color: rgb(242, 203, 29); background-color: rgb(246, 245, 210);
-    var customColor = { "blue": ["border-left-color:#285e8e; background-color:  #3276b1;"," color: white;"],
-                        "yellow": ["background-color: yellow; border-left-color: #D7DF01;"," color: black;"],
-                        "orange": ["background-color: #FF8000; border-left-color: #DF7401;"," color: black;"],
-                        "green": ["background-color: #33A904; border-left-color: #1B5C01;"," color: white;"],
-                        "pink": ["background-color: #F781F3; border-left-color: #FA58F4;"," color: black;"],
-                        "asure": ["background-color: #00FFFF; border-left-color: #01DFD7;"," color: black;"],
-                        "asure": ["background-color: #00FFFF; border-left-color: #01DFD7;"," color: black;"],
-                        "purple": ["background-color: #9A2EFE; border-left-color: #A901DB;"," color: white;"],
-                        "expediter": ["background-color: black; border-left-color: #DDDDDD;"," color: white"],
-                        "black": ["background-color: black; border-left-color: #DDDDDD;"," color: white;"],
-                        "blocked": ["background-color: #d2322d; border-left-color: #ac2925;"," color: white;"], 
-                        "red": ["background-color: #d2322d; border-left-color: #ac2925;"," color: white"],
-                        "lightgreen": ["background-color: #C3FCD4; border-left-color: #00FF80;","color: black"],
-                        "gray": ["background-color: #A1A19F; border-left-color:black; ","color: white"],
-                        "standard": ["border-left-color: rgb(0, 156, 204); background-color: rgb(214, 236, 242); ","color:black;"]
+    var customColor = { "blue": ["border-left-color:#285e8e;","background-color:  #3276b1;"," color: white;"],
+                        "yellow": ["border-left-color: #D7DF01;","background-color: yellow;"," color: black;"],
+                        "orange": ["border-left-color: #DF7401;","background-color: #FF8000;"," color: black;"],
+                        "green": ["border-left-color: #1B5C01;","background-color: #33A904;"," color: white;"],
+                        "pink": ["border-left-color: #FA58F4;","background-color: #F781F3;"," color: black;"],
+                        "asure": ["border-left-color: #01DFD7;","background-color: #00FFFF;"," color: black;"],
+                        "asure": ["border-left-color: #01DFD7;","background-color: #00FFFF;"," color: black;"],
+                        "purple": ["border-left-color: #A901DB;","background-color: #9A2EFE;"," color: white;"],
+                        "expediter": ["border-left-color: #DDDDDD;","background-color: black;"," color: white"],
+                        "black": ["border-left-color: #DDDDDD;","background-color: black;"," color: white;"],
+                        "blocked": ["border-left-color: #ac2925;","background-color: #d2322d;"," color: white;"],
+                        "red": ["border-left-color: #ac2925;","background-color: #d2322d;"," color: white"],
+                        "lightgreen": ["border-left-color: #00FF80;","background-color: #C3FCD4;","color: black"],
+                        "gray": ["border-left-color:black; ","background-color: #A1A19F;","color: white"],
+                        "standard": ["border-left-color: rgb(0, 156, 204);"," background-color: rgb(214, 236, 242); ","color:black;"],
+                        "lightpurple":[" border-left-color: rgb(119, 59, 147);","background-color: rgb(238, 226, 242);","color:black"]
                        };
     
     function improveBoard(colorMap, board) {
@@ -47,7 +48,7 @@ function updateBoard(settings) {
         console.log($tiles.length + " tiles on board");
         setTileColors($tiles,colorMap);
         highlightDates($tiles);
-        setTimeout(function(){improveBoard(colorMap,board);}, 2000);
+        //setTimeout(function(){improveBoard(colorMap,board);}, 2000);
             
         
     }
@@ -56,12 +57,22 @@ function updateBoard(settings) {
     function setTileColor($itemElm,colorMap){
         var itemClassification = "";
         var tileData = $itemElm.text().split(" ");
+        var newBoardSetup = false
         itemClassification = tileData[0];
         // set woorktype
+        if($itemElm.find(".editIcon")){
+            newBoardSetup = true;
+        }
         console.log("colorMap[itemClassification] = " + colorMap[itemClassification]);
         if(typeof colorMap[itemClassification]!="undefined"){
-            setStyle($itemElm,customColor[colorMap[itemClassification]][0]);
-            setStyle($itemElm.find(".witTitle"),customColor[colorMap[itemClassification]][1]);
+            if(!newBoardSetup){
+                setStyle($itemElm.find(".tbTileContent"),customColor[colorMap[itemClassification]][0] + " " + customColor[colorMap[itemClassification]][1]);
+            }else{
+                setStyle($itemElm,customColor[colorMap[itemClassification]][0])
+                setStyle($itemElm.find(".tbTileContent"),customColor[colorMap[itemClassification]][1]);
+            }
+
+            setStyle($itemElm.find(".witTitle"),customColor[colorMap[itemClassification]][2]);
         } else{
             //setStyle($itemElm, customColor[""]);
         }

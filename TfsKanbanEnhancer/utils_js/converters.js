@@ -40,7 +40,9 @@ function convertStorageColorMapToSettingsColorMap(storageColorMap,storageDescrip
 							{"color" : "asure" ,       "prefix" : "", "description" : ""},
 							{"color" : "purple" ,      "prefix" : "", "description" : ""},
 							{"color" : "lightgreen" ,  "prefix" : "", "description" : ""},
-							{"color" : "gray" ,        "prefix" : "", "description" : ""}];
+							{"color" : "gray" ,        "prefix" : "", "description" : ""},
+							{"color" : "lightpurple" , "prefix" : "", "description" : ""}
+							];
 
 	function setColorMap(color,prefix){
 		for(var i in settingsColorMap){

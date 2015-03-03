@@ -41,6 +41,7 @@ function updateBoard(settings) {
         ".$tileClass.lightgreen.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.gray.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
         ".$tileClass.standard.pale {background-color: transparent; border-color: #ddd; color: #ddd}"+
+        ".$tileClass.lightpurple.pale{background-color: transparent; border-color: #ddd; color: #ddd}"+ 
         ".duedate.white.pale {background-color: transparent; color: #ddd}"+
         ".duedate.yellow.pale {background-color: transparent; color: #ddd}"+
         ".duedate.red.pale {background-color: transparent; color: #ddd}"
@@ -61,7 +62,8 @@ function updateBoard(settings) {
         ".$tileClass.red {background-color: #d2322d; border-color: #ac2925; color: white} " +
         ".$tileClass.lightgreen {background-color: #C3FCD4; border-color: #00FF80; color: black} " +
         ".$tileClass.gray {background-color: #A1A19F; border-color:black; color: white} " +
-        ".$tileClass.standard {border-left-color: rgb(0, 156, 204); background-color: rgb(214, 236, 242) color = black}"+
+        ".$tileClass.standard {border-color: rgb(0, 156, 204); background-color: rgb(214, 236, 242) color = black}"+
+        ".$tileClass.lightpurple {background-color: rgb(238, 226, 242); border-color: rgb(119, 59, 147); color: black}"+
         ".duedate.white {background-color: black; color: white} "+
         ".duedate.yellow {background-color: black; color: yellow} "+
         ".duedate.red {background-color: black; color: red} "+

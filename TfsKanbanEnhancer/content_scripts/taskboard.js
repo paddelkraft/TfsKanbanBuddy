@@ -14,6 +14,12 @@ function updateBoard(settings) {
         "wip"       : false
     };
  
+    var customStyleColor =
+        ".duedate.white {background-color: black; color: white} "+
+        ".duedate.yellow {background-color: black; color: yellow} "+
+        ".duedate.red {background-color: black; color: red} "
+    ;
+
     //border-left-color: rgb(242, 203, 29); background-color: rgb(246, 245, 210);
     var customColor = { "blue": ["border-left-color:#285e8e;","background-color:  #3276b1;"," color: white;"],
                         "yellow": ["border-left-color: #D7DF01;","background-color: yellow;"," color: black;"],
@@ -48,7 +54,7 @@ function updateBoard(settings) {
         console.log($tiles.length + " tiles on board");
         setTileColors($tiles,colorMap);
         highlightDates($tiles);
-        //setTimeout(function(){improveBoard(colorMap,board);}, 2000);
+        setTimeout(function(){improveBoard(colorMap,board);}, 2000);
             
         
     }
@@ -56,11 +62,12 @@ function updateBoard(settings) {
  
     function setTileColor($itemElm,colorMap){
         var itemClassification = "";
-        var tileData = $itemElm.text().split(" ");
+        var tileData = $itemElm.find(".witTitle").text().split(" ");
         var newBoardSetup = false
         itemClassification = tileData[0];
         // set woorktype
-        if($itemElm.find(".editIcon")){
+        var temp = $itemElm.find(".editIcon");
+        if($itemElm.find(".editIcon").length!==0){
             newBoardSetup = true;
         }
         console.log("colorMap[itemClassification] = " + colorMap[itemClassification]);
@@ -157,6 +164,16 @@ function updateBoard(settings) {
        
       
     }
+
+    function addGlobalStyle(css) {
+        var head, style;
+        head = document.getElementsByTagName('head')[0];
+        if (!head) { return; }
+        style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerHTML = css;
+        head.appendChild(style);
+    }
     
     
     function userscript () {
@@ -170,6 +187,7 @@ function updateBoard(settings) {
                 improveBoard(response, taskBoard);
             }
             
+            addGlobalStyle(customStyleColor);
             $(window)
             .focus(function () { is_focused = true; })
             .blur(function () { is_focused = false; });

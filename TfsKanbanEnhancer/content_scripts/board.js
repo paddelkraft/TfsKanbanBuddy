@@ -93,7 +93,7 @@ function updateBoard(settings) {
         highlightDates($tiles);
         //console.log("tile colors set");
         if (board.relations){
-            //setLargeCards($tiles);
+            setLargeCards($tiles);
             setRelationAttributes($tiles);
             var filters = setFilrerAttributes($tiles);
             if (! jQuery.isEmptyObject(filters)) {
@@ -298,7 +298,9 @@ function removeColumnColor(){
     }
  
     function setLargeCard($itemElm){
-        setClass($itemElm,"largeCard");
+        if($itemElm.find(".editIcon").length===0){
+            setClass($itemElm,"largeCard");
+        }
     }
  
     function setRelationAttribute($itemElm){

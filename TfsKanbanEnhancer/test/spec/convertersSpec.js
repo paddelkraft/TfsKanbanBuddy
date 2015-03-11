@@ -25,7 +25,8 @@ var _settingsPageColorMap = [{"color" : "expediter" ,   "prefix" : "!" },
     {"color" : "asure" ,       "prefix" : ""},
     {"color" : "purple" ,      "prefix" : ""},
     {"color" : "lightgreen" ,  "prefix" : ""},
-    {"color" : "gray" ,        "prefix" : ""}];
+    {"color" : "gray" ,        "prefix" : ""},
+    {"color" : "lightpurple" ,  "prefix" : ""},];
 
 var _emptySettingsPageColorMap = [{"color" : "expediter" ,   "prefix" : "" },
     {"color" : "blocked" ,     "prefix" : ""},
@@ -37,7 +38,8 @@ var _emptySettingsPageColorMap = [{"color" : "expediter" ,   "prefix" : "" },
     {"color" : "asure" ,       "prefix" : ""},
     {"color" : "purple" ,      "prefix" : ""},
     {"color" : "lightgreen" ,  "prefix" : ""},
-    {"color" : "gray" ,        "prefix" : ""}];
+    {"color" : "gray" ,        "prefix" : ""},
+    {"color" : "lightpurple" ,  "prefix" : ""}];
 
 var _newSettingsPageColorMap = [{"color" : "black" ,       "prefix" : "!" , "description" : "expediter"},
     {"color" : "red" ,         "prefix" : "*" , "description" : "blocked"},
@@ -49,7 +51,8 @@ var _newSettingsPageColorMap = [{"color" : "black" ,       "prefix" : "!" , "des
     {"color" : "asure" ,       "prefix" : "",   "description" : ""},
     {"color" : "purple" ,     "prefix" : "",   "description" : ""},
     {"color" : "lightgreen" ,  "prefix" : "",   "description" : ""},
-    {"color" : "gray" ,        "prefix" : "",   "description" : ""}];
+    {"color" : "gray" ,        "prefix" : "",   "description" : ""},
+    {"color" : "lightpurple" , "prefix" : "",   "description" : ""}];
 
 var _newEmptySettingsPageColorMap = [{"color" : "black" ,       "prefix" : "", "description" : "expediter"},
     {"color" : "red" ,         "prefix" : "", "description" : "blocked"},
@@ -61,7 +64,8 @@ var _newEmptySettingsPageColorMap = [{"color" : "black" ,       "prefix" : "", "
     {"color" : "asure" ,       "prefix" : "", "description" : ""},
     {"color" : "purple" ,      "prefix" : "", "description" : ""},
     {"color" : "lightgreen" ,  "prefix" : "", "description" : ""},
-    {"color" : "gray" ,        "prefix" : "", "description" : ""}];
+    {"color" : "gray" ,        "prefix" : "", "description" : ""},
+    {"color" : "lightpurple" , "prefix" : "", "description" : ""}];
 
 
 describe("Converters", function() {
@@ -75,39 +79,39 @@ describe("Converters", function() {
     var links = _storedLinks;
     var settingsLinks = convertStorageLinksToSettingsLinks(links);
     var expectedResult = _settingsPageLinks;
-    expect(settingsLinks).toEqual(expectedResult);
+    expect(settingsLinks).jsonToBe(expectedResult);
   });
 
   it("should convert settings links to storage format", function() {
     var expectedResult = _storedLinks;
     var links = _settingsPageLinks;
     var storageLinks = convertSettingsLinksToStorageLinks(links);
-    expect(storageLinks).toEqual(expectedResult);
+    expect(storageLinks).jsonToBe(expectedResult);
   });
 
   it("should return empty colorMap with null input", function() {
     var settingsPageColorMap = convertStorageColorMapToSettingsColorMap(null,null);
-    expect(settingsPageColorMap).toEqual(_newEmptySettingsPageColorMap);
+    expect(settingsPageColorMap).jsonToBe(_newEmptySettingsPageColorMap);
   });
 
   it("should convert stored color map to view format", function() {
     var settingsPageColorMap = convertStorageColorMapToSettingsColorMap(_storageColorMap,_storageDescriptionMap);
-    expect(settingsPageColorMap).toEqual(_newSettingsPageColorMap);
+    expect(settingsPageColorMap).jsonToBe(_newSettingsPageColorMap);
   });
 
   it("should convert settings color map to storage color format", function() {
     var storageColorMap = convertSettingsColorMapToStorageColorMap(_newSettingsPageColorMap);
-    expect(storageColorMap).toEqual(_storageColorMap);
+    expect(storageColorMap).jsonToBe(_storageColorMap);
   });
 
   it("should convert settings color map to storage description format", function() {
     var storageDescriptionMap = convertSettingsColorMapToStorageDescriptionMap(_newSettingsPageColorMap);
-    expect(storageDescriptionMap).toEqual(_storageDescriptionMap);
+    expect(storageDescriptionMap).jsonToBe(_storageDescriptionMap);
   });
   
   it("should convert old seetings page color map to new format", function () {
     var newSettingsPageColorMap = convertSettingsPageColorMapToNewFormat(_settingsPageColorMap);
-    expect(newSettingsPageColorMap).toEqual(_newSettingsPageColorMap);
+    expect(newSettingsPageColorMap).jsonToBe(_newSettingsPageColorMap);
   });
 
   it("should convert 2 dimensional json array to csv", function() {

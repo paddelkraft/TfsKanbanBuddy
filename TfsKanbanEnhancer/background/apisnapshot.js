@@ -6,16 +6,14 @@ function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl){
 	self.apiUrl = apiUrl;
 	self.boardUrl = boardUrl;
 	self.genericItemUrl= genericItemUrl;
-	self.projectUrl = projectUrl
+	self.projectUrl = projectUrl;
 	self.snapshot = null;
-	self.status = 0
+	self.status = 0;
 	self.get = function(callback){
 		$.get(apiUrl,callback);
 	};
 
 	function callback(data,status){
-		var lanes;
-		var tickets;
 		if (status === "success"){
 			self.snapshot = self.buildSnapshot(data);
 		}
@@ -33,6 +31,7 @@ function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl){
 			snapshot.boardUrl = boardUrl;
 			snapshot.board = projectUrl; 
 			snapshot.genericItemUrl = self.genericItemUrl;
+            snapshot.doneState = self.getDoneState(apiResponse);
 			_.forEach(lanes,function(lane){
 				lane.tickets = self.ticketsInlane(tickets,lane.name);
 				lane.wip.limit = lane.wip.limit;
@@ -83,15 +82,74 @@ function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl){
 		return lanes;
 	};
 
+    self.getDoneState = function(apiResponse){
+        var doneLane = _.last(apiResponse.boardSettings.columns);
+        var doneStates = [];
+
+        _.forEach(doneLane.stateMappings,function(state){
+            doneStates.push(state);
+        });
+        return doneStates;
+    };
+
 	self.getSnapshot = function(callback){
 		if(self.status===0){
 			self.whenDone = callback;
 		}else{
-			callback();
+			callback(self.snapshot);
 		}
 	};
 	self.get(callback);
 	return self;
+}
+
+function ApiWorkItem(apiUrl,$jq){
+    var self = {};
+    self.status = 0;
+    if(!$jq){
+        $jq =$;
+    }
+
+    self.get = function(callback){
+        $jq.get(apiUrl,callback);
+    };
+
+    function callback(data,status){
+
+        if (status === "success"){
+            self.tickets = self.buildTickets(data);
+        }
+        self.status = status;
+        if(self.whenDone){
+            self.whenDone(self.tickets);
+        }
+    }
+
+    self.then = function(callback){
+        if(self.status===0){
+            self.whenDone = callback;
+        }else{
+            callback(self.tickets);
+        }
+    };
+
+    self.buildTickets = function (apiData){
+        var tickets = [];
+        _.forEach(apiData["value"], function(apiTicket){
+            var ticket = {};
+            ticket.id = apiTicket.id;
+            _forEachIndex(apiTicket.fields,function(fieldValue,index){
+                ticket[index.replace("System.","")]= fieldValue;
+            });
+            tickets.push(ticket);
+        });
+
+        return tickets;
+    };
+
+    self.get(callback);
+    return self;
+
 }
 
 

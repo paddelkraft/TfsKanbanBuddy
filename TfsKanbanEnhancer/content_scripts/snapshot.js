@@ -58,17 +58,17 @@
     
 
     function getGenericItemUrl(){
+        return  boardUrl().split(getProjectName())[0] + projectName + "/_workitems#_a=edit&id=";
+    }
+
+    function getProjectName(){
         var projectName ;
         if(document.getElementsByClassName("project-name")[0]){ //older version
             projectName = document.getElementsByClassName("project-name")[0].textContent;
         }else {
             projectName =$("span[title~='Project']").text();
         }
-        log("Url = "+boardUrl());
-        return  boardUrl().split(projectName)[0] + projectName + "/_workitems#_a=edit&id=";
     }
-
-    
     function takeSnapshot(giveFeedback){
         var message = {};
         message.type = "save-snapshot";
@@ -134,7 +134,8 @@
         var url =getProjectUrl();
         snapshot.board=url;
         snapshot.boardUrl = decodeUrlKeepEncodedSpaces( document.URL);
-        snapshot.genericItemUrl = genericItemUrl;
+        snapshot.projectName = getProject(Name);
+        snapshot.genericItemUrl = getGenericItemUrl();
         var headerContainer = document.getElementsByClassName("header-container")[0];
         var headers = headerContainer.getElementsByClassName("member-header-content");
         var columnContainer = document.getElementsByClassName("content-container")[0];
@@ -177,7 +178,6 @@
         return snapshot;
     }
 
-    //addProductBacklogViewTabsLink("Take board Snapshot", "#","takeSnapshot", takeSnapshot);
     addProductBacklogViewTabsLink("flow data", "#","showFlowData", showFlowData);
     addProductBacklogViewTabsLink("CFD", "#","cfd", function(){openDataPage("cfd")});
     var genericItemUrl = getGenericItemUrl();

@@ -55,6 +55,7 @@ function updateBoard(settings) {
         setTileColors($tiles,colorMap);
         highlightDates($tiles);
         setTimeout(function(){improveBoard(colorMap,board);}, 2000);
+
             
         
     }
@@ -66,8 +67,7 @@ function updateBoard(settings) {
         var newBoardSetup = false
         itemClassification = tileData[0];
         // set woorktype
-        var temp = $itemElm.find(".editIcon");
-        if($itemElm.find(".editIcon").length!==0){
+        if($itemElm.find(".editIcon").length !==0){
             newBoardSetup = true;
         }
         console.log("colorMap[itemClassification] = " + colorMap[itemClassification]);

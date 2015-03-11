@@ -65,6 +65,7 @@ function testSnapshot(milliseconds){
         "milliseconds": milliseconds,
         "board": "https://boardUrl/",
         "genericItemUrl" : "https://collectionUrl/_workitems#_a=edit&id=",
+        "doneState":["Done","Done"],
         "lanes": [
           {
             "name": "ToDo",
@@ -98,22 +99,22 @@ function testSnapshot(milliseconds){
   function testBoardDesign(){
     return [
           {
-            "name": "ToDo",
+            "name": "ToDo"
           },
           {
             "name": "Dev IP",
             "wip": {
               "limit": 5
-            },
+            }
           },
           {
             "name": "Dev DONE",
             "wip": {
               "limit": 0
-            },
+            }
           },
           {
-            "name": "In production",
+            "name": "In production"
           }
         ];
   }
@@ -158,6 +159,15 @@ function testSnapshot(milliseconds){
     return boardData;
   }
 
+function twoIdenticalSnapdhots(){
+    var boardData = new BoardData();
+    var ticket = createSnapshotTicket("1","CR testTicket");
+    var day = timeUtil.MILLISECONDS_DAY;
+    boardData.addSnapshot(simpleSnapshot(10*day,[ticket],[],[],[]));
+    boardData.addSnapshot(simpleSnapshot(19*day,[ticket],[],[],[]));
+    return boardData;
+}
+
 describe("BoardData", function() {
   var boardData;
   var boardDesign;
@@ -198,6 +208,10 @@ describe("BoardData", function() {
     approvals.verify(boardData.getLatestSnapshot());
   });
 
+    it("identical snapshots should result in 1 snapshot record",function(){
+        expect(twoIdenticalSnapdhots().snapshotRecords.length).toBe(1);
+    })
+
   approveIt("boardData for 1 ticket moving back and forth",function(approvals){
     approvals.verify(jsonEncode(boardDataOneTicketMovingBackAndforth()));
   });
@@ -212,7 +226,7 @@ describe("BoardData", function() {
     expect(boardData.boardDesignHistory.boardDesignRecords[0].getBoardDesignForSnapshot()).approve(boardDesign);
   });
 
-  it("boardDesign shoud have correct firstSeen and lastSeen times", function() {
+  it("boardDesign should have correct firstSeen and lastSeen times", function() {
     boardData.addSnapshot(snapshot);
     snapshot.milliseconds = snapshot.milliseconds + 10;
     boardData.addSnapshot(snapshot);
@@ -221,7 +235,19 @@ describe("BoardData", function() {
     expect(boardDesign.lastSeen).toEqual(snapshot.milliseconds);
   });
 
-  it("should contain new Board Design", function() {
+
+    it("should have latest snapshot time", function() {
+        boardData.addSnapshot(snapshot);
+        expect(boardData.getLatestSnapshotTime()).toEqual(snapshot.milliseconds);
+    });
+
+    it("should have lastLane on board", function() {
+        boardData.addSnapshot(snapshot);
+        expect(boardData.getLastLaneOnBoard()).toEqual(_.last(snapshot.lanes).name);
+    });
+
+
+    it("should contain new Board Design", function() {
     boardData.addSnapshot(snapshot);
     snapshot.milliseconds = snapshot.milliseconds + 10;
     snapshot.lanes[0].name = "Att Göra";
@@ -270,12 +296,30 @@ describe("BoardData", function() {
     approvals.verify(ticket);
   });
 
-  it("ticket should have left the board",function(){
-    var flowData = new FlowData();
-    boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
-    boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY));
-    expect(boardData.flowData[1].inLane).toBe("In production");
-  });
+    it("ticket should be missing",function(){
+        var flowData = new FlowData();
+        boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
+        boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY));
+        expect(boardData.getTicketsMissingOnBoard()).jsonToBe(["1"]);
+    });
+
+    it("ticket should be done",function(){
+        boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
+        boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY));
+        boardData.updateStateForCardsNotOnBoard([{"id":1,"State":"Done"}])
+        boardData.updateDoneTickets();
+        expect(boardData.flowData[1].inLane).toBe("In production");
+        expect(boardData.flowData[1].state).toBe("done");
+    });
+
+    it("ticket should be removed",function(){
+        var flowData = new FlowData();
+        boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
+        boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY));
+        boardData.updateStateForCardsNotOnBoard([{"id":1,"State":"ToDo"}])
+        boardData.updateDoneTickets();
+        expect(boardData.flowData[1].state).toBe("removed");
+    });
 
   approveIt("should create first snapshot from boardData", function(approvals) {
     boardData.addSnapshot(snapshot);
@@ -290,6 +334,11 @@ describe("BoardData", function() {
     boardData.addSnapshot(snapshot2);
     approvals.verify(boardData.getSnapshots());
   });
+
+    it("done state should be done",function(){
+        expect(twoIdenticalSnapdhots().doneState).jsonToBe(["Done","Done"]);
+    })
+
 });
 
 describe("Snapshot",function(){
@@ -548,6 +597,24 @@ describe("CFD",function(){
     var filter = {"endMilliseconds" : 1*timeUtil.MILLISECONDS_DAY};
     approvals.verify( boardData.getCfdData(filter));
   });
+
+    approveIt("CFD for done ticket disapeared from board ", function(approvals){
+        var boardData = new BoardData();
+        boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
+        boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY-1));
+        boardData.updateStateForCardsNotOnBoard([{"id":1,"State":"Done"}])
+        approvals.verify(boardData.getCfdData());
+    });
+
+    approveIt("CFD for removed ticket", function(approvals){
+        var boardData = new BoardData();
+        boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
+        boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY-1));
+        boardData.updateStateForCardsNotOnBoard([{"id":1,"State":"ToDo"}])
+        approvals.verify(boardData.getCfdData());
+    });
+
+
 
   approveIt("CFD for tickets filtered by CR", function(approvals){
     var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket"),createSnapshotTicket("2"," CR TestTicket")]);

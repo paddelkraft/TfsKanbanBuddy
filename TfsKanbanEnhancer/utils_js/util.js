@@ -229,3 +229,14 @@ function filterArray(arr, filterFunc){
 
     return filteredArray;
 }
+
+ function _forEachIndex(collection, func){
+     var index;
+     var breakLoop;
+     for(index in collection){
+         breakLoop = func(collection[index],index);
+         if(breakLoop===false){
+             break;
+         }
+     }
+ }

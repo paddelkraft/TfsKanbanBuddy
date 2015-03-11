@@ -93,4 +93,14 @@ describe("messageHandling",function(){
         approvals.verify(buildApprovalObject());
 
     });
+
+    approveIt("(background messageHandling)save-snapshot with removed ticket", function(approvals){
+        var request ={"type":"save-snapshot" };
+        request.snapshot = simpleSnapshot(1000000,[createSnapshotTicket(1,"test"),createSnapshotTicket(16,"test")]);
+        request.snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
+        messageHandler(buddyDB,request,{},responseCallback)
+        messageHandler(buddyDB,{"type":"get-flow-data","board":"http://boardurl.com/_backlogs/board/Backlog%20items"},{},responseCallback)
+        approvals.verify(buildApprovalObject());
+
+    });
 });

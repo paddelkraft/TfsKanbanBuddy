@@ -2,7 +2,7 @@
 //apiSpec.js
 
 
-describe("TFS API ", function() {
+describe("TFS Board API ", function() {
 	var snapshot ={};
     snapshot.board = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection";
     snapshot.boardUrl = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/Backlog%20items";
@@ -40,7 +40,11 @@ describe("TFS API ", function() {
 
 
 	approveIt("should createA new boardRecord", function(approvals) {
-		approvals.verify( apiUtil().createBoardRecord(snapshot));
+		var boardRecord = apiUtil().createBoardRecord(snapshot);
+        boardRecord.boardApiUrl = boardRecord.getBoardApiUrl();
+        boardRecord.genericItemUrl=boardRecord.getGenericItemUrl();
+        boardRecord.workItemApiUrl = boardRecord.getWorkItemApiUrl([1,2],["System.field"]);
+        approvals.verify( boardRecord);
 	});
 
 	approveIt("should register board",function(approvals){
@@ -69,7 +73,7 @@ describe("TFS API ", function() {
 		expect(setRegisteredBoards).toHaveBeenCalled();
 	});
 
-	it("should update boardUrl in storage",function(){
+	approveIt("should update boardUrl in storage",function(approvals){
 		var storageMock = ApiStorage();
 		var boardRegistry = {};
 		var setRegisteredBoards = spyOn(storageMock,"setRegisteredBoards").and.callFake(function(input){
@@ -78,7 +82,8 @@ describe("TFS API ", function() {
 		var getRegisteredBoards = spyOn(storageMock,"getRegisteredBoards")
 			.and.returnValue(_.cloneDeep(boardRegistryWithShortBoardUrl));
 		apiUtil(storageMock).registerBoard(snapshot);
-		expect(boardRegistry).jsonToBe(boardRegistryWithLongBoardUrl);
+        //expect(boardRegistry).jsonToBe(boardRegistryWithLongBoardUrl);
+        approvals.verify(boardRegistry)
 	});
 
 	//Remove 0.6.0
@@ -112,7 +117,7 @@ describe("TFS API ", function() {
 		approvals.verify(boardRegistry);
 	});//end remove
 
-	it("should use long boardUrl in storage",function(){
+	approveIt("should use long boardUrl in storage",function(approvals){
 		var storageMock = ApiStorage();
 		var boardRegistry = {};
 		var setRegisteredBoards = spyOn(storageMock,"setRegisteredBoards").and.callFake(function(input){
@@ -121,7 +126,7 @@ describe("TFS API ", function() {
 		var getRegisteredBoards = spyOn(storageMock,"getRegisteredBoards")
 			.and.returnValue(_.cloneDeep(boardRegistryWithLongBoardUrl));
 		apiUtil(storageMock).registerBoard(snapshotWithShortUrl);
-		expect(boardRegistry).jsonToBe(boardRegistryWithLongBoardUrl);
+		approvals.verify(boardRegistry);//.jsonToBe(boardRegistryWithLongBoardUrl);
 	});
 
 
@@ -139,4 +144,27 @@ describe("TFS API ", function() {
 		expect(getApiSnapshot).toHaveBeenCalled();
 		expect(_boardRecord).jsonToBe({"boardUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/Backlog%20items","apiUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=3","genericItemUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id="});
 	});
+
 });
+
+
+
+describe("TFS workitem api",function(){
+
+    approveIt("should get workitem with state from api", function(approvals){
+        //https://paddelkraft.visualstudio.com/defaultcollection/_apis/wit/workitems?api-version=1.0&ids=16&fields=System.state
+        //_apis/wit/workitems?api-version=1.0&ids=16&fields=System.state;
+        var jqMock = {"get":function(apiUrl,callback){
+            callback({"count":1,"value":[{"id":16,"rev":6,"fields":{"System.State":"Removed"},"url":"https://paddelkraft.visualstudio.com/DefaultCollection/_apis/wit/workItems/16"}]},
+                     "success");
+        }};
+        var apiWorkItem = new ApiWorkItem("https://paddelkraft.visualstudio.com/defaultcollection/_apis/wit/workitems?api-version=1.0&ids=16&fields=System.state",jqMock)
+        apiWorkItem.then(function(tickets){
+            approvals.verify(tickets);
+        })
+    });
+
+
+
+
+});//

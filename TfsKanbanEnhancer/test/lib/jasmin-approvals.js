@@ -54,11 +54,13 @@ approvalTests = {};
 
 function Approvals(done, testInfo){
     var self = {};
-    self.verify = function(recievedResult){
-
-        testInfo.actual = jsonEncode(recievedResult);
+    self.verify = function(receivedResult){
+        if(typeof receivedResult !=="string"){
+            receivedResult = jsonEncode(receivedResult);
+        }
+        testInfo.actual = receivedResult;
         approvalTests[testInfo.description]= testInfo;
-        expect(recievedResult).approve(testInfo.approvedOutput);
+        expect(receivedResult).approve(testInfo.approvedOutput);
         done();
     };
     return self;

@@ -168,6 +168,14 @@ function twoIdenticalSnapdhots(){
     return boardData;
 }
 
+function boardDataWith1Snapdhot(){
+    var boardData = new BoardData();
+    var ticket = createSnapshotTicket("1","CR testTicket");
+    var day = timeUtil.MILLISECONDS_DAY;
+    boardData.addSnapshot(simpleSnapshot(10 * day,[ticket],[],[],[]));
+    return boardData;
+}
+
 describe("BoardData", function() {
   var boardData;
   var boardDesign;
@@ -306,7 +314,7 @@ describe("BoardData", function() {
     it("ticket should be done",function(){
         boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
         boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY));
-        boardData.updateStateForCardsNotOnBoard([{"id":1,"State":"Done"}])
+        boardData.updateStateForTicketsNotOnBoard([{"id":1,"State":"Done"}])
         boardData.updateDoneTickets();
         expect(boardData.flowData[1].inLane).toBe("In production");
         expect(boardData.flowData[1].state).toBe("done");
@@ -316,7 +324,7 @@ describe("BoardData", function() {
         var flowData = new FlowData();
         boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
         boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY));
-        boardData.updateStateForCardsNotOnBoard([{"id":1,"State":"ToDo"}])
+        boardData.updateStateForTicketsNotOnBoard([{"id":1,"State":"ToDo"}])
         boardData.updateDoneTickets();
         expect(boardData.flowData[1].state).toBe("removed");
     });
@@ -602,7 +610,7 @@ describe("CFD",function(){
         var boardData = new BoardData();
         boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
         boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY-1));
-        boardData.updateStateForCardsNotOnBoard([{"id":1,"State":"Done"}])
+        boardData.updateStateForTicketsNotOnBoard([{"id":1,"State":"Done"}])
         approvals.verify(boardData.getCfdData());
     });
 
@@ -610,7 +618,7 @@ describe("CFD",function(){
         var boardData = new BoardData();
         boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
         boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY-1));
-        boardData.updateStateForCardsNotOnBoard([{"id":1,"State":"ToDo"}])
+        boardData.updateStateForTicketsNotOnBoard([{"id":1,"State":"ToDo"}])
         approvals.verify(boardData.getCfdData());
     });
 

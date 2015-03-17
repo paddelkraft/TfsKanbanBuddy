@@ -2,7 +2,7 @@
 
 function getApiSnapshots (){
 	console.log("get api snapshots");
-	apiUtil().getApiSnapshots();
+	ApiUtil().getApiSnapshots();
 	setTimeout(getApiSnapshots,300000);
 }
 

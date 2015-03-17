@@ -12,6 +12,7 @@ function BoardData(data){
     }
     
     self.ver="0.5.0";
+    self.updated=null;
     self.board = (data.board)?data.board:null;
     self.boardUrl = (data.boardUrl) ? data.boardUrl : null;
     self.storageKey = "snapshots_" + self.boardUrl;
@@ -87,9 +88,11 @@ function BoardData(data){
             self.doneState = snapshot.doneState;
         }
 
+        self.updated = timeUtil.dateFormat(snapshot.milliseconds);
+
     };
 
-    self.updateStateForCardsNotOnBoard = function(tickets){
+    self.updateStateForTicketsNotOnBoard = function(tickets){
         _.forEach(tickets, function(ticket){
             if(_.indexOf(self.doneState,ticket.State)!==-1)
                 self.flowData[ticket.id].state = "done";
@@ -661,6 +664,9 @@ function FlowTicket(flowItemData, genericItemUrl){
     self.isBlocked = (flowItemData.isBlocked)? flowItemData.isBlocked : false;
     self.blockedRecords = (flowItemData.blockedRecords)?flowItemData.blockedRecords:[];
     self.inLane = (flowItemData.inLane)? flowItemData.inLane : null;
+    if(flowItemData.state){
+        self.state = flowItemData.state;
+    }
     //internal util functions
     //readable versions fo firstSeen and lastSeen is attached to object
     function addEnterAndExitFunctions(item){

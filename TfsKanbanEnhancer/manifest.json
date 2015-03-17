@@ -71,7 +71,11 @@
                         "http://*/*/*/_backlogs/board*",
                         "https://*/*/*/_backlogs/board*"
                        ],
-            "js": ["utils_js/util.js","utils_js/jquery-2.1.1.min.js","content_scripts/snapshot.js"]
+            "js": ["/utils_js/lodash.js",
+                   "utils_js/util.js",
+                   "utils_js/jquery-2.1.1.min.js",
+                   "content_scripts/snapshot.js"
+                  ]
         },
         {
             "matches": ["http://*/*/*", "https://*/*/*"],

@@ -1,7 +1,7 @@
 //apisnapshot.js
 
 
-function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl){
+function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl,$jq){
 	var self = this;
 	self.apiUrl = apiUrl;
 	self.boardUrl = boardUrl;
@@ -9,8 +9,11 @@ function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl){
 	self.projectUrl = projectUrl;
 	self.snapshot = null;
 	self.status = 0;
-	self.get = function(callback){
-		$.get(apiUrl,callback);
+	if(!$jq){
+        $jq = $;
+    }
+    self.get = function(callback){
+		$jq.get(apiUrl,callback);
 	};
 
 	function callback(data,status){

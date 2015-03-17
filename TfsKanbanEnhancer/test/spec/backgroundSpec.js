@@ -1,4 +1,4 @@
-function createLocalStorageMock(){
+function LocalStorageMock(){
     var mock = {
                 "data":{},
                 "log":[]
@@ -19,6 +19,7 @@ function createLocalStorageMock(){
 
     mock.getItem = function(key){
         log("getItem",key,jsonDecode(mock.data[key]));
+        console.log("Data retrieved = " + mock.data[key]);
         return mock.data[key];
     };
 
@@ -55,7 +56,7 @@ describe("messageHandling",function(){
     }
 
     beforeEach(function(){
-        mockedLocalStorage = createLocalStorageMock();
+        mockedLocalStorage = new LocalStorageMock();
         storageUtil = new StorageUtil(mockedLocalStorage);
         buddyDB = new BuddyDB(storageUtil);
         responseLog =[];
@@ -84,12 +85,20 @@ describe("messageHandling",function(){
 
     });
 
-    approveIt("save-snapshot get-flow-data", function(approvals){
+    approveIt("get-flow-data", function(approvals){
+        var boardData = boardDataWith1Snapdhot();
+        boardData.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items";
+        mockedLocalStorage.data["snapshots_"+ boardData.boardUrl] = jsonEncode(boardData);
+        messageHandler(buddyDB,{"type":"get-flow-data","board":boardData.boardUrl},{},responseCallback)
+        approvals.verify(buildApprovalObject());
+
+    });
+
+    approveIt("save-snapshot", function(approvals){
         var request ={"type":"save-snapshot" };
         request.snapshot = simpleSnapshot(1000000,[createSnapshotTicket(1,"test")]);
-        request.snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
+        request.snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items";
         messageHandler(buddyDB,request,{},responseCallback)
-        messageHandler(buddyDB,{"type":"get-flow-data","board":"http://boardurl.com/_backlogs/board/Backlog%20items"},{},responseCallback)
         approvals.verify(buildApprovalObject());
 
     });
@@ -99,6 +108,9 @@ describe("messageHandling",function(){
         request.snapshot = simpleSnapshot(1000000,[createSnapshotTicket(1,"test"),createSnapshotTicket(16,"test")]);
         request.snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
         messageHandler(buddyDB,request,{},responseCallback)
+        request.snapshot = simpleSnapshot(2000000,[createSnapshotTicket(1,"test"),createSnapshotTicket(16,"test")]);
+        request.snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
+
         messageHandler(buddyDB,{"type":"get-flow-data","board":"http://boardurl.com/_backlogs/board/Backlog%20items"},{},responseCallback)
         approvals.verify(buildApprovalObject());
 

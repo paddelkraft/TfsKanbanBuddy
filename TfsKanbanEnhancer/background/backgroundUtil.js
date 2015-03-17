@@ -1,8 +1,3 @@
-/**
- * Created by siven on 28/02/15.
- *
- */
-
 var GET_KANBAN_BOARD_COLOR_MAPPING = "get-color-map";
 var GET_TASK_BOARD_COLOR_MAPPING = "get-task-color-map";
 var SET_KANBAN_BOARD_COLOR_MAPPING = "set-color-map";
@@ -13,6 +8,8 @@ var SET_KANBAN_BOARD_DESCRIPTION_MAPPING = "set-description-map";
 var SET_TASK_BOARD_DESCRIPTION_MAPPING = "set-task-description-map";
 
 function messageHandler (_buddyDB,request, sender, sendResponse) {
+    "use strict";
+    var apiUtil = new ApiUtil(_buddyDB);
     var data,settings,key;
     console.log ("Incoming request type = " + request.type);
     switch(request.type) {
@@ -105,19 +102,15 @@ function messageHandler (_buddyDB,request, sender, sendResponse) {
             break;
 
         case "save-snapshot"://Incoming data from kanban board
-            _buddyDB.saveSnapshot(request.snapshot);
-            apiUtil().registerBoard(request.snapshot);
+            //_buddyDB.saveSnapshot(request.snapshot);
+            apiUtil.getApiSnapshot(apiUtil.registerBoard(request.snapshot));
             sendResponse("Saved");
             break;
 
         case "set-board-data"://Incoming data from kanban board
-
-        function setBoardData(boardData){
-            _buddyDB.setBoardData(boardData);
+            _buddyDB.setBoardData(request.boardData);
             console.log("Imported Boarddata saved with key " +snapshot.boardUrl);
             //console.log(getStringFromStorage(key));
-        }
-            setBoardData(request.boardData);
             break;
 
         case "open-data-page"://board triggering flowData page opening
@@ -175,6 +168,7 @@ function messageHandler (_buddyDB,request, sender, sendResponse) {
 }
 
 function BuddyDB(_storage){
+    "use strict";
     var self = {};
     if(!_storage){
         _storage = new StorageUtil(localStorage);
@@ -251,12 +245,12 @@ function BuddyDB(_storage){
     };
 
     self.getBoardData = function(boardUrl){
-        return _storage.getObjectFromStorage("snapshots_"+boardUrl);
+        return new BoardData(_storage.getObjectFromStorage("snapshots_"+boardUrl));
     };
 
-    self.setBoardData= function (key,boardData){
-        _storage.saveObjectToStorage("snapshots_"+key, boardData);
-        console.log("boardData updated key = " + key);
+    self.setBoardData= function (boardUrl,boardData){
+        _storage.saveObjectToStorage("snapshots_"+boardUrl, boardData);
+        console.log("boardData updated key = " + boardUrl);
     };
 
     self.removeItem = function (key){
@@ -294,8 +288,8 @@ function BuddyDB(_storage){
     self.saveSnapshot = function(snapshot){
         var boardData;
         var data = null;
-        var boardUrl = apiUtil().getBoardUrl(snapshot.boardUrl,snapshot.board , snapshot.cardCategory);
-        var registeredUrl = apiUtil().getRegisteredBoardUrl(snapshot.board,snapshot.cardCategory);
+        var boardUrl = ApiUtil(self).getBoardUrl(snapshot.boardUrl,snapshot.board , snapshot.cardCategory);
+        var registeredUrl = ApiUtil(self).getRegisteredBoardUrl(snapshot.board,snapshot.cardCategory);
         var ticketsNotOnBoard;
         var apiWorkItems;
         console.log("Snapshot to save = "+jsonEncode(snapshot));
@@ -328,24 +322,24 @@ function BuddyDB(_storage){
         boardData.addSnapshot(snapshot);
         ticketsNotOnBoard = boardData.getTicketsMissingOnBoard()
         if(ticketsNotOnBoard.length !== 0){
-            apiWorkItems = new ApiWorkItem(apiUtil().createBoardRecord(snapshot).getWorkItemApiUrl(ticketsNotOnBoard,"System.State"));
+            apiWorkItems = new ApiWorkItem(ApiUtil(self).createBoardRecord(snapshot).getWorkItemApiUrl(ticketsNotOnBoard,["System.State"]));
             apiWorkItems.then(function(tickets){
-                boardData.updateStateForCardsNotOnBoard(tickets);
+                boardData.updateStateForTicketsNotOnBoard(tickets);
             });
         }
         //console.log(boardData.genericItemUrl);
         self.setBoardData(boardUrl, boardData);
     };
 
-    return self;
-}
+    self.getTicketsMissingOnBoard = function(boardUrl){
+        return self.getBoardData(boardUrl).getTicketsMissingOnBoard();
+    };
 
-function ApiStorage(_storage){
-    var self = {};
-    if(!_storage){
-        _storage = new StorageUtil();
-    }
-
+    self.updateStateForTicketsNotOnBoard = function(boardUrl,tickets){
+        var boardData = self.getBoardData(boardUrl);
+        boardData.updateStateForTicketsNotOnBoard(tickets);
+        self.setBoardData(boardUrl,boardData);
+    };
 
     self.getRegisteredBoards = function(){
         var registeredBoards = {};
@@ -355,25 +349,8 @@ function ApiStorage(_storage){
         });
 
         console.log("registered boards read from local storage");
-        //Remove
-        registeredBoards = self.removeOldRegistrys(registeredBoards);
 
         return registeredBoards;
-    };
-
-
-    //Remove 0.6
-    self.removeOldRegistrys = function(registeredBoards){
-        var apiUrl;
-        var registry;
-        var newRegistry = {};
-        for(apiUrl in registeredBoards){
-            registry = registeredBoards[apiUrl];
-            if(registry.boardUrl && registry.boardUrl.indexOf("_backlogs/board")!== -1){
-                newRegistry[apiUrl] = registry;
-            }
-        }
-        return newRegistry;
     };
 
     self.setRegisteredBoards = function(registeredBoards){
@@ -384,10 +361,13 @@ function ApiStorage(_storage){
     return self;
 }
 
-function apiUtil(_storage){
+
+
+function ApiUtil(_buddyDB){
+    "use strict";
     var self = {};
-    if(!_storage){
-        _storage = ApiStorage();
+    if(!_buddyDB){
+        _buddyDB = new BuddyDB();
     }
 
 
@@ -411,17 +391,18 @@ function apiUtil(_storage){
     };
 
     self.registerBoard = function(snapshot){
-        var registeredBoards  = removeUrlsWithEncodedDash(_storage.getRegisteredBoards()); //storage.getRegisteredBoards();
+        var registeredBoards  = removeUrlsWithEncodedDash(_buddyDB.getRegisteredBoards()); //storage.getRegisteredBoards();
         var boardRecord = self.createBoardRecord(snapshot);
         registeredBoards[boardRecord.getBoardApiUrl()] = boardRecord;
         console.log("Register board " + boardRecord.boardUrl);
 
-        _storage.setRegisteredBoards(registeredBoards);
+        _buddyDB.setRegisteredBoards(registeredBoards);
 
+        return boardRecord;
     };
 
     self.getBoardUrl = function(boardUrl,projectUrl,cardCategory){
-        var registeredBoards  = _storage.getRegisteredBoards();
+        var registeredBoards  = _buddyDB.getRegisteredBoards();
         var url = boardUrl;
         _.forEach(registeredBoards,function(board){
 
@@ -446,7 +427,7 @@ function apiUtil(_storage){
     };
 
     self.getRegisteredBoardUrl = function(projectUrl,cardCategory){
-        var registeredBoards  = _storage.getRegisteredBoards();
+        var registeredBoards  = _buddyDB.getRegisteredBoards();
         var boardUrl = null;
         var apiUrl = self.getApiUrl(projectUrl,cardCategory);
         if(registeredBoards[apiUrl]){
@@ -458,18 +439,27 @@ function apiUtil(_storage){
 
     self.getApiSnapshot = function(boardRecord){
         var api;
-        console.log("Fetch snapshot from api "+boardRecord.apiUrl );
-        api = new ApiSnapshot(boardRecord.apiUrl,boardRecord.boardUrl,boardRecord.genericItemUrl,boardRecord.projectUrl);
+        var missingTickets;
+        console.log("Fetch snapshot from api "+boardRecord.getBoardApiUrl() );
+        api = new ApiSnapshot(boardRecord.getBoardApiUrl(),boardRecord.boardUrl,boardRecord.getGenericItemUrl(),boardRecord.getProjectUrl(),$);
 
         api.getSnapshot( function(snapshot){
+            var apiWorkItem;
             console.log ("apiSnapshot built");
             buddyDB.saveSnapshot(snapshot);
+            missingTickets = buddyDB.getTicketsMissingOnBoard(boardRecord.boardUrl);
+            if(missingTickets.length!==0){
+                apiWorkItem = new ApiWorkItem(boardRecord.getWorkItemApiUrl(missingTickets,["System.State"]),$);
+                apiWorkItem.then(function(tickets){
+                    buddyDB.updateStateForTicketsNotOnBoard(boardRecord.boardUrl,tickets);
+                });
+            }
 
         });
     };
 
     self.getApiSnapshots = function (){
-        _.forEach (_storage.getRegisteredBoards(),function(boardRecord){
+        _.forEach (_buddyDB.getRegisteredBoards(),function(boardRecord){
             self.getApiSnapshot(boardRecord);
         });
     };

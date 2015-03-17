@@ -28,6 +28,12 @@
         return ticketObject;
     }
 
+    function getBoardId(){
+        var url = $(".cumulative-flow-chart").find("img").attr("src");
+        var boardId = _.last(url.split("/_api")[0].split("/"));
+        return boardId;
+    }
+
     function appendLiToUlByClass(matchClass, li) {
         var elems = document.getElementsByTagName('ul'), i;
         for (i in elems) {
@@ -58,7 +64,8 @@
     
 
     function getGenericItemUrl(){
-        return  boardUrl().split(getProjectName())[0] + projectName + "/_workitems#_a=edit&id=";
+        var projectName =getProjectName();
+        return  boardUrl().split(projectName)[0] + projectName + "/_workitems#_a=edit&id=";
     }
 
     function getProjectName(){
@@ -68,6 +75,8 @@
         }else {
             projectName =$("span[title~='Project']").text();
         }
+
+        return projectName;
     }
     function takeSnapshot(giveFeedback){
         var message = {};
@@ -134,8 +143,9 @@
         var url =getProjectUrl();
         snapshot.board=url;
         snapshot.boardUrl = decodeUrlKeepEncodedSpaces( document.URL);
-        snapshot.projectName = getProject(Name);
+        snapshot.projectName = getProjectName();
         snapshot.genericItemUrl = getGenericItemUrl();
+        snapshot.boardId = getBoardId();
         var headerContainer = document.getElementsByClassName("header-container")[0];
         var headers = headerContainer.getElementsByClassName("member-header-content");
         var columnContainer = document.getElementsByClassName("content-container")[0];

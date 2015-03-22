@@ -84,7 +84,7 @@ describe("http.get apiSnapshot", function (){
 	var boardUrl = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/";
 	var apiSnapshot;
 	beforeEach(function(done){
-		var api = new ApiSnapshot(apiUrl,boardUrl,"genericItemUrl","https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection");
+		var api = new ApiSnapshot($,timeUtil,apiUrl,boardUrl,"genericItemUrl","https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection");
 		api.getSnapshot( function(snapshot){
 			console.log ("apiSnapshot = " + snapshot);
 			apiSnapshot = snapshot;

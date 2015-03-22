@@ -7,9 +7,8 @@ var GET_TASK_BOARD_DESCRIPTION_MAPPING = "get-task-description-map";
 var SET_KANBAN_BOARD_DESCRIPTION_MAPPING = "set-description-map";
 var SET_TASK_BOARD_DESCRIPTION_MAPPING = "set-task-description-map";
 
-function messageHandler (_buddyDB,request, sender, sendResponse) {
+function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse) {
     "use strict";
-    var apiUtil = new ApiUtil(_buddyDB);
     var data,settings,key;
     console.log ("Incoming request type = " + request.type);
     switch(request.type) {
@@ -103,7 +102,7 @@ function messageHandler (_buddyDB,request, sender, sendResponse) {
 
         case "save-snapshot"://Incoming data from kanban board
             //_buddyDB.saveSnapshot(request.snapshot);
-            apiUtil.getApiSnapshot(apiUtil.registerBoard(request.snapshot));
+            getApiSnapshot(_buddyDB.registerBoard(request.snapshot));
             sendResponse("Saved");
             break;
 
@@ -119,7 +118,7 @@ function messageHandler (_buddyDB,request, sender, sendResponse) {
                 var url = decodeUrlKeepEncodedSpaces(request.board);
                 console.log("flowdata for"  + request.board + " requested");
                 if(endsWith(request.board,"board")|| endsWith(request.board,"board/")){
-                    url = apiUtil().getRegisteredBoardUrl(request.board,"Microsoft.RequirementCategory");
+                    url = _buddyDB.getRegisteredBoardUrl(request.board,"Microsoft.RequirementCategory");
                 }
 
 
@@ -138,7 +137,7 @@ function messageHandler (_buddyDB,request, sender, sendResponse) {
             var url = request.board;
             console.log("flowdata for"  + request.board + " requested");
             if(endsWith(request.board,"board")|| endsWith(request.board,"board/")){
-                url = apiUtil().getRegisteredBoardUrl(request.board,"Microsoft.RequirementCategory");
+                url = _buddyDB.getRegisteredBoardUrl(request.board,"Microsoft.RequirementCategory");
             }
             if(request.page){
                 page = request.page;
@@ -167,14 +166,9 @@ function messageHandler (_buddyDB,request, sender, sendResponse) {
     return true;
 }
 
-function BuddyDB(_storage){
+function BuddyDB(_storage,apiUtil,tfsApi){
     "use strict";
     var self = {};
-    if(!_storage){
-        _storage = new StorageUtil(localStorage);
-    }
-
-
 
     self.largestBoardDataStore = function (boardUrl1,boardUrl2){
         var data1 = _storage.getStringFromStorage("snapshots_"+boardUrl1);
@@ -288,8 +282,8 @@ function BuddyDB(_storage){
     self.saveSnapshot = function(snapshot){
         var boardData;
         var data = null;
-        var boardUrl = ApiUtil(self).getBoardUrl(snapshot.boardUrl,snapshot.board , snapshot.cardCategory);
-        var registeredUrl = ApiUtil(self).getRegisteredBoardUrl(snapshot.board,snapshot.cardCategory);
+        var boardUrl = self.getBoardUrl(snapshot.boardUrl,snapshot.board , snapshot.cardCategory);
+        var registeredUrl = self.getRegisteredBoardUrl(snapshot.board,snapshot.cardCategory);
         var ticketsNotOnBoard;
         var apiWorkItems;
         console.log("Snapshot to save = "+jsonEncode(snapshot));
@@ -322,7 +316,7 @@ function BuddyDB(_storage){
         boardData.addSnapshot(snapshot);
         ticketsNotOnBoard = boardData.getTicketsMissingOnBoard()
         if(ticketsNotOnBoard.length !== 0){
-            apiWorkItems = new ApiWorkItem(ApiUtil(self).createBoardRecord(snapshot).getWorkItemApiUrl(ticketsNotOnBoard,["System.State"]));
+            apiWorkItems = tfsApi.workItem(self.createBoardRecord(snapshot).getWorkItemApiUrl(ticketsNotOnBoard,["System.State"]));
             apiWorkItems.then(function(tickets){
                 boardData.updateStateForTicketsNotOnBoard(tickets);
             });
@@ -353,56 +347,30 @@ function BuddyDB(_storage){
         return registeredBoards;
     };
 
-    self.setRegisteredBoards = function(registeredBoards){
-        _storage.saveObjectToStorage("registered-boards", registeredBoards) ;
-        console.log("registeredBoards saved to local storage " );
-    };
-
-    return self;
-}
-
-
-
-function ApiUtil(_buddyDB){
-    "use strict";
-    var self = {};
-    if(!_buddyDB){
-        _buddyDB = new BuddyDB();
-    }
-
-
-    //remove 0.6.0
-    function removeUrlsWithEncodedDash(registeredBoards){
-        var cleanedRegistry = {};
-        _.forEach(registeredBoards,function (board){
-            if(!(board.boardUrl.indexOf("E2%80%93")>-1)){
-                cleanedRegistry[board.apiUrl] = board;
-            }
-        });
-
-        return cleanedRegistry;
-    }
-
-    self.createBoardRecord = function (snapshot){
-        var boardRecord ;
-        snapshot.boardUrl = self.getBoardUrl(snapshot.boardUrl,snapshot.board,snapshot.cardCategory);
-        boardRecord = new BoardRecord(snapshot);
-        return boardRecord;
-    };
-
     self.registerBoard = function(snapshot){
-        var registeredBoards  = removeUrlsWithEncodedDash(_buddyDB.getRegisteredBoards()); //storage.getRegisteredBoards();
+        var registeredBoards  = apiUtil.removeUrlsWithEncodedDash(self.getRegisteredBoards()); //storage.getRegisteredBoards();
         var boardRecord = self.createBoardRecord(snapshot);
         registeredBoards[boardRecord.getBoardApiUrl()] = boardRecord;
         console.log("Register board " + boardRecord.boardUrl);
 
-        _buddyDB.setRegisteredBoards(registeredBoards);
+        self.setRegisteredBoards(registeredBoards);
 
         return boardRecord;
     };
 
+    self.getRegisteredBoardUrl = function(projectUrl,cardCategory){
+        var registeredBoards  = self.getRegisteredBoards();
+        var boardUrl = null;
+        var apiUrl = apiUtil.getApiUrl(projectUrl,cardCategory);
+        if(registeredBoards[apiUrl]){
+            boardUrl = registeredBoards[apiUrl].boardUrl;
+        }
+
+        return boardUrl;
+    };
+
     self.getBoardUrl = function(boardUrl,projectUrl,cardCategory){
-        var registeredBoards  = _buddyDB.getRegisteredBoards();
+        var registeredBoards  = self.getRegisteredBoards();
         var url = boardUrl;
         _.forEach(registeredBoards,function(board){
 
@@ -417,6 +385,73 @@ function ApiUtil(_buddyDB){
         return url;
     };
 
+    self.createBoardRecord = function (snapshot){
+        var boardRecord ;
+        snapshot.boardUrl = self.getBoardUrl(snapshot.boardUrl,snapshot.board,snapshot.cardCategory);
+        boardRecord = new BoardRecord(snapshot);
+        return boardRecord;
+    };
+
+    self.setRegisteredBoards = function(registeredBoards){
+        _storage.saveObjectToStorage("registered-boards", registeredBoards) ;
+        console.log("registeredBoards saved to local storage " );
+    };
+
+    return self;
+}
+
+function apiInvocation(){
+    var self = {};
+    self.getApiSnapshot = function (buddyDB,tfsApi,boardRecord){
+        var api;
+        var missingTickets;
+        console.log("Fetch snapshot from api "+boardRecord.getBoardApiUrl() );
+        api = tfsApi.snapshot(boardRecord.getBoardApiUrl(),boardRecord.boardUrl,boardRecord.getGenericItemUrl(),boardRecord.getProjectUrl());
+
+        api.getSnapshot( function(snapshot){
+            var apiWorkItem;
+            console.log ("apiSnapshot built");
+            buddyDB.saveSnapshot(snapshot);
+            missingTickets = buddyDB.getTicketsMissingOnBoard(boardRecord.boardUrl);
+            if(missingTickets.length!==0){
+                apiWorkItem = tfsApi.workItem(boardRecord.getWorkItemApiUrl(missingTickets,["System.State"]));
+                apiWorkItem.then(function(tickets){
+                    buddyDB.updateStateForTicketsNotOnBoard(boardRecord.boardUrl,tickets);
+                });
+            }
+
+        });
+    };
+
+    self.getApiSnapshots = function  (_buddyDB,getApiSnapshot){
+        _.forEach (_buddyDB.getRegisteredBoards(),function(boardRecord){
+            getApiSnapshot(boardRecord);
+        });
+    };
+
+    return self;
+}
+
+
+
+
+
+function ApiUtil(){
+    "use strict";
+    var self = {};
+
+    //remove 0.6.0
+    self.removeUrlsWithEncodedDash = function(registeredBoards){
+        var cleanedRegistry = {};
+        _.forEach(registeredBoards,function (board){
+            if(!(board.boardUrl.indexOf("E2%80%93")>-1)){
+                cleanedRegistry[board.apiUrl] = board;
+            }
+        });
+
+        return cleanedRegistry;
+    };
+
     self.getApiUrl = function(boardUrl, cardCategory){
         var projName = boardUrl.split("/_backlogs")[0];
         if(!cardCategory){
@@ -426,57 +461,17 @@ function ApiUtil(_buddyDB){
 
     };
 
-    self.getRegisteredBoardUrl = function(projectUrl,cardCategory){
-        var registeredBoards  = _buddyDB.getRegisteredBoards();
-        var boardUrl = null;
-        var apiUrl = self.getApiUrl(projectUrl,cardCategory);
-        if(registeredBoards[apiUrl]){
-            boardUrl = registeredBoards[apiUrl].boardUrl;
-        }
-
-        return boardUrl;
-    };
-
-    self.getApiSnapshot = function(boardRecord){
-        var api;
-        var missingTickets;
-        console.log("Fetch snapshot from api "+boardRecord.getBoardApiUrl() );
-        api = new ApiSnapshot(boardRecord.getBoardApiUrl(),boardRecord.boardUrl,boardRecord.getGenericItemUrl(),boardRecord.getProjectUrl(),$);
-
-        api.getSnapshot( function(snapshot){
-            var apiWorkItem;
-            console.log ("apiSnapshot built");
-            buddyDB.saveSnapshot(snapshot);
-            missingTickets = buddyDB.getTicketsMissingOnBoard(boardRecord.boardUrl);
-            if(missingTickets.length!==0){
-                apiWorkItem = new ApiWorkItem(boardRecord.getWorkItemApiUrl(missingTickets,["System.State"]),$);
-                apiWorkItem.then(function(tickets){
-                    buddyDB.updateStateForTicketsNotOnBoard(boardRecord.boardUrl,tickets);
-                });
-            }
-
-        });
-    };
-
-    self.getApiSnapshots = function (){
-        _.forEach (_buddyDB.getRegisteredBoards(),function(boardRecord){
-            self.getApiSnapshot(boardRecord);
-        });
-    };
-
-
     return self;
-
 }
 
 
-function autoImport(timeout){
+function autoImport(buddyDB,$jq,timeout){
     console.log("Auto import");
     var data = buddyDB.getImportUrl();
     console.log(jsonEncode(data));
     if( data && data.url && data.automaticImport){
         console.log("fetch settings from URL " + data.url);
-        $.get(data.url,function(content){
+        $jq.get(data.url,function(content){
             chrome.runtime.sendMessage({type : "set-settings", "settings" : jsonDecode(content) });
         });
     }
@@ -487,9 +482,7 @@ function autoImport(timeout){
 
 function StorageUtil(storage){
     var self = {};
-    if (!storage){
-        storage = localStorage;
-    }
+
     self.localStorage = storage;
     self.saveObjectToStorage = function(key, toSave){
         var content = jsonEncode(toSave);
@@ -517,7 +510,6 @@ function StorageUtil(storage){
     return self;
 }
 
-var storageUtil = new StorageUtil();
 
 function BoardRecord(imput){
     var self = {};
@@ -575,6 +567,47 @@ function BoardRecord(imput){
 
     return self;
 
+}
+
+function BackgroundFactory(localStorage, jQuery, timeUtil){
+    var self = {};
+    self.tfsApi = new TfsApi(timeUtil,jQuery);
+
+    self.storageUtil = function(){
+        return new StorageUtil(localStorage);
+    };
+
+    self.apiUtil= function(){
+        return ApiUtil ()
+    };
+
+    self.buddyDB = function (){
+        return new BuddyDB(self.storageUtil(), self.apiUtil(),self.tfsApi);
+    };
+
+    self.messageHandler = function(){
+        return _.curry( messageHandler)(self.buddyDB(),self.getApiSnapshot);
+    };
+
+    self.autoImport = function(timeout){
+        autoImport(self.buddyDB(),jQuery,timeout);
+    };
+
+    self.getApiSnapshot = function (boardRecord){
+        apiInvocation().getApiSnapshot(self.buddyDB(),self.tfsApi,boardRecord)
+    };
+
+    self.getApiSnapshots = function (){
+        return function (){
+            apiInvocation().getApiSnapshots(self.buddyDB(),self.getApiSnapshot);
+        }
+    };
+
+
+
+
+
+    return self;
 }
 
 

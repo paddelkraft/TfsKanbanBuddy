@@ -1,7 +1,7 @@
 //apisnapshot.js
 
 
-function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl,$jq){
+function ApiSnapshot($jq, _timeUtil, apiUrl,boardUrl,genericItemUrl, projectUrl){
 	var self = this;
 	self.apiUrl = apiUrl;
 	self.boardUrl = boardUrl;
@@ -9,9 +9,7 @@ function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl,$jq){
 	self.projectUrl = projectUrl;
 	self.snapshot = null;
 	self.status = 0;
-	if(!$jq){
-        $jq = $;
-    }
+
     self.get = function(callback){
 		$jq.get(apiUrl,callback);
 	};
@@ -30,7 +28,7 @@ function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl,$jq){
 			var lanes = self.getLanes(apiResponse);
 			var tickets = self.getTickets(apiResponse);
 			var snapshot = {};
-			snapshot.milliseconds = new Date().getTime();
+			snapshot.milliseconds = _timeUtil.now().getTime();
 			snapshot.boardUrl = boardUrl;
 			snapshot.board = projectUrl; 
 			snapshot.genericItemUrl = self.genericItemUrl;
@@ -106,12 +104,10 @@ function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl,$jq){
 	return self;
 }
 
-function ApiWorkItem(apiUrl,$jq){
+function ApiWorkItem($jq,apiUrl){
     var self = {};
     self.status = 0;
-    if(!$jq){
-        $jq =$;
-    }
+
 
     self.get = function(callback){
         $jq.get(apiUrl,callback);
@@ -155,6 +151,16 @@ function ApiWorkItem(apiUrl,$jq){
 
 }
 
+function TfsApi(timeUtil,jQuery){
+    var self = {};
+    self.jQuery = jQuery;
+    self.timeUtil = timeUtil;
+
+    self.workItem = _.curry( ApiWorkItem)(self.jQuery);
+
+    self.snapshot = _.curry(ApiSnapshot)(self.jQuery,self.timeUtil);
+    return self;
+}
 
 
 

@@ -1,3 +1,5 @@
+var boardApiResponcePlain = {"boardSettings":{"id":"70127d15-57d5-4a7e-866b-e5a1cd9002ce","extensionId":"288bdc8a-0f49-4c93-8197-f14cdc35302d","revision":1,"teamId":"41af1a67-a729-4771-9da0-c12964cdb46e","categoryReferenceName":"Microsoft.FeatureCategory","columns":[{"id":"8f1ab1d1-4d12-4311-80a6-e97823630341","name":"New","order":0,"columnType":0,"itemLimit":0,"stateMappings":{"Feature":"New"},"isDeleted":false,"isSplit":false,"description":null},{"id":"ce29f831-854d-41d6-bf07-689f4d893df4","name":"In Progress","order":1,"columnType":1,"itemLimit":5,"stateMappings":{"Feature":"In Progress"},"isDeleted":false,"isSplit":false,"description":null},{"id":"e8f7454e-fee2-4870-b7c2-630656dd23c7","name":"Done","order":2,"columnType":2,"itemLimit":0,"stateMappings":{"Feature":"Done"},"isDeleted":false,"isSplit":false,"description":null}],"isValid":true,"allowedMappings":{"0":{"Feature":["New"]},"1":{"Feature":["In Progress","New"]},"2":{"Feature":["Done"]}},"canEdit":true,"isSplitColumnFeatureEnabled":true,"isColumnDescriptionFeatureEnabled":true},"board":{"node":{"fieldName":"WEF_288BDC8A0F494C938197F14CDC35302D_Kanban.Column","layoutStyle":"horizontal","members":[{"title":"New","values":["New"],"canCreateNewItems":true,"layoutOptions":{"cssClass":"proposed"},"itemOrdering":{"id":"ProposedInProgressItemComparer","data":{"fields":{"orderField":"Microsoft.VSTS.Common.BacklogPriority"}}},"metadata":{"boardColumnType":"Incoming"},"handlesNull":false},{"title":"In Progress","values":["In Progress"],"canCreateNewItems":false,"layoutOptions":{"cssClass":"inprogress"},"itemOrdering":{"id":"ProposedInProgressItemComparer","data":{"fields":{"orderField":"Microsoft.VSTS.Common.BacklogPriority"}}},"limits":{"limit":5},"metadata":{"boardColumnType":"InProgress"},"handlesNull":false},{"title":"Done","values":["Done"],"canCreateNewItems":false,"layoutOptions":{"cssClass":"complete"},"itemOrdering":{"id":"CompletedItemComparer","data":{"fields":{"closedDateField":"Microsoft.VSTS.Common.ClosedDate"}}},"metadata":{"boardColumnType":"Outgoing"},"handlesNull":false}]},"fields":{"Activity":"Microsoft.VSTS.Common.Activity","Order":"Microsoft.VSTS.Common.BacklogPriority","ApplicationLaunchInstructions":"Microsoft.VSTS.Feedback.ApplicationLaunchInstructions","ApplicationStartInformation":"Microsoft.VSTS.Feedback.ApplicationStartInformation","ApplicationType":"Microsoft.VSTS.Feedback.ApplicationType","Effort":"Microsoft.VSTS.Scheduling.Effort","RemainingWork":"Microsoft.VSTS.Scheduling.RemainingWork","Team":"System.AreaPath"},"membership":{"id":"TeamMembership"}},"itemSource":{"type":"wit","transitions":{"Feature":{"New":["Done","In Progress"],"In Progress":["New","Done"],"Done":["New","In Progress"]}},"payload":{"columns":["System.Id","System.State","System.IterationPath","System.AssignedTo","System.Title","System.WorkItemType","System.ChangedDate","Microsoft.VSTS.Common.ClosedDate","System.AreaPath","Microsoft.VSTS.Scheduling.Effort","Microsoft.VSTS.Common.BacklogPriority","WEF_288BDC8A0F494C938197F14CDC35302D_Kanban.Column","WEF_288BDC8A0F494C938197F14CDC35302D_System.ExtensionMarker","WEF_288BDC8A0F494C938197F14CDC35302D_Kanban.Column.Done"],"rows":[[28,"In Progress","tfsDataCollection",null,"test2","Feature","\/Date(1426578531230)\/",null,"tfsDataCollection",null,1999955279,"In Progress",true,false],[25,"New","tfsDataCollection",null,"Test","Feature","\/Date(1425324618450)\/",null,"tfsDataCollection",null,null,"New",true,false]],"hierarchy":{}},"limitReached":false,"workItemTypes":["Feature"]}};
+
 function LocalStorageMock(){
     var mock = {
                 "data":{},
@@ -13,7 +15,7 @@ function LocalStorageMock(){
     }
 
     mock.setItem = function(key,content){
-        log("setItem",key,content);
+        log("setItem",key,jsonDecode(content));
         mock.data[key]=content;
     };
 
@@ -30,11 +32,19 @@ function LocalStorageMock(){
 
 describe("messageHandling",function(){
 
+    function JqMock(response){
+        return {"get":function(apiUrl,callback){
+            console.log("jqMock.get("+apiUrl+")");
+            callback(response,
+                "success");
+        }};
+    }
 
     var mockedLocalStorage;
     var storageUtil;
     var buddyDB;
     var responseLog;
+    var getApiSnapshot;
 
     function responseCallback(response){
         responseLog.push(response);
@@ -44,6 +54,9 @@ describe("messageHandling",function(){
         if(mockedLocalStorage.data["settings-updated"]){
             mockedLocalStorage.data["settings-updated"] = "2015-01-30 23:01"
         }
+        _forEachIndex(mockedLocalStorage.data,function(entry,key){
+            mockedLocalStorage.data[key] = jsonDecode(entry);
+        });
         _.forEach(mockedLocalStorage.log, function (entry){
             if(entry.key === "settings-updated"){
                 entry.content = "2015-01-30 23:01";
@@ -58,8 +71,10 @@ describe("messageHandling",function(){
     beforeEach(function(){
         mockedLocalStorage = new LocalStorageMock();
         storageUtil = new StorageUtil(mockedLocalStorage);
-        buddyDB = new BuddyDB(storageUtil);
+        buddyDB = new BuddyDB(storageUtil,ApiUtil(),TfsApi(TimeUtil(),JqMock("Empty response")));
         responseLog =[];
+        getApiSnapshot = _.curry(apiInvocation().getApiSnapshot)(buddyDB,JqMock({}));
+
     });
 
     approveIt("get-set-settings", function(approvals){
@@ -70,17 +85,18 @@ describe("messageHandling",function(){
         request.settings.kanbanBoardDescriptionMap = _storageDescriptionMap;
         request.settings.taskBoardColorMap = _storageColorMap;
         request.settings.taskBoardDescriptionMap = _storageDescriptionMap;
-        messageHandler(buddyDB,request,{},responseCallback)
-        messageHandler(buddyDB,{"type":"get-settings"},{},responseCallback)
+        messageHandler(buddyDB, getApiSnapshot,request,{},responseCallback)
+        messageHandler(buddyDB, getApiSnapshot,{"type":"get-settings"},{},responseCallback)
         approvals.verify(buildApprovalObject());
 
     });
 
     approveIt("get-set-settings empty", function(approvals){
         var request ={"type":"set-settings" };
+
         request.settings ={};
-        messageHandler(buddyDB,request,{},responseCallback)
-        messageHandler(buddyDB,{"type":"get-settings"},{},responseCallback)
+        messageHandler(buddyDB, getApiSnapshot,request,{},responseCallback)
+        messageHandler(buddyDB, getApiSnapshot,{"type":"get-settings"},{},responseCallback)
         approvals.verify(buildApprovalObject());
 
     });
@@ -89,30 +105,38 @@ describe("messageHandling",function(){
         var boardData = boardDataWith1Snapdhot();
         boardData.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items";
         mockedLocalStorage.data["snapshots_"+ boardData.boardUrl] = jsonEncode(boardData);
-        messageHandler(buddyDB,{"type":"get-flow-data","board":boardData.boardUrl},{},responseCallback)
+        messageHandler(buddyDB, getApiSnapshot,{"type":"get-flow-data","board":boardData.boardUrl},{},responseCallback)
         approvals.verify(buildApprovalObject());
 
     });
 
     approveIt("save-snapshot", function(approvals){
         var request ={"type":"save-snapshot" };
+        var timeUtil = new TimeUtil();
+        var tfsApi = TfsApi(timeUtil,JqMock(boardApiResponcePlain));
+        timeUtil.now = function(){return new Date(1000000);};
+        buddyDB = new BuddyDB(storageUtil,ApiUtil(),tfsApi);
         request.snapshot = simpleSnapshot(1000000,[createSnapshotTicket(1,"test")]);
         request.snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items";
-        messageHandler(buddyDB,request,{},responseCallback)
+        getApiSnapshot = _.curry(apiInvocation().getApiSnapshot)(buddyDB,tfsApi);
+        messageHandler(buddyDB, getApiSnapshot,request,{},responseCallback)
         approvals.verify(buildApprovalObject());
 
     });
 
-    approveIt("(background messageHandling)save-snapshot with removed ticket", function(approvals){
-        var request ={"type":"save-snapshot" };
-        request.snapshot = simpleSnapshot(1000000,[createSnapshotTicket(1,"test"),createSnapshotTicket(16,"test")]);
-        request.snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
-        messageHandler(buddyDB,request,{},responseCallback)
-        request.snapshot = simpleSnapshot(2000000,[createSnapshotTicket(1,"test"),createSnapshotTicket(16,"test")]);
-        request.snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
+    approveIt("(background BuddyDB)save-snapshot with removed ticket", function(approvals){
+        var snapshot = simpleSnapshot(1000000,[createSnapshotTicket(1,"test"),createSnapshotTicket(16,"test")]);
+        snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
+        var timeUtil = new TimeUtil();
+        var tfsApi = TfsApi(timeUtil,JqMock({"count":1,"value":[{"id":16,"rev":6,"fields":{"System.State":"Removed"},"url":"https://paddelkraft.visualstudio.com/DefaultCollection/_apis/wit/workItems/16"}]}));
+        timeUtil.now = function(){return new Date(1000000);};
+        buddyDB = new BuddyDB(storageUtil,ApiUtil(),tfsApi);
 
-        messageHandler(buddyDB,{"type":"get-flow-data","board":"http://boardurl.com/_backlogs/board/Backlog%20items"},{},responseCallback)
-        approvals.verify(buildApprovalObject());
+        buddyDB.saveSnapshot(snapshot);
+        snapshot = simpleSnapshot(2000000,[createSnapshotTicket(1,"test")]);
+        snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
+        buddyDB.saveSnapshot(snapshot);
+        approvals.verify(jsonDecode(mockedLocalStorage.data["snapshots_http://boardurl.com/_backlogs/board/Backlog%20items"]).flowData["16"]);
 
     });
 });

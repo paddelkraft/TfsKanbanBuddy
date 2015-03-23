@@ -10,7 +10,7 @@ backgroundFactory.autoImport(3600000);
 function getApiSnapshots (apiSnapshots){
     console.log("get api snapshots");
     apiSnapshots();
-    setTimeout(apiSnapshots,300000);
+    setTimeout(function(){getApiSnapshots(apiSnapshots)},300000);
 }
 
 getApiSnapshots(backgroundFactory.getApiSnapshots());

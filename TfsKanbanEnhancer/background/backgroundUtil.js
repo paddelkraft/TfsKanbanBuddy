@@ -54,15 +54,15 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
             sendResponse("Settings saved");
             break;
 
-        case "save-snapshot"://Incoming data from kanban board
+        case "trigger-snapshot"://Incoming data from kanban board
             //_buddyDB.saveSnapshot(request.snapshot);
             getApiSnapshot(_buddyDB.registerBoard(request.snapshot));
-            sendResponse("Saved");
+            sendResponse("Snapshot triggered");
             break;
 
         case "set-board-data"://Incoming data from kanban board
             _buddyDB.setBoardData(request.boardData);
-            console.log("Imported Boarddata saved with key " +snapshot.boardUrl);
+            console.log("Imported BoardData saved with key " +snapshot.boardUrl);
             //console.log(getStringFromStorage(key));
             break;
 
@@ -465,22 +465,22 @@ function StorageUtil(storage){
 }
 
 
-function BoardRecord(imput){
+function BoardRecord(input){
     "use strict";
     var self = {};
     self.type = "BoardRecord";
-    if(imput.cardCategory){
-        self.cardCategory = imput.cardCategory;
+    if(input.cardCategory){
+        self.cardCategory = input.cardCategory;
 
     }
 
-    self.boardUrl = imput.boardUrl;
+    self.boardUrl = input.boardUrl;
 
-    if(imput.genericItemUrl){
-        var projectUrl = imput.genericItemUrl.replace("/_workitems#_a=edit&id=","");
+    if(input.genericItemUrl){
+        var projectUrl = input.genericItemUrl.replace("/_workitems#_a=edit&id=","");
         self.projectName = _.last(projectUrl.split("/"))
     }else{
-        self.projectName = imput.projectName;
+        self.projectName = input.projectName;
     }
 
     self.getProjectUrl = function (){

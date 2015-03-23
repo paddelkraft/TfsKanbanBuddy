@@ -40,14 +40,6 @@
     function boardUrl(){
         return decodeUrlKeepEncodedSpaces(document.URL);
     }
-   
-    
-    function getProjectUrl(){
-        return boardUrl().split("/_backlogs/")[0];
-    }
-
-
-    
 
     function getGenericItemUrl(){
         var projectName =getProjectName();
@@ -66,7 +58,7 @@
     }
     function takeSnapshot(giveFeedback){
         var message = {};
-        message.type = "save-snapshot";
+        message.type = "trigger-snapshot";
         message.snapshot = getBoardSnapshot();
         console.log("Snapshot = "+jsonEncode(message.snapshot));
         chrome.runtime.sendMessage(message, function(response){
@@ -113,11 +105,7 @@
 
     function getBoardSnapshot(){
         var snapshot = {};
-        var i;
-        //snapshot.time = timestamp();
         snapshot.milliseconds = new Date().getTime();
-        var url =getProjectUrl();
-        snapshot.board=url;
         snapshot.boardUrl = decodeUrlKeepEncodedSpaces( document.URL);
         snapshot.projectName = getProjectName();
         snapshot.genericItemUrl = getGenericItemUrl();

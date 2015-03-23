@@ -2,7 +2,7 @@
 
 
 function ApiSnapshot($jq, _timeUtil, apiUrl,boardUrl,genericItemUrl, projectUrl){
-	var self = this;
+	var self = {};
 	self.apiUrl = apiUrl;
 	self.boardUrl = boardUrl;
 	self.genericItemUrl= genericItemUrl;

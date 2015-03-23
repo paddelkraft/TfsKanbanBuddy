@@ -13,20 +13,6 @@
         takeSnapshot(false);
     }
 
-    function createTicketObject(element){
-        var isBlocked = (element.getAttribute("class").indexOf("blocked")> -1);
-        var ticketObject = {
-            id : element.getAttribute("data-item-id"),
-            //$itemElm.find(".title").text()
-            title : element.getElementsByClassName("title")[0].textContent,
-            
-        };
-        if(isBlocked){
-          ticketObject.blocked = isBlocked;
-        }
-        
-        return ticketObject;
-    }
 
     function getBoardId(){
         var url = $(".cumulative-flow-chart").find("img").attr("src");
@@ -100,16 +86,6 @@
         });
     }
 
-    function openPage(page){
-         var message = {};
-        message.type = "show-flow-data";
-        message.page = page;
-        message.board = boardUrl();
-        message.boardUrl =
-        chrome.runtime.sendMessage(message, function(response){
-            log(response);
-        });
-    }
 
     function openDataPage(page){
         var message = {};
@@ -146,51 +122,13 @@
         snapshot.projectName = getProjectName();
         snapshot.genericItemUrl = getGenericItemUrl();
         snapshot.boardId = getBoardId();
-        var headerContainer = document.getElementsByClassName("header-container")[0];
-        var headers = headerContainer.getElementsByClassName("member-header-content");
-        var columnContainer = document.getElementsByClassName("content-container")[0];
-        var columns = columnContainer.getElementsByClassName("member-content");
-        snapshot.lanes = [];
-        for (i in headers) {
-            if(headers[i].textContent !== undefined){
-                var lane ={};
-                snapshot.lanes.push(lane);
-                lane.name =  headers[i].getAttribute("title");
-                lane.wip = {};
-                lane.wip.limit = 0;
-                lane.wip.limit =  0;
-                if(headers[i].getElementsByClassName("current")[0]){
-                    
-                    var current = headers[i].getElementsByClassName("current")[0].textContent;
-                    lane.wip.current = (current==="")?0:parseInt(current);
 
-                }
-                if(headers[i].getElementsByClassName("limit")[0])
-                {
-                    var limit = headers[i].getElementsByClassName("limit")[0].textContent.replace("/","");
-                    lane.wip.limit = (limit==="")?0:parseInt(limit) ;
-                }
-                var tickets = columns[i].getElementsByClassName("board-tile");
-                lane.tickets = [];
-                var j;
-                for (j in tickets){
-                    var ticket={};
-                    if (tickets[j].textContent !== undefined){
-                        lane.tickets.push(createTicketObject(tickets[j]));
-                        
-                    }
-                }
-                
-            }
-
-        }
         snapshot.cardCategory = getCardCategory();
         return snapshot;
     }
 
     addProductBacklogViewTabsLink("flow data", "#","showFlowData", showFlowData);
     addProductBacklogViewTabsLink("CFD", "#","cfd", function(){openDataPage("cfd")});
-    var genericItemUrl = getGenericItemUrl();
     onloadSnapshot();
 
 })();

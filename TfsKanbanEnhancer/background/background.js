@@ -3,6 +3,7 @@
 
 var backgroundFactory = BackgroundFactory(localStorage, $,TimeUtil());
 
+
 chrome.extension.onMessage.addListener(backgroundFactory.messageHandler());
 backgroundFactory.autoImport(3600000);
 

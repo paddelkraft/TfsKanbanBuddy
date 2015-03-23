@@ -12,52 +12,6 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
     var data,settings,key;
     console.log ("Incoming request type = " + request.type);
     switch(request.type) {
-        case SET_KANBAN_BOARD_COLOR_MAPPING://Color mapping for kanban board
-            _buddyDB.setKanbanBoardColorMap(request.colorMap);
-            sendResponse("Saved " );
-            break;
-        case GET_KANBAN_BOARD_COLOR_MAPPING:
-            sendResponse(_buddyDB.getKanbanBoardColorMap());
-            console.log("color-map sent " + jsonEncode(_buddyDB.getKanbanBoardColorMap()));
-            break;
-
-        case SET_TASK_BOARD_COLOR_MAPPING://Color mapping for Task (scrum board)
-            _buddyDB.setTaskBoardColorMap(request.colorMap);
-            sendResponse("Saved " );
-            break;
-        case GET_TASK_BOARD_COLOR_MAPPING:
-            sendResponse(getTaskBoardColorMap());
-            console.log("task-color-map sent " + jsonEncode(_buddyDB.getTaskBoardColorMap()));
-            break;
-
-        case SET_KANBAN_BOARD_DESCRIPTION_MAPPING://Color mapping for kanban board
-            _buddyDB.setKanbanBoardDescriptionMap(request.descriptionMap);
-            sendResponse("Saved " );
-            break;
-        case GET_KANBAN_BOARD_DESCRIPTION_MAPPING:
-            sendResponse(getKanbanBoardDescriptionMap());
-            console.log("description-map sent " + jsonEncode(_buddyDB.getKanbanBoardDescriptionMap()));
-            break;
-
-        case SET_TASK_BOARD_DESCRIPTION_MAPPING://Color mapping for Task (scrum board)
-            _buddyDB.setTaskBoardDescriptionMap(request.descriptionMap);
-            sendResponse("Saved " );
-            break;
-        case GET_TASK_BOARD_DESCRIPTION_MAPPING:
-            sendResponse(getTaskBoardDescriptionMap());
-            console.log("description-color-map sent " + jsonEncode(_buddyDB.getTaskBoardDescriptionMap()));
-            break;
-
-        case "set-links"://Project links
-            _buddyDB.setBoardLinks(request.links);
-            sendResponse("Saved " );
-            break;
-        case "get-links":
-            var boardLinks = _buddyDB.getBoardLinks();
-            sendResponse(boardLinks);
-            console.log("links sent " + jsonEncode(boardLinks));
-            break;
-
         case "set-import-url"://Settings Import Url
             data = request.importData;
 
@@ -512,6 +466,7 @@ function StorageUtil(storage){
 
 
 function BoardRecord(imput){
+    "use strict";
     var self = {};
     self.type = "BoardRecord";
     if(imput.cardCategory){
@@ -570,6 +525,7 @@ function BoardRecord(imput){
 }
 
 function BackgroundFactory(localStorage, jQuery, timeUtil){
+    "use strict";
     var self = {};
     self.tfsApi = new TfsApi(timeUtil,jQuery);
 

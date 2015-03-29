@@ -13,16 +13,6 @@ function updateBoard(settings) {
         "relations" : true,
         "wip"       : true
     };
- 
-    var taskBoard   = {
-        "type"      : "taskBoard",
-        "tileClass" : "tbTileContent",
-        "removeClass" :"witTitle",
-        "update"    : true,
-        "relations" : false,
-        "wip"       : false
-    };
- 
     var customCardSize = ".largeCard {width: 150px !important;height: 95px !important;}";
  
     var customStylePale =
@@ -89,7 +79,10 @@ function updateBoard(settings) {
         
         var $tiles = getTiles(board);
         console.log($tiles.length + " tiles on board");
-        setTileColors($tiles,colorMap);
+        var standardColors = getStandardColors($tiles);
+        var standardCardClasses = generateStandardCardClasses(standardColors);
+        setStandardCardGlobalStyle(standardCardClasses);
+        setTileColors($tiles,colorMap,standardColors);
         highlightDates($tiles);
         //console.log("tile colors set");
         if (board.relations){
@@ -245,27 +238,62 @@ function removeColumnColor(){
  
  
  
-    function setTileColor($itemElm,colorMap){
-        var itemClassification = "";
+    function setTileColor($itemElm,colorMap,standardColors){
+        var itemClassification;
         var tileData = $itemElm.find(".title").text().split(" ");
+        var style = $itemElm.attr("style")
+        var styleIndex = _.indexOf(standardColors,style);
         itemClassification = tileData[0];
         // set woorktype
-        if(colorMap[itemClassification]!="undefined"){
+        var color = colorMap[itemClassification];
+        if(typeof colorMap[itemClassification]!=="undefined"){
             setClass($itemElm,colorMap[itemClassification]);
         } else{
-            setClass($itemElm, "standard");
+
+            setClass($itemElm, "std"+styleIndex);
         }
     }
+
+    function getStandardColors($tiles){
+        var styles = {};
+        _.forEach($tiles,function($tile){
+            var style = $($tile).attr("style");
+            styles[style] = style;
+        });
+        var standardColors = [];
+        _.forEach(styles,function(style){
+           standardColors.push(style);
+        });
+        return standardColors;
+    }
+
+    function generateStandardCardClasses(standardColors){
+        var styles = {};
+        var index = 0
+        _.forEach(standardColors,function(color){
+            styles["std"+index] = ".board-tile.std"+index+".pale {background-color: transparent; border-color: #ddd; color: #ddd}"+
+            ".board-tile.std"+index + "{"+color+"}";
+            index++;
+        });
+        return styles;
+    }
+
+    function setStandardCardGlobalStyle(styles){
+        var stdStyles ="";
+        _.forEach(styles,function(style){
+           stdStyles += style;
+        });
+        addGlobalStyle(stdStyles);
+    }
  
-    function setTileColors($tiles, colorMap){
+    function setTileColors($tiles, colorMap, standardColors){
         $tiles.each(function () {
             var $itemElm = $(this);
-            setTileColor($itemElm,colorMap);
+            setTileColor($itemElm,colorMap,standardColors);
         });
     }
 
     function highlightDate($itemElm,colorMap){
-        var itemClassification = "";
         var tileData = $itemElm.html();
         var date = tileData.match(/\d{4}-\d{2}-\d{2}/);
         var color = "white";
@@ -304,7 +332,7 @@ function removeColumnColor(){
     }
  
     function setRelationAttribute($itemElm){
-        var caseId = "";// Set relation
+        var caseId;// Set relation
         var tileData = $itemElm.text().split(" ");
         caseId = getRelationId(tileData);
         $itemElm.attr('data-case-id', caseId);
@@ -503,12 +531,7 @@ function removeColumnColor(){
     }
  
     function getBoardType(){
-        var board = taskBoard;
-        if(isKanbanBoard()){
-            board = kanbanBoard;
-        }
-        console.log("Board data " + jsonEncode(board) );
-        return board;
+        return kanbanBoard;
     }
  
     function getTiles(board){

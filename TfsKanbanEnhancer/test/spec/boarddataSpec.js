@@ -314,7 +314,7 @@ describe("BoardData", function() {
     it("ticket should be done",function(){
         boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
         boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY));
-        boardData.updateStateForTicketsNotOnBoard([{"id":1,"State":"Done"}])
+        boardData.updateStateForTicketsNotOnBoard([{"id":1,"state":"Done"}])
         boardData.updateDoneTickets();
         expect(boardData.flowData[1].inLane).toBe("In production");
         expect(boardData.flowData[1].state).toBe("done");
@@ -324,7 +324,7 @@ describe("BoardData", function() {
         var flowData = new FlowData();
         boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
         boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY));
-        boardData.updateStateForTicketsNotOnBoard([{"id":1,"State":"ToDo"}])
+        boardData.updateStateForTicketsNotOnBoard([{"id":1,"state":"ToDo"}])
         boardData.updateDoneTickets();
         expect(boardData.flowData[1].state).toBe("removed");
     });
@@ -610,7 +610,7 @@ describe("CFD",function(){
         var boardData = new BoardData();
         boardData.addSnapshot(simpleSnapshot(0,[createSnapshotTicket("1","TestTicket")]));
         boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY-1));
-        boardData.updateStateForTicketsNotOnBoard([{"id":1,"State":"Done"}])
+        boardData.updateStateForTicketsNotOnBoard([{"id":1,"state":"Done"}])
         approvals.verify(boardData.getCfdData());
     });
 

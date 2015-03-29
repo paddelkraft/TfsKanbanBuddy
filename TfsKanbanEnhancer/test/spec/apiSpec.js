@@ -2,14 +2,9 @@
 
 
 describe("TFS Board API ", function() {
-	var snapshot ={};
-    snapshot.board = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection";
-    snapshot.boardUrl = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/Backlog%20items";
-    snapshot.genericItemUrl = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=";
-    snapshot.cardCategory = "Custom";
+	var snapshot;
 
-    var snapshotWithShortUrl = _.cloneDeep(snapshot);
-    snapshotWithShortUrl.boardUrl = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/";
+    var snapshotWithShortUrl ;
 
     var boardRegistryWithShortBoardUrl={
     	"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Custom":{
@@ -36,6 +31,13 @@ describe("TFS Board API ", function() {
 
     beforeEach(function(){
         _mockedLocalStorage = new LocalStorageMock();
+        snapshot = {};
+        snapshot.board = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection";
+        snapshot.boardUrl = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/Backlog%20items";
+        snapshot.genericItemUrl = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=";
+        snapshot.cardCategory = "Custom";
+        snapshotWithShortUrl = _.cloneDeep(snapshot);
+        snapshotWithShortUrl.boardUrl = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/";
     })
 		
   
@@ -49,9 +51,19 @@ describe("TFS Board API ", function() {
 		var boardRecord = BuddyDB(StorageUtil(_mockedLocalStorage), ApiUtil()).createBoardRecord(snapshot);
         boardRecord.boardApiUrl = boardRecord.getBoardApiUrl();
         boardRecord.genericItemUrl=boardRecord.getGenericItemUrl();
-        boardRecord.workItemApiUrl = boardRecord.getWorkItemApiUrl([1,2],["System.field"]);
+        boardRecord.workItemApiUrl = boardRecord.getWorkItemApiRequest([1,2],["System.field"]);
         approvals.verify( boardRecord);
 	});
+
+    approveIt("should createA new boardRecord post", function(approvals) {
+        var boardRecord;
+        snapshot.__RequestVerificationToken = "request_token";
+        boardRecord = BuddyDB(StorageUtil(_mockedLocalStorage), ApiUtil()).createBoardRecord(snapshot);
+        boardRecord.boardApiUrl = boardRecord.getBoardApiUrl();
+        boardRecord.genericItemUrl=boardRecord.getGenericItemUrl();
+        boardRecord.workItemApiUrl = boardRecord.getWorkItemApiRequest([1,2],["System.field"]);
+        approvals.verify( boardRecord);
+    });
 
 	approveIt("should register board",function(approvals){
         var boardRegistry;
@@ -67,6 +79,21 @@ describe("TFS Board API ", function() {
 		expect(setRegisteredBoards).toHaveBeenCalled();
 		approvals.verify(boardRegistry); //('{"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=3":{"boardUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/","apiUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=3","genericItemUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id="}}');
 	});
+
+    approveIt("should register board post",function(approvals){
+        var boardRegistry;
+        var storageMock = BuddyDB(StorageUtil(_mockedLocalStorage),ApiUtil());
+        var setRegisteredBoards = spyOn(storageMock,"setRegisteredBoards").and.callFake(function(input){
+            boardRegistry = input;
+        });
+
+        var getRegisteredBoards = spyOn(storageMock,"getRegisteredBoards").and.returnValue({});
+        snapshot.__RequestVerificationToken = "request_token";
+        storageMock.registerBoard(snapshot);
+        expect(getRegisteredBoards).toHaveBeenCalled();
+        expect(setRegisteredBoards).toHaveBeenCalled();
+        approvals.verify(boardRegistry); //('{"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=3":{"boardUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/","apiUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=3","genericItemUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id="}}');
+    });
 
 	it("board should  updateBoardUrl",function(){
 		var storageMock = BuddyDB(StorageUtil(_mockedLocalStorage),ApiUtil());
@@ -142,23 +169,44 @@ describe("TFS workitem api",function(){
 
 
     function JqMock(){
-        return {"get":function(apiUrl,callback){
-            callback({"count":1,"value":[{"id":16,"rev":6,"fields":{"System.State":"Removed"},"url":"https://paddelkraft.visualstudio.com/DefaultCollection/_apis/wit/workItems/16"}]},
-                "success");
-        }};
+        return {
+            "get": function (apiUrl, callback) {
+                callback({
+                        "count": 1,
+                        "value": [{
+                            "id": 16,
+                            "rev": 6,
+                            "fields": {"System.State": "Removed"},
+                            "url": "https://paddelkraft.visualstudio.com/DefaultCollection/_apis/wit/workItems/16"
+                        }]
+                    },
+                    "success");
+            }, "post": function (apiUrl, content, callback) {
+                callback({"columns": ["System.Id", "System.State"], "rows": [[16, "Removed"]]},
+                    "success");
+            }
+        }
     }
 
 
-    approveIt("should get workitem with state from api", function(approvals){
-        //https://paddelkraft.visualstudio.com/defaultcollection/_apis/wit/workitems?api-version=1.0&ids=16&fields=System.state
-        //_apis/wit/workitems?api-version=1.0&ids=16&fields=System.state;
+    approveIt("should get workitem with state from post api", function(approvals){
         var jqMock = JqMock();
-        var apiWorkItem = new ApiWorkItem(jqMock,"https://paddelkraft.visualstudio.com/defaultcollection/_apis/wit/workitems?api-version=1.0&ids=16&fields=System.state");
+        var apiWorkItem = new ApiWorkItem(jqMock,{"type":"post",
+                "url":"https://paddelkraft.visualstudio.com/defaultcollection/_api/wit/workitems",
+                "content":{"__RequestVerificationToken":"token", workItemIds: "1,2",
+                    fields: "System.Id,System.State"}});
         apiWorkItem.then(function(tickets){
             approvals.verify(tickets);
         });
     });
 
+    approveIt("should get workitem with state from api", function(approvals){
+        var jqMock = JqMock();
+        var apiWorkItem = new ApiWorkItem(jqMock,{"type":"get", "url":"https://paddelkraft.visualstudio.com/defaultcollection/_apis/wit/workitems?api-version=1.0&ids=16&fields=System.state"});
+        apiWorkItem.then(function(tickets){
+            approvals.verify(tickets);
+        });
+    });
 
 
 

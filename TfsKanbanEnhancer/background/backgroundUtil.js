@@ -270,7 +270,7 @@ function BuddyDB(_storage,apiUtil,tfsApi){
         boardData.addSnapshot(snapshot);
         ticketsNotOnBoard = boardData.getTicketsMissingOnBoard()
         if(ticketsNotOnBoard.length !== 0){
-            apiWorkItems = tfsApi.workItem(self.createBoardRecord(snapshot).getWorkItemApiUrl(ticketsNotOnBoard,["System.State"]));
+            apiWorkItems = tfsApi.workItem(self.createBoardRecord(snapshot).getWorkItemApiRequest(ticketsNotOnBoard,["System.State"]));
             apiWorkItems.then(function(tickets){
                 boardData.updateStateForTicketsNotOnBoard(tickets);
             });
@@ -368,8 +368,10 @@ function apiInvocation(){
             buddyDB.saveSnapshot(snapshot);
             missingTickets = buddyDB.getTicketsMissingOnBoard(boardRecord.boardUrl);
             if(missingTickets.length!==0){
-                apiWorkItem = tfsApi.workItem(boardRecord.getWorkItemApiUrl(missingTickets,["System.State"]));
+                console.log("Fetch missing ticket info from api " + missingTickets );
+                apiWorkItem = tfsApi.workItem(boardRecord.getWorkItemApiRequest(missingTickets,["System.State"]));
                 apiWorkItem.then(function(tickets){
+                    console.log("Update tickets missing on board "+ jsonEncode(tickets))
                     buddyDB.updateStateForTicketsNotOnBoard(boardRecord.boardUrl,tickets);
                 });
             }
@@ -475,6 +477,9 @@ function BoardRecord(input){
     }
 
     self.boardUrl = input.boardUrl;
+    if(input.__RequestVerificationToken){
+        self.__RequestVerificationToken =input.__RequestVerificationToken;
+    }
 
     if(input.genericItemUrl){
         var projectUrl = input.genericItemUrl.replace("/_workitems#_a=edit&id=","");
@@ -515,9 +520,23 @@ function BoardRecord(input){
         return self.getProjectUrl() + "/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName="+self.cardCategory;
     };
 
-    self.getWorkItemApiUrl = function (ids,fields){
-        return self.getCollectionUrl() + "/_apis/wit/workitems?api-version=1.0&ids="+
-        arrayToCommaSeparatedString(ids)+"&fields="+arrayToCommaSeparatedString(fields);
+    self.getWorkItemApiRequest = function (ids,fields){
+        var request = {};
+        if(!self.__RequestVerificationToken){
+            request.type = "get"
+            request.url= self.getCollectionUrl() + "/_apis/wit/workitems?api-version=1.0&ids="+
+                arrayToCommaSeparatedString(ids)+"&fields="+arrayToCommaSeparatedString(fields);
+        }else{
+            request.type = "post";
+            request.url = self.getCollectionUrl()+"/_api/_wit/pageWorkItems";
+            request.content = {}
+            request.content.workItemIds = arrayToCommaSeparatedString(ids);
+            request.content.fields = "System.Id,"+arrayToCommaSeparatedString(fields);
+            request.content.__RequestVerificationToken = self.__RequestVerificationToken;
+            console.log ("missing WorkitemRequest = " +jsonEncode(request))
+        }
+        return request;
+
     };
 
     return self;

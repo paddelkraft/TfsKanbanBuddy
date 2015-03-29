@@ -20,6 +20,12 @@
         return boardId;
     }
 
+    function getRequestVerificationToken(){
+        try{
+           return $('[name=__RequestVerificationToken]').val();
+        }catch (err){}
+    };
+
     function appendLiToUlByClass(matchClass, li) {
         var elems = document.getElementsByTagName('ul'), i;
         for (i in elems) {
@@ -105,13 +111,17 @@
 
     function getBoardSnapshot(){
         var snapshot = {};
+        var token;
         snapshot.milliseconds = new Date().getTime();
         snapshot.boardUrl = decodeUrlKeepEncodedSpaces( document.URL);
         snapshot.projectName = getProjectName();
         snapshot.genericItemUrl = getGenericItemUrl();
         snapshot.boardId = getBoardId();
-
         snapshot.cardCategory = getCardCategory();
+        token = getRequestVerificationToken();
+        if (token){
+            snapshot.__RequestVerificationToken = token;
+        }
         return snapshot;
     }
 

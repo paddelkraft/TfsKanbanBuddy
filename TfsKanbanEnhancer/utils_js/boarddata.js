@@ -33,7 +33,7 @@ function BoardData(data){
         _.last(self.snapshotRecords).lastSeen=milliseconds;
     }
 
-    //generates new snapshot record when the board state has changed sinse last snapshot
+    //generates new snapshot record when the board state has changed since last snapshot
     function newSnapshotRecord(milliseconds){
         self.snapshotRecords.push({"firstSeen":milliseconds,"lastSeen":milliseconds});
     }
@@ -94,7 +94,7 @@ function BoardData(data){
 
     self.updateStateForTicketsNotOnBoard = function(tickets){
         _.forEach(tickets, function(ticket){
-            if(_.indexOf(self.doneState,ticket.State)!==-1)
+            if(_.indexOf(self.doneState,ticket.state)!==-1)
                 self.flowData[ticket.id].state = "done";
             else{
                 self.flowData[ticket.id].state = "removed";

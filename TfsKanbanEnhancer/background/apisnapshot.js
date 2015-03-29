@@ -104,19 +104,35 @@ function ApiSnapshot($jq, _timeUtil, apiUrl,boardUrl,genericItemUrl, projectUrl)
 	return self;
 }
 
-function ApiWorkItem($jq,apiUrl){
+function ApiWorkItem($jq,request){
     var self = {};
     self.status = 0;
-
+    console.log("ApiWorkItem: " +jsonEncode(request));
 
     self.get = function(callback){
-        $jq.get(apiUrl,callback);
+        $jq.get(request.apiUrl,callback);
     };
 
-    function callback(data,status){
+    self.post = function(callback){
+
+        $jq.post(request.url,request.content,callback);
+    }
+
+    function callbackGet(data,status){
 
         if (status === "success"){
-            self.tickets = self.buildTickets(data);
+            self.tickets = self.buildTicketsGet(data);
+        }
+        self.status = status;
+        if(self.whenDone){
+            self.whenDone(self.tickets);
+        }
+    }
+
+    function callbackPost(data,status){
+
+        if (status === "success"){
+            self.tickets = self.buildTicketsPost(data);
         }
         self.status = status;
         if(self.whenDone){
@@ -132,13 +148,17 @@ function ApiWorkItem($jq,apiUrl){
         }
     };
 
-    self.buildTickets = function (apiData){
+    function systemField(fieldName){
+        return fieldName.replace("System.","").toLowerCase();
+    }
+
+    self.buildTicketsGet = function (apiData){
         var tickets = [];
         _.forEach(apiData["value"], function(apiTicket){
             var ticket = {};
             ticket.id = apiTicket.id;
             _forEachIndex(apiTicket.fields,function(fieldValue,index){
-                ticket[index.replace("System.","")]= fieldValue;
+                ticket[systemField(index)]= fieldValue;
             });
             tickets.push(ticket);
         });
@@ -146,7 +166,27 @@ function ApiWorkItem($jq,apiUrl){
         return tickets;
     };
 
-    self.get(callback);
+    self.buildTicketsPost =function(apiData){
+        var columns = apiData.columns;
+        var rows = apiData.rows;
+        var tickets = [];
+        _.forEach(rows,function(row){
+            var ticket = {};
+            _forEachIndex(columns,function(column,index){
+                ticket[systemField(column)] = row[index];
+            });
+            tickets.push(ticket);
+        });
+        return tickets;
+    };
+
+    if(request.type === "get"){
+        self.get(callbackGet);
+    }else{
+        self.post(callbackPost);
+    }
+
+
     return self;
 
 }

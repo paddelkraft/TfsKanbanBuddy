@@ -34,10 +34,13 @@ describe("messageHandling",function(){
 
     function JqMock(response){
         return {"get":function(apiUrl,callback){
-            console.log("jqMock.get("+apiUrl+")");
-            callback(response,
-                "success");
-        }};
+                console.log("jqMock.get("+apiUrl+")");
+                callback(response, "success");
+            },"post":function(url,content,callback){
+                console.log("jqMock.get("+url+")");
+                callback(response, "success");
+            }
+        }
     }
 
     var mockedLocalStorage;
@@ -111,7 +114,7 @@ describe("messageHandling",function(){
     });
 
     approveIt("save-snapshot", function(approvals){
-        var request ={"type":"save-snapshot" };
+        var request ={"type":"trigger-snapshot" };
         var timeUtil = new TimeUtil();
         var tfsApi = TfsApi(timeUtil,JqMock(boardApiResponcePlain));
         timeUtil.now = function(){return new Date(1000000);};
@@ -135,6 +138,24 @@ describe("messageHandling",function(){
         buddyDB.saveSnapshot(snapshot);
         snapshot = simpleSnapshot(2000000,[createSnapshotTicket(1,"test")]);
         snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
+        buddyDB.saveSnapshot(snapshot);
+        approvals.verify(jsonDecode(mockedLocalStorage.data["snapshots_http://boardurl.com/_backlogs/board/Backlog%20items"]).flowData["16"]);
+
+    });
+
+    approveIt("(background BuddyDB)save-snapshot with removed ticket using POST api", function(approvals){
+        var snapshot = simpleSnapshot(1000000,[createSnapshotTicket(1,"test"),createSnapshotTicket(16,"test")]);
+        snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
+
+        var timeUtil = new TimeUtil();
+        var tfsApi = TfsApi(timeUtil,JqMock({"columns":["System.Id","System.State"],"rows":[[16,"Removed"]]}));
+        timeUtil.now = function(){return new Date(1000000);};
+        buddyDB = new BuddyDB(storageUtil,ApiUtil(),tfsApi);
+        snapshot.__RequestVerificationToken = "requestToken";
+        buddyDB.saveSnapshot(snapshot);
+        snapshot = simpleSnapshot(2000000,[createSnapshotTicket(1,"test")]);
+        snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
+        snapshot.__RequestVerificationToken = "requestToken";
         buddyDB.saveSnapshot(snapshot);
         approvals.verify(jsonDecode(mockedLocalStorage.data["snapshots_http://boardurl.com/_backlogs/board/Backlog%20items"]).flowData["16"]);
 

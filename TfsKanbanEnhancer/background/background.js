@@ -14,3 +14,13 @@ function getApiSnapshots (apiSnapshots){
 }
 
 getApiSnapshots(backgroundFactory.getApiSnapshots());
+
+/*$.post("https://paddelkraft.visualstudio.com/DefaultCollection/_api/_wit/pageWorkItems",
+        {"workItemIds":"31,32",
+            "fields":"System.Id,System.State",
+            "__RequestVerificationToken":"bio43hMeyEpM7RBmKxkjPMk2ESZAPdaN86fq4ZnT27vp199123bgqkEJY0X9V2uLxilAvd6EQOXwsjWjc5e2aL214agoQBjxGNjyGZsi46LMmzcBCOn9Ch2FHugDcdDRwbk9rA2"
+        },
+        function(data,status){
+            console.log(jsonEncode(data));
+        }
+    );*/

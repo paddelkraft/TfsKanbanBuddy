@@ -71,8 +71,8 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
                 var page = "spa.html";
                 var url = decodeUrlKeepEncodedSpaces(request.board);
                 console.log("flowdata for"  + request.board + " requested");
-                if(endsWith(request.board,"board")|| endsWith(request.board,"board/")){
-                    url = _buddyDB.getRegisteredBoardUrl(request.board,"Microsoft.RequirementCategory");
+                if(endsWith(request.boardUrl,"board")|| endsWith(request.boardUrl,"board/")){
+                    url = _buddyDB.getRegisteredBoardUrl(request.boardUrl,"Microsoft.RequirementCategory");
                 }
 
 
@@ -91,7 +91,7 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
             var url = request.board;
             console.log("flowdata for"  + request.board + " requested");
             if(endsWith(request.board,"board")|| endsWith(request.board,"board/")){
-                url = _buddyDB.getRegisteredBoardUrl(request.board,"Microsoft.RequirementCategory");
+                url = _buddyDB.getRegisteredBoardUrl(request.boardUrl,"Microsoft.RequirementCategory");
             }
             if(request.page){
                 page = request.page;
@@ -236,8 +236,8 @@ function BuddyDB(_storage,apiUtil,tfsApi){
     self.saveSnapshot = function(snapshot){
         var boardData;
         var data = null;
-        var boardUrl = self.getBoardUrl(snapshot.boardUrl,snapshot.board , snapshot.cardCategory);
-        var registeredUrl = self.getRegisteredBoardUrl(snapshot.board,snapshot.cardCategory);
+        var boardUrl = self.getBoardUrl(snapshot.boardUrl, snapshot.cardCategory);
+        var registeredUrl = self.getRegisteredBoardUrl(snapshot.boardUrl,snapshot.cardCategory);
         var ticketsNotOnBoard;
         var apiWorkItems;
         console.log("Snapshot to save = "+jsonEncode(snapshot));
@@ -302,7 +302,7 @@ function BuddyDB(_storage,apiUtil,tfsApi){
     };
 
     self.registerBoard = function(snapshot){
-        var registeredBoards  = apiUtil.removeUrlsWithEncodedDash(self.getRegisteredBoards()); //storage.getRegisteredBoards();
+        var registeredBoards  = self.getRegisteredBoards(); //storage.getRegisteredBoards();
         var boardRecord = self.createBoardRecord(snapshot);
         registeredBoards[boardRecord.getBoardApiUrl()] = boardRecord;
         console.log("Register board " + boardRecord.boardUrl);
@@ -312,10 +312,15 @@ function BuddyDB(_storage,apiUtil,tfsApi){
         return boardRecord;
     };
 
-    self.getRegisteredBoardUrl = function(projectUrl,cardCategory){
+    self.getRegisteredBoardUrl = function(url,cardCategory){
         var registeredBoards  = self.getRegisteredBoards();
         var boardUrl = null;
-        var apiUrl = apiUtil.getApiUrl(projectUrl,cardCategory);
+        var apiUrl;
+        if(!url){
+            throw new Error("url is undefined");
+        }
+        apiUrl = apiUtil.getApiUrl(url,cardCategory);
+
         if(registeredBoards[apiUrl]){
             boardUrl = registeredBoards[apiUrl].boardUrl;
         }
@@ -323,12 +328,13 @@ function BuddyDB(_storage,apiUtil,tfsApi){
         return boardUrl;
     };
 
-    self.getBoardUrl = function(boardUrl,projectUrl,cardCategory){
+    self.getBoardUrl = function(boardUrl,cardCategory){
         var registeredBoards  = self.getRegisteredBoards();
         var url = boardUrl;
+        var projectUrl = boardUrl.split("/_backlogs")[0];
         _.forEach(registeredBoards,function(board){
 
-            if(board.projectUrl===projectUrl && board.cardCategory === cardCategory){
+            if(board.getProjectUrl()===projectUrl && board.cardCategory === cardCategory){
                 if (boardUrl.length < board.boardUrl.length && (endsWith(boardUrl,"board") || endsWith(boardUrl,"board/"))){
                     url = board.boardUrl;
                 }
@@ -341,7 +347,7 @@ function BuddyDB(_storage,apiUtil,tfsApi){
 
     self.createBoardRecord = function (snapshot){
         var boardRecord ;
-        snapshot.boardUrl = self.getBoardUrl(snapshot.boardUrl,snapshot.board,snapshot.cardCategory);
+        snapshot.boardUrl = self.getBoardUrl(snapshot.boardUrl,snapshot.cardCategory);
         boardRecord = new BoardRecord(snapshot);
         return boardRecord;
     };
@@ -396,17 +402,17 @@ function ApiUtil(){
     "use strict";
     var self = {};
 
-    //remove 0.6.0
+    /*/remove 0.6.0
     self.removeUrlsWithEncodedDash = function(registeredBoards){
         var cleanedRegistry = {};
         _.forEach(registeredBoards,function (board){
             if(!(board.boardUrl.indexOf("E2%80%93")>-1)){
-                cleanedRegistry[board.apiUrl] = board;
+                cleanedRegistry[board.getBoardApiUrl()] = board;
             }
         });
 
         return cleanedRegistry;
-    };
+    };*/
 
     self.getApiUrl = function(boardUrl, cardCategory){
         var projName = boardUrl.split("/_backlogs")[0];

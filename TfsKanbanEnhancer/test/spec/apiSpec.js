@@ -7,23 +7,23 @@ describe("TFS Board API ", function() {
     var snapshotWithShortUrl ;
 
     var boardRegistryWithShortBoardUrl={
-    	"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Custom":{
+    	"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Custom":BoardRecord({
     		"boardUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/",
-    		"projectUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection",
-    		"apiUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Custom",
+    		//"projectUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection",
+    		//"apiUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Custom",
     		"genericItemUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=",
     		"cardCategory": "Custom"
-    	}
+    	})
     };
 
     var boardRegistryWithLongBoardUrl={
-    	"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Custom":{
+    	"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Custom":BoardRecord({
     		"boardUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/Backlog%20items",
-    		"projectUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection",
-    		"apiUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Custom",
+    		//"projectUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection",
+    		//"apiUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Custom",
     		"genericItemUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=",
     		"cardCategory": "Custom"
-    	}
+    	})
     };
 
     var _mockedLocalStorage;
@@ -32,7 +32,7 @@ describe("TFS Board API ", function() {
     beforeEach(function(){
         _mockedLocalStorage = new LocalStorageMock();
         snapshot = {};
-        snapshot.board = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection";
+        //snapshot.board = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection";
         snapshot.boardUrl = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/Backlog%20items";
         snapshot.genericItemUrl = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id=";
         snapshot.cardCategory = "Custom";
@@ -98,9 +98,11 @@ describe("TFS Board API ", function() {
 	it("board should  updateBoardUrl",function(){
 		var storageMock = BuddyDB(StorageUtil(_mockedLocalStorage),ApiUtil());
 		var setRegisteredBoards = spyOn(storageMock,"setRegisteredBoards");
-		var getRegisteredBoards = spyOn(storageMock,"getRegisteredBoards")
-			.and.returnValue({"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=3":{"boardUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/","apiUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=3","genericItemUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id="}});
-		
+		var boardRecord = new BoardRecord({"boardUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/",
+            "genericItemUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id="
+        });
+        var getRegisteredBoards = spyOn(storageMock,"getRegisteredBoards")
+			.and.returnValue({"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=3":boardRecord});
 		storageMock.registerBoard(snapshot);
 		expect(getRegisteredBoards).toHaveBeenCalled();
 		expect(setRegisteredBoards).toHaveBeenCalled();
@@ -119,7 +121,7 @@ describe("TFS Board API ", function() {
         approvals.verify(boardRegistry)
 	});
 
-	//Remove 0.6.0
+	/*/Remove 0.6.0
 	approveIt("should remove boardUrl with encoded - in storage",function(approvals){
 		 var registeredBoards ={
 		 
@@ -148,7 +150,7 @@ describe("TFS Board API ", function() {
 			.and.returnValue(registeredBoards);
 		storageMock.registerBoard(snapshot);
 		approvals.verify(boardRegistry);
-	});//end remove
+	});//end remove*/
 
 	approveIt("should use long boardUrl in storage",function(approvals){
 		var storageMock = BuddyDB(StorageUtil(_mockedLocalStorage),ApiUtil());;;

@@ -75,21 +75,12 @@
         });
     }
 
-    function showFlowData(){
-         var message = {};
-        message.type = "show-flow-data";
-        message.board = boardUrl();
-        chrome.runtime.sendMessage(message, function(response){
-            log(response);
-        });
-    }
-
 
     function openDataPage(page){
         var message = {};
         message.type = "open-data-page";
         message.page = page;
-        message.board = boardUrl();
+        message.boardUrl = boardUrl();
         chrome.runtime.sendMessage(message, function(response){
             log(response);
         });
@@ -125,7 +116,6 @@
         return snapshot;
     }
 
-    addProductBacklogViewTabsLink("flow data", "#","showFlowData", showFlowData);
     addProductBacklogViewTabsLink("CFD", "#","cfd", function(){openDataPage("cfd")});
     onloadSnapshot();
 

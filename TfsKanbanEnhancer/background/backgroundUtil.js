@@ -17,7 +17,7 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
 
             _buddyDB.setImportUrl(data);
             sendResponse ("import url Saved " );
-            console.log("import url saved to local storage " + dbBuddy.getImportUrl());
+            console.log("import url saved to local storage " + _buddyDB.getImportUrl());
             break;
         case "get-settings"://complete board config
             settings = {
@@ -69,8 +69,8 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
         case "open-data-page"://board triggering flowData page opening
             (function(){
                 var page = "spa.html";
-                var url = decodeUrlKeepEncodedSpaces(request.board);
-                console.log("flowdata for"  + request.board + " requested");
+                var url = decodeUrlKeepEncodedSpaces(request.boardUrl);
+                console.log("flowdata for"  + request.boardUrl + " requested");
                 if(endsWith(request.boardUrl,"board")|| endsWith(request.boardUrl,"board/")){
                     url = _buddyDB.getRegisteredBoardUrl(request.boardUrl,"Microsoft.RequirementCategory");
                 }
@@ -86,11 +86,11 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
             })();
 
             break;
-        case "show-flow-data"://board triggering flowData page opening
+        /*case "show-flow-data"://board triggering flowData page opening
             var page = "flowData.html";
-            var url = request.board;
-            console.log("flowdata for"  + request.board + " requested");
-            if(endsWith(request.board,"board")|| endsWith(request.board,"board/")){
+            var url = request.boardUrl;
+            console.log("flowdata for"  + request.boardUrl + " requested");
+            if(endsWith(request.boardUrl,"board")|| endsWith(request.boardUrl,"board/")){
                 url = _buddyDB.getRegisteredBoardUrl(request.boardUrl,"Microsoft.RequirementCategory");
             }
             if(request.page){
@@ -100,10 +100,10 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
             chrome.tabs.create({ url: newURL });
             sendResponse("OK");
             console.log("show-flow-data handled flowdata.html opened");
-            break;
+            break;*/
         case "get-flow-data"://flowdata page requesting data
-            console.log("get-flow-data for board "+ request.board);
-            var response = _buddyDB.getBoardData(request.board);
+            console.log("get-flow-data for board "+ request.boardUrl);
+            var response = _buddyDB.getBoardData(request.boardUrl);
             if(!response){
                 console.log("No flowdata available");
             }else{
@@ -211,7 +211,7 @@ function BuddyDB(_storage,apiUtil,tfsApi){
     };
 
     self.setImportUrl = function(url){
-        _storage.saveObjectToStorage ("import-url", data)
+        _storage.saveObjectToStorage ("import-url", url)
     };
 
     self.setSettingsUpdated = function (timestamp){

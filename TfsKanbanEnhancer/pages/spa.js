@@ -157,7 +157,7 @@ app.factory("boardDataFactory",function(){
 	var factory = {};
 	factory.getBoardData = function(board){
 		var message = {type:"get-flow-data"};
-		message.board = board;
+		message.boardUrl = board;
 		return sendExtensionMessage(message);
 	};
 	return factory;

@@ -96,7 +96,8 @@ function approveIt(description, testToRun){
 
             // Handle network errors
             req.onerror = function() {
-                reject(Error("Network Error"));
+                resolve('No approved output');
+                //reject(Error("Network Error"));
             };
 
             // Make the request

@@ -108,7 +108,7 @@ describe("messageHandling",function(){
         var boardData = boardDataWith1Snapdhot();
         boardData.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items";
         mockedLocalStorage.data["snapshots_"+ boardData.boardUrl] = jsonEncode(boardData);
-        messageHandler(buddyDB, getApiSnapshot,{"type":"get-flow-data","board":boardData.boardUrl},{},responseCallback)
+        messageHandler(buddyDB, getApiSnapshot,{"type":"get-flow-data","boardUrl":boardData.boardUrl},{},responseCallback)
         approvals.verify(buildApprovalObject());
 
     });

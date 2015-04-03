@@ -518,12 +518,16 @@ function BoardRecord(input){
         return string.substring(0, string.length - 1);
     }
 
+    self.getTeamUrl = function(){
+        return self.boardUrl.split("/_backlogs")[0];
+    };
+
     self.getBoardApiUrl = function(){
 
         if(!self.cardCategory){
-            return self.getProjectUrl() + "/_api/_backlog/GetBoard?__v=3";
+            return self.getTeamUrl() + "/_api/_backlog/GetBoard?__v=3";
         }
-        return self.getProjectUrl() + "/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName="+self.cardCategory;
+        return self.getTeamUrl() + "/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName="+self.cardCategory;
     };
 
     self.getWorkItemApiRequest = function (ids,fields){

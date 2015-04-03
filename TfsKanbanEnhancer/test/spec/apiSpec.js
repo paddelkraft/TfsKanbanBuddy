@@ -80,6 +80,23 @@ describe("TFS Board API ", function() {
 		approvals.verify(boardRegistry); //('{"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=3":{"boardUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/","apiUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_api/_backlog/GetBoard?__v=3","genericItemUrl":"https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_workitems#_a=edit&id="}}');
 	});
 
+	approveIt("should register team board",function(approvals){
+        var boardRegistry;
+		var storageMock = BuddyDB(StorageUtil(_mockedLocalStorage),ApiUtil());
+        var setRegisteredBoards = spyOn(storageMock,"setRegisteredBoards").and.callFake(function(input){
+			boardRegistry = input;
+		});
+		var getRegisteredBoards = spyOn(storageMock,"getRegisteredBoards").and.returnValue({});
+		snapshot.boardUrl = "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20–%20Dev%20Gothenburg/_backlogs/board/Acceptance%20Tests";
+		snapshot.projectName = "SEGOT-GDP";
+		snapshot.genericItemUrl = false;
+		storageMock.registerBoard(snapshot);
+		expect(getRegisteredBoards).toHaveBeenCalled();
+		expect(setRegisteredBoards).toHaveBeenCalled();
+		approvals.verify(boardRegistry); 
+	});
+
+
     approveIt("should register board post",function(approvals){
         var boardRegistry;
         var storageMock = BuddyDB(StorageUtil(_mockedLocalStorage),ApiUtil());

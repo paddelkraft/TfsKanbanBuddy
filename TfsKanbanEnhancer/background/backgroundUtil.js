@@ -268,6 +268,7 @@ function BuddyDB(_storage,apiUtil,tfsApi){
         boardData.setBlockedPrefix(self.getBlockedPrefix());
 
         boardData.addSnapshot(snapshot);
+        self.setBoardData(boardUrl, boardData);
         //this functionality should in the api call
         ticketsNotOnBoard = boardData.getTicketsMissingOnBoard()
         if(ticketsNotOnBoard.length !== 0){
@@ -277,11 +278,13 @@ function BuddyDB(_storage,apiUtil,tfsApi){
             apiWorkItems = tfsApi.workItem(self.createBoardRecord(snapshot).
                 getWorkItemApiRequest(ticketsNotOnBoard,["System.State"]));
             apiWorkItems.then(function(tickets){
+                var boardData = self.getBoardData(boardUrl);
                 boardData.updateStateForTicketsNotOnBoard(tickets);
+                self.setBoardData(boardUrl,boardData);
             });
         }//end
         //console.log(boardData.genericItemUrl);
-        self.setBoardData(boardUrl, boardData);
+
     };
 
     self.getTicketsMissingOnBoard = function(boardUrl){

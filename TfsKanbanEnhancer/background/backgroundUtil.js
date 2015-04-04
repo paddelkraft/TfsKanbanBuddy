@@ -268,17 +268,18 @@ function BuddyDB(_storage,apiUtil,tfsApi){
         boardData.setBlockedPrefix(self.getBlockedPrefix());
 
         boardData.addSnapshot(snapshot);
+        //this functionality should in the api call
         ticketsNotOnBoard = boardData.getTicketsMissingOnBoard()
         if(ticketsNotOnBoard.length !== 0){
             if(ticketsNotOnBoard.length >50){
-                ticketsNotOnBoard = _.slice(ticketsNotOnBoard,0,50);
+                ticketsNotOnBoard = ticketsNotOnBoard.slice(0,50);
             }
             apiWorkItems = tfsApi.workItem(self.createBoardRecord(snapshot).
                 getWorkItemApiRequest(ticketsNotOnBoard,["System.State"]));
             apiWorkItems.then(function(tickets){
                 boardData.updateStateForTicketsNotOnBoard(tickets);
             });
-        }
+        }//end
         //console.log(boardData.genericItemUrl);
         self.setBoardData(boardUrl, boardData);
     };
@@ -376,15 +377,19 @@ function apiInvocation(){
             var apiWorkItem;
             console.log ("apiSnapshot built");
             buddyDB.saveSnapshot(snapshot);
+            /* //TODO this code is now in save snapshot but it belongs here
             missingTickets = buddyDB.getTicketsMissingOnBoard(boardRecord.boardUrl);
             if(missingTickets.length!==0){
                 console.log("Fetch missing ticket info from api " + missingTickets );
+                if(missingTickets.length >50){
+                    missingTickets = missingTickets.slice(0,50);
+                }
                 apiWorkItem = tfsApi.workItem(boardRecord.getWorkItemApiRequest(missingTickets,["System.State"]));
                 apiWorkItem.then(function(tickets){
                     console.log("Update tickets missing on board "+ jsonEncode(tickets))
                     buddyDB.updateStateForTicketsNotOnBoard(boardRecord.boardUrl,tickets);
                 });
-            }
+            }*/
 
         });
     };
@@ -405,18 +410,6 @@ function apiInvocation(){
 function ApiUtil(){
     "use strict";
     var self = {};
-
-    /*/remove 0.6.0
-    self.removeUrlsWithEncodedDash = function(registeredBoards){
-        var cleanedRegistry = {};
-        _.forEach(registeredBoards,function (board){
-            if(!(board.boardUrl.indexOf("E2%80%93")>-1)){
-                cleanedRegistry[board.getBoardApiUrl()] = board;
-            }
-        });
-
-        return cleanedRegistry;
-    };*/
 
     self.getApiUrl = function(boardUrl, cardCategory){
         var projName = boardUrl.split("/_backlogs")[0];

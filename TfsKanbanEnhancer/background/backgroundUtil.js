@@ -270,7 +270,11 @@ function BuddyDB(_storage,apiUtil,tfsApi){
         boardData.addSnapshot(snapshot);
         ticketsNotOnBoard = boardData.getTicketsMissingOnBoard()
         if(ticketsNotOnBoard.length !== 0){
-            apiWorkItems = tfsApi.workItem(self.createBoardRecord(snapshot).getWorkItemApiRequest(ticketsNotOnBoard,["System.State"]));
+            if(ticketsNotOnBoard.length >50){
+                ticketsNotOnBoard = _.slice(ticketsNotOnBoard,0,50);
+            }
+            apiWorkItems = tfsApi.workItem(self.createBoardRecord(snapshot).
+                getWorkItemApiRequest(ticketsNotOnBoard,["System.State"]));
             apiWorkItems.then(function(tickets){
                 boardData.updateStateForTicketsNotOnBoard(tickets);
             });

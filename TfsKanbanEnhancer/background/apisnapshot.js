@@ -8,6 +8,9 @@ function ApiSnapshot($jq, _timeUtil, boardRecord){//apiUrl,boardUrl,genericItemU
 	self.boardUrl = boardRecord.boardUrl;
 	self.genericItemUrl= boardRecord.getGenericItemUrl();
 	self.projectUrl = boardRecord.getProjectUrl();
+    if(boardRecord.cardCategory){
+        self.cardCategory = boardRecord.cardCategory;
+    }
     if(boardRecord.__RequestVerificationToken){
         self.__RequestVerificationToken = boardRecord.__RequestVerificationToken;
     }
@@ -37,6 +40,9 @@ function ApiSnapshot($jq, _timeUtil, boardRecord){//apiUrl,boardUrl,genericItemU
 			snapshot.boardUrl = self.boardUrl;
 			snapshot.board = self.projectUrl;
 			snapshot.genericItemUrl = self.genericItemUrl;
+            if(self.cardCategory){
+                snapshot.cardCategory = self.cardCategory;
+            }
             if(self.__RequestVerificationToken){
                 snapshot.__RequestVerificationToken = self.__RequestVerificationToken;
             }

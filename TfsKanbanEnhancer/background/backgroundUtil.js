@@ -243,16 +243,20 @@ function BuddyDB(_storage,apiUtil,tfsApi){
         console.log("Snapshot to save = "+jsonEncode(snapshot));
         //same board can have several shorter urls we only want to save the data once
         if(registeredUrl && boardUrl!==registeredUrl){
-            if(registeredUrl === self.largestBoardDataStore(boardUrl,registeredUrl)){
+            if(registeredUrl.length < boardUrl.length && registeredUrl === self.largestBoardDataStore(boardUrl,registeredUrl)){
                 data = self.getBoardData(registeredUrl);
                 self.removeItem("snapshots_" + registeredUrl);
-                self.registerBoard(snapshot);
             }
 
+            if(registeredUrl.length > boardUrl.length){
+                boardUrl = registeredUrl;
+                snapshot.boardUrl = boardUrl;
+            }
+            //self.registerBoard(snapshot);
+
         }
-        else if(!registeredUrl ){
-            self.registerBoard(snapshot);
-        }
+
+        self.registerBoard(snapshot);
         if (data===null){
             data = self.getBoardData(boardUrl);
         }
@@ -260,7 +264,7 @@ function BuddyDB(_storage,apiUtil,tfsApi){
         if(snapshot.boardUrl && snapshot.boardUrl.indexOf("_backlogs/board")>-1 && snapshot.cardCategory === "Microsoft.RequirementCategory"){
             //old keys remove when safe
             if (jsonEncode(data)==="{}"){
-                boardData = new BoardData( self.getBoardData(snapshot.board));
+                boardData = new BoardData( self.getBoardData(snapshot.boardUrl));
             }else {
                 //New data for
                 boardData = new BoardData(data);
@@ -349,10 +353,10 @@ function BuddyDB(_storage,apiUtil,tfsApi){
     self.getBoardUrl = function(boardUrl,cardCategory){
         var registeredBoards  = self.getRegisteredBoards();
         var url = boardUrl;
-        var projectUrl = boardUrl.split("/_backlogs")[0];
+        var teamUrl = boardUrl.split("/_backlogs")[0];
         _.forEach(registeredBoards,function(board){
 
-            if(board.getProjectUrl()===projectUrl && board.cardCategory === cardCategory){
+            if(board.getTeamUrl()===teamUrl && board.cardCategory === cardCategory){
                 if (boardUrl.length < board.boardUrl.length && (endsWith(boardUrl,"board") || endsWith(boardUrl,"board/"))){
                     url = board.boardUrl;
                 }

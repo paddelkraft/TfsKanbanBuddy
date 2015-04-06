@@ -30,6 +30,12 @@ function LocalStorageMock(){
         delete mock.data[key];
     };
 
+    mock.convertDataEntriesToObjects = function (){
+        _forEachIndex(mock.data,function(entry,key){
+            mock.data[key] = jsonDecode(entry);
+        });
+    };
+
     return mock
 }
 
@@ -57,6 +63,7 @@ describe("messageHandling",function(){
     function responseCallback(response){
         responseLog.push(response);
     }
+
 
     function buildApprovalObject(){
         if(mockedLocalStorage.data["settings-updated"]){
@@ -166,36 +173,56 @@ describe("messageHandling",function(){
 
     });
 
-    //Todo Test that gets snapshot board with short url and then with longer url should move data from first snapshot into
-    //A new boarddata with the longer url as key
+    function save2Snapshots(firstBoardUrl,secondBoardUrl){
+        var snapshot;
 
-    approveIt("(background BuddyDB) should have only one boardData with long Url as key", function(approvals){
-        var snapshot = simpleSnapshot(1000000,[createSnapshotTicket(1,"test")]);
-        snapshot.boardUrl = "http://boardurl.com/_backlogs/board";
 
         var timeUtil = new TimeUtil();
         var tfsApi = TfsApi(timeUtil,JqMock("should not be called"));
         timeUtil.now = function(){return new Date(1000000);};
         buddyDB = new BuddyDB(storageUtil,ApiUtil(),tfsApi);
+        snapshot = simpleSnapshot(1000000,[createSnapshotTicket(1,"test")]);
+        snapshot.boardUrl = firstBoardUrl;
+        snapshot.cardCategory = "Microsoft.RequirementCategory";
         snapshot.__RequestVerificationToken = "requestToken";
         buddyDB.saveSnapshot(snapshot);
+
         snapshot = simpleSnapshot(2000000,[createSnapshotTicket(1,"test")]);
-        snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
+        snapshot.boardUrl = secondBoardUrl;
         snapshot.__RequestVerificationToken = "requestToken";
+        snapshot.cardCategory = "Microsoft.RequirementCategory";
         buddyDB.saveSnapshot(snapshot);
+        mockedLocalStorage.convertDataEntriesToObjects();
+    }
+
+
+    approveIt("(background BuddyDB) should have only one boardData with long Url as key", function(approvals){
+        save2Snapshots( "http://boardurl.com/collection/project/team/_backlogs/board", "http://boardurl.com/collection/project/team/_backlogs/board/Backlog%20items")
         approvals.verify(mockedLocalStorage.data);
 
     });
 
+    approveIt("(background BuddyDB) should have only one boardData with long Url as key long first", function(approvals){
+        save2Snapshots( "http://boardurl.com/collection/project/team/_backlogs/board/Backlog%20items","http://boardurl.com/collection/project/team/_backlogs/board")
+        approvals.verify(mockedLocalStorage.data);
+    });
+
+    approveIt("(background BuddyDB) should have 2 boardData one for project and one for team", function(approvals){
+        save2Snapshots( "http://boardurl.com/collection/project/team/_backlogs/board/Backlog%20items","http://boardurl.com/collection/project/_backlogs/board")
+
+        approvals.verify(mockedLocalStorage.data);
+    });
+
+
     function register2Boards(firstBoardUrl,secondBoardUrl){
           var snapshot = simpleSnapshot(1000000,[createSnapshotTicket(1,"test"),createSnapshotTicket(16,"test")]);
-        snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items";
+        snapshot.boardUrl = firstBoardUrl;
         var timeUtil = new TimeUtil();
         var tfsApi = TfsApi(timeUtil,JqMock({"columns":["System.Id","System.State"],"rows":[[16,"Removed"]]}));
         timeUtil.now = function(){return new Date(1000000);};
         buddyDB = new BuddyDB(storageUtil,ApiUtil(),tfsApi);
         buddyDB.registerBoard(snapshot);
-        snapshot.boardUrl = "http://boardurl.com/_backlogs/board";
+        snapshot.boardUrl = secondBoardUrl;
         buddyDB.registerBoard(snapshot);
         return mockedLocalStorage;
     }

@@ -246,10 +246,11 @@ function BuddyDB(_storage,apiUtil,tfsApi){
             if(registeredUrl === self.largestBoardDataStore(boardUrl,registeredUrl)){
                 data = self.getBoardData(registeredUrl);
                 self.removeItem("snapshots_" + registeredUrl);
+                self.registerBoard(snapshot);
             }
 
         }
-        else if(!registeredUrl){
+        else if(!registeredUrl ){
             self.registerBoard(snapshot);
         }
         if (data===null){

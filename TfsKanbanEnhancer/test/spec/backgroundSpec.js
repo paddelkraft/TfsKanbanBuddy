@@ -25,6 +25,11 @@ function LocalStorageMock(){
         return mock.data[key];
     };
 
+    mock.removeItem = function(key){
+        log("removeItem",key,jsonDecode(mock.data[key]));
+        delete mock.data[key];
+    };
+
     return mock
 }
 
@@ -158,6 +163,27 @@ describe("messageHandling",function(){
         snapshot.__RequestVerificationToken = "requestToken";
         buddyDB.saveSnapshot(snapshot);
         approvals.verify(jsonDecode(mockedLocalStorage.data["snapshots_http://boardurl.com/_backlogs/board/Backlog%20items"]).flowData["16"]);
+
+    });
+
+    //Todo Test that gets snapshot board with short url and then with longer url should move data from first snapshot into
+    //A new boarddata with the longer url as key
+
+    approveIt("(background BuddyDB) should have only one boardData with long Url as key", function(approvals){
+        var snapshot = simpleSnapshot(1000000,[createSnapshotTicket(1,"test")]);
+        snapshot.boardUrl = "http://boardurl.com/_backlogs/board";
+
+        var timeUtil = new TimeUtil();
+        var tfsApi = TfsApi(timeUtil,JqMock("should not be called"));
+        timeUtil.now = function(){return new Date(1000000);};
+        buddyDB = new BuddyDB(storageUtil,ApiUtil(),tfsApi);
+        snapshot.__RequestVerificationToken = "requestToken";
+        buddyDB.saveSnapshot(snapshot);
+        snapshot = simpleSnapshot(2000000,[createSnapshotTicket(1,"test")]);
+        snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
+        snapshot.__RequestVerificationToken = "requestToken";
+        buddyDB.saveSnapshot(snapshot);
+        approvals.verify(mockedLocalStorage.data);
 
     });
 

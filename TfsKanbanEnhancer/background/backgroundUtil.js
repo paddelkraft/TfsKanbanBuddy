@@ -312,6 +312,11 @@ function BuddyDB(_storage,apiUtil,tfsApi){
     self.registerBoard = function(snapshot){
         var registeredBoards  = self.getRegisteredBoards(); //storage.getRegisteredBoards();
         var boardRecord = self.createBoardRecord(snapshot);
+        if(registeredBoards[boardRecord.getBoardApiUrl()] &&
+                registeredBoards[boardRecord.getBoardApiUrl()].boardUrl.indexOf(boardRecord.boardUrl)===0){
+            //the url or a longer variant of the board url is allready registered 
+            boardRecord.boardUrl = registeredBoards[boardRecord.getBoardApiUrl()].boardUrl;
+        }
         registeredBoards[boardRecord.getBoardApiUrl()] = boardRecord;
         console.log("Register board " + boardRecord.boardUrl);
 
@@ -374,7 +379,7 @@ function apiInvocation(){
         var api;
         var missingTickets;
         console.log("Fetch snapshot from api "+boardRecord.getBoardApiUrl() );
-        api = tfsApi.snapshot(boardRecord.getBoardApiUrl(),boardRecord.boardUrl,boardRecord.getGenericItemUrl(),boardRecord.getProjectUrl());
+        api = tfsApi.snapshot(boardRecord);//.getBoardApiUrl(),boardRecord.boardUrl,boardRecord.getGenericItemUrl(),boardRecord.getProjectUrl());
 
         api.getSnapshot( function(snapshot){
             var apiWorkItem;

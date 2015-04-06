@@ -145,7 +145,7 @@ describe("messageHandling",function(){
 
     approveIt("(background BuddyDB)save-snapshot with removed ticket using POST api", function(approvals){
         var snapshot = simpleSnapshot(1000000,[createSnapshotTicket(1,"test"),createSnapshotTicket(16,"test")]);
-        snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items"
+        snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items";
 
         var timeUtil = new TimeUtil();
         var tfsApi = TfsApi(timeUtil,JqMock({"columns":["System.Id","System.State"],"rows":[[16,"Removed"]]}));
@@ -159,5 +159,32 @@ describe("messageHandling",function(){
         buddyDB.saveSnapshot(snapshot);
         approvals.verify(jsonDecode(mockedLocalStorage.data["snapshots_http://boardurl.com/_backlogs/board/Backlog%20items"]).flowData["16"]);
 
+    });
+
+    function register2Boards(firstBoardUrl,secondBoardUrl){
+          var snapshot = simpleSnapshot(1000000,[createSnapshotTicket(1,"test"),createSnapshotTicket(16,"test")]);
+        snapshot.boardUrl = "http://boardurl.com/_backlogs/board/Backlog%20items";
+        var timeUtil = new TimeUtil();
+        var tfsApi = TfsApi(timeUtil,JqMock({"columns":["System.Id","System.State"],"rows":[[16,"Removed"]]}));
+        timeUtil.now = function(){return new Date(1000000);};
+        buddyDB = new BuddyDB(storageUtil,ApiUtil(),tfsApi);
+        buddyDB.registerBoard(snapshot);
+        snapshot.boardUrl = "http://boardurl.com/_backlogs/board";
+        buddyDB.registerBoard(snapshot);
+        return mockedLocalStorage;
+    }
+
+    it("(buddyDB) register board with first long then short url",function(){
+        register2Boards("http://boardurl.com/_backlogs/board/Backlog%20items","http://boardurl.com/_backlogs/board");
+        expect(jsonDecode( mockedLocalStorage.data["registered-boards"])
+            ["http://boardurl.com/_api/_backlog/GetBoard?__v=3"].boardUrl)
+            .jsonToBe("http://boardurl.com/_backlogs/board/Backlog%20items");
+    });
+
+    it("(buddyDB) register board with first short then long url",function(){
+        register2Boards("http://boardurl.com/_backlogs/board", "http://boardurl.com/_backlogs/board/Backlog%20items");
+        expect(jsonDecode( mockedLocalStorage.data["registered-boards"])
+            ["http://boardurl.com/_api/_backlog/GetBoard?__v=3"].boardUrl)
+            .jsonToBe("http://boardurl.com/_backlogs/board/Backlog%20items");
     });
 });

@@ -79,12 +79,18 @@ describe("Snapshot", function(){
 	});
 });
 
+
+
+
 describe("http.get apiSnapshot", function (){
 	var apiUrl = "data/snapshotApi.json";
 	var boardUrl = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/";
 	var apiSnapshot;
 	beforeEach(function(done){
-		var api = new ApiSnapshot($,timeUtil,apiUrl,boardUrl,"genericItemUrl","https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection");
+		var boardRecord = new BoardRecord({"boardUrl":boardUrl,"cardCategory":"custom","projectName" : "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection"})
+        var api;
+        boardRecord.getBoardApiUrl = function(){return apiUrl};
+        api = new ApiSnapshot($,timeUtil,boardRecord);
 		api.getSnapshot( function(snapshot){
 			console.log ("apiSnapshot = " + snapshot);
 			apiSnapshot = snapshot;
@@ -98,6 +104,32 @@ describe("http.get apiSnapshot", function (){
 		apiSnapshot.milliseconds = 10000;
 		approvals.verify(apiSnapshot);
 	});
+});
+
+describe("http.get apiSnapshot", function (){
+    var apiUrl = "data/snapshotApi.json";
+    var boardUrl = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/";
+    var apiSnapshot;
+    beforeEach(function(done){
+        var boardRecord = new BoardRecord({"boardUrl":boardUrl,"cardCategory":"custom",
+                "projectName" : "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection",
+                "__RequestVerificationToken" : "requestToken"})
+        var api;
+        boardRecord.getBoardApiUrl = function(){return apiUrl};
+        api = new ApiSnapshot($,timeUtil,boardRecord);
+        api.getSnapshot( function(snapshot){
+            console.log ("apiSnapshot = " + snapshot);
+            apiSnapshot = snapshot;
+            done();
+        });
+    });
+
+
+
+    approveIt("should getsnapshot from Api with RequestToken",function(approvals){
+        apiSnapshot.milliseconds = 10000;
+        approvals.verify(apiSnapshot);
+    });
 });
 
 describe("API snapshots",function(){

@@ -1,17 +1,22 @@
 //apisnapshot.js
 
 
-function ApiSnapshot($jq, _timeUtil, apiUrl,boardUrl,genericItemUrl, projectUrl){
-	var self = {};
-	self.apiUrl = apiUrl;
-	self.boardUrl = boardUrl;
-	self.genericItemUrl= genericItemUrl;
-	self.projectUrl = projectUrl;
+function ApiSnapshot($jq, _timeUtil, boardRecord){//apiUrl,boardUrl,genericItemUrl, projectUrl){
+	//.getBoardApiUrl(),boardRecord.boardUrl,boardRecord.getGenericItemUrl(),boardRecord.getProjectUrl())
+    var self = {};
+	self.apiUrl = boardRecord.getBoardApiUrl();
+	self.boardUrl = boardRecord.boardUrl;
+	self.genericItemUrl= boardRecord.getGenericItemUrl();
+	self.projectUrl = boardRecord.getProjectUrl();
+    if(boardRecord.__RequestVerificationToken){
+        self.__RequestVerificationToken = boardRecord.__RequestVerificationToken;
+    }
+
 	self.snapshot = null;
 	self.status = 0;
 
     self.get = function(callback){
-		$jq.get(apiUrl,callback);
+		$jq.get(self.apiUrl,callback);
 	};
 
 	function callback(data,status){
@@ -29,9 +34,12 @@ function ApiSnapshot($jq, _timeUtil, apiUrl,boardUrl,genericItemUrl, projectUrl)
 			var tickets = self.getTickets(apiResponse);
 			var snapshot = {};
 			snapshot.milliseconds = _timeUtil.now().getTime();
-			snapshot.boardUrl = boardUrl;
-			snapshot.board = projectUrl; 
+			snapshot.boardUrl = self.boardUrl;
+			snapshot.board = self.projectUrl;
 			snapshot.genericItemUrl = self.genericItemUrl;
+            if(self.__RequestVerificationToken){
+                snapshot.__RequestVerificationToken = self.__RequestVerificationToken;
+            }
             snapshot.doneState = self.getDoneState(apiResponse);
 			_.forEach(lanes,function(lane){
 				lane.tickets = self.ticketsInlane(tickets,lane.name);

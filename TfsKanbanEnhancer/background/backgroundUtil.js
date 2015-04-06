@@ -56,7 +56,7 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
 
         case "trigger-snapshot"://Incoming data from kanban board
             //_buddyDB.saveSnapshot(request.snapshot);
-            getApiSnapshot(_buddyDB.registerBoard(request.snapshot));
+            getApiSnapshot(_buddyDB.createBoardRecord(request.snapshot));
             sendResponse("Snapshot triggered");
             break;
 
@@ -249,6 +249,9 @@ function BuddyDB(_storage,apiUtil,tfsApi){
             }
 
         }
+        else if(!registeredUrl){
+            self.registerBoard(snapshot);
+        }
         if (data===null){
             data = self.getBoardData(boardUrl);
         }
@@ -313,6 +316,7 @@ function BuddyDB(_storage,apiUtil,tfsApi){
         var registeredBoards  = self.getRegisteredBoards(); //storage.getRegisteredBoards();
         var boardRecord = self.createBoardRecord(snapshot);
         if(registeredBoards[boardRecord.getBoardApiUrl()] &&
+                registeredBoards[boardRecord.getBoardApiUrl()].boardUrl.length>boardRecord.boardUrl.length &&
                 registeredBoards[boardRecord.getBoardApiUrl()].boardUrl.indexOf(boardRecord.boardUrl)===0){
             //the url or a longer variant of the board url is allready registered 
             boardRecord.boardUrl = registeredBoards[boardRecord.getBoardApiUrl()].boardUrl;
@@ -377,7 +381,7 @@ function apiInvocation(){
     var self = {};
     self.getApiSnapshot = function (buddyDB,tfsApi,boardRecord){
         var api;
-        var missingTickets;
+        //var missingTickets;
         console.log("Fetch snapshot from api "+boardRecord.getBoardApiUrl() );
         api = tfsApi.snapshot(boardRecord);//.getBoardApiUrl(),boardRecord.boardUrl,boardRecord.getGenericItemUrl(),boardRecord.getProjectUrl());
 

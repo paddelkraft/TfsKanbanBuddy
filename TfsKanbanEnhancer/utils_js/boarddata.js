@@ -12,6 +12,7 @@ function BoardData(data){
     }
     
     self.ver="0.5.0";
+    self.updated=null;
     self.board = (data.board)?data.board:null;
     self.boardUrl = (data.boardUrl) ? data.boardUrl : null;
     self.storageKey = "snapshots_" + self.boardUrl;
@@ -32,7 +33,7 @@ function BoardData(data){
         _.last(self.snapshotRecords).lastSeen=milliseconds;
     }
 
-    //generates new snapshot record when the board state has changed sinse last snapshot
+    //generates new snapshot record when the board state has changed since last snapshot
     function newSnapshotRecord(milliseconds){
         self.snapshotRecords.push({"firstSeen":milliseconds,"lastSeen":milliseconds});
     }
@@ -79,18 +80,66 @@ function BoardData(data){
             newSnapshotRecord(snapshot.milliseconds);
         }
         self.flowData.addSnapshot(snapshot);
+        //self.flowData.updateTicketsNotOnBoard(snapshot.milliseconds, _.last(snapshot.lanes).name);
         self.genericItemUrl = snapshot.genericItemUrl;
         self.board = snapshot.board;
-        self.boardUrl = snapshot.boardUrl
-        //console.log("genericItemUrl " + self.genericItemUrl);
-        
-        
+        self.boardUrl = snapshot.boardUrl;
+        if(snapshot.doneState){
+            self.doneState = snapshot.doneState;
+        }
+
+        self.updated = timeUtil.dateFormat(snapshot.milliseconds);
+
     };
 
+    self.updateStateForTicketsNotOnBoard = function(tickets){
+        _.forEach(tickets, function(ticket){
+            if(_.indexOf(self.doneState,ticket.state)!==-1)
+                self.flowData[ticket.id].state = "done";
+            else{
+                self.flowData[ticket.id].state = "removed";
+            }
+        });
+        self.updateDoneTickets();
+    };
+
+    self.getTicketsMissingOnBoard = function(){
+        var tickets = [];
+        var milliseconds = self.getLatestSnapshotTime();
+        _.forEach(self.flowData,function(ticket){
+            if(! _.isFunction(ticket)){
+                if(ticket.lastSeen() < milliseconds && !ticket.state ){
+                    tickets.push(ticket.id)
+                }
+            }
+        });
+
+        return tickets
+    };
+
+    self.updateDoneTickets = function(){
+        var milliseconds = self.getLatestSnapshotTime();
+        var lastLaneOnBoard = self.getLastLaneOnBoard();
+        _.forEach(self.flowData,function(ticket){
+            if(! _.isFunction(ticket)){
+                if(ticket.lastSeen() < milliseconds && ticket.state && ticket.state === "done"){
+                    ticket.setLane(lastLaneOnBoard,milliseconds);
+                }
+            }
+        });
+    };
+
+    self.getLatestSnapshotTime = function (){
+       return _.last(self.snapshotRecords).lastSeen;
+    };
+
+    self.getLastLaneOnBoard = function(){
+       return _.last(_.last(self.boardDesignHistory.boardDesignRecords).design).name;
+    }
 
     self.getLatestSnapshot = function(){
         if(self.snapshotRecords.length>0){
-            return self.getSnapshot(_.last(self.snapshotRecords).lastSeen);
+            return self.getSnapshot(self.getLatestSnapshotTime());
         }
         return null;
     };
@@ -144,9 +193,8 @@ function BoardData(data){
 
     //get the current board design at the given time in milliseconds
     self.findBoardDesignRecord = function(milliseconds){
-        var designRecordIndex;
-        var snapshotTime;
         var boardDesign = null;
+        var snapshotTime;
         _.forEach(self.snapshotRecords,function (record){
             if(record.firstSeen <= milliseconds && record.lastSeen>=milliseconds){
                 snapshotTime = milliseconds;
@@ -342,6 +390,9 @@ function Snapshot(snapshot){
     //link direct into tfs items from reports 
     self.genericItemUrl = snapshot.genericItemUrl;
     self.cardCategory = snapshot.cardCategory;
+    if(snapshot.doneState){
+        self.doneState = snapshot.doneState
+    }
     //board state
     self.lanes = [];
     _.forEach(snapshot.lanes,function(lane){
@@ -553,42 +604,31 @@ function FlowData(flowData, genericItemUrl){
         return flowTicket;
     }
 
+
+
     //add data from a new snapshot
     self.addSnapshot = function (snapshot){
         log("add snapshot millisecond = " + snapshot.milliseconds);
-        var index, laneIndex ;
+        var laneIndex ;
         for(laneIndex in snapshot.lanes){
             var lane = snapshot.lanes[laneIndex];
             //console.log("Lane = "+lane.name);
             //console.log("lane.tickets.length = "+ lane.tickets.length );
             for(var i = 0 ; i < lane.tickets.length ; i++ ){
                 var ticket = lane.tickets[i];
-                
                 self[ticket.id] = createOrUpdateFlowTicket(ticket,lane, snapshot);
             }
         }
 
-        updateTicketsNotOnBoard(snapshot.milliseconds, _.last(snapshot.lanes).name);
-        
     };
-
-    function updateTicketsNotOnBoard(milliseconds,lastLaneOnBoard){
-        _.forEach(self,function(ticket){
-           if(! _.isFunction(ticket)){
-                if(ticket.lastSeen() < milliseconds){
-                    ticket.setLane(lastLaneOnBoard,milliseconds);
-                }
-            }
-        });
-    }
 
     self.getCfdData = function(filter){
         var cfdData = [];
         var ticketData;
         _.forEach(self, function(ticket ){
-            if(ticket instanceof FlowTicket){
+            if(ticket instanceof FlowTicket && (!ticket.state || ticket.state!=="removed")){
                 if(filter && filter.text){
-                    if(-1 < ticket.title.toUpperCase().indexOf(filter.text.toUpperCase())){
+                    if(-1 < ticket.title.indexOf(filter.text)){
                         ticketData = ticket.cfdData(filter);
                         cfdData.push(ticketData);
                     }
@@ -624,6 +664,9 @@ function FlowTicket(flowItemData, genericItemUrl){
     self.isBlocked = (flowItemData.isBlocked)? flowItemData.isBlocked : false;
     self.blockedRecords = (flowItemData.blockedRecords)?flowItemData.blockedRecords:[];
     self.inLane = (flowItemData.inLane)? flowItemData.inLane : null;
+    if(flowItemData.state){
+        self.state = flowItemData.state;
+    }
     //internal util functions
     //readable versions fo firstSeen and lastSeen is attached to object
     function addEnterAndExitFunctions(item){
@@ -895,6 +938,7 @@ function BoardDesignHistory(boardDesignHistoryObject){
     boardDesignHistory.getLatestBoardObservationTime = function(){
         return this.boardDesignRecords[this.boardDesignRecords.length -1].lastSeen;
     };
+
 
     boardDesignHistory.getRecordForBoardDesign = function(design){
         for(var index in this.boardDesignRecords){

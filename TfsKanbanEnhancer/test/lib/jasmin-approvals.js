@@ -19,7 +19,34 @@ beforeEach(function(){
                     return result;
                 }
             };
-        }
+        },
+        jsonToBe: function() {
+        return {
+            compare: function(actual, expected) {
+                var result;
+                var actualString = actual;
+                var expectedString = expected;
+                var div = document.createElement("div");
+
+                if(typeof actual !== "string"){
+                    actualString = jsonEncode(actual);
+                }
+
+                if(typeof expected !== "string"){
+                    expectedString = jsonEncode(expectedString);
+                }
+                result  = {pass:actualString===expectedString};
+                var diffArgs   = {
+                    source: expectedString,
+                    diff  : actualString,
+                    lang  : "json"
+                };
+                div.innerHTML = prettydiff(diffArgs) + "<br>Result   = "+ actualString + "<br>Expected = " +expectedString;
+                result.message = div;
+                return result;
+            }
+        };
+    }
     });
 });
 
@@ -27,11 +54,13 @@ approvalTests = {};
 
 function Approvals(done, testInfo){
     var self = {};
-    self.verify = function(recievedResult){
-
-        testInfo.actual = jsonEncode(recievedResult);
+    self.verify = function(receivedResult){
+        if(typeof receivedResult !=="string"){
+            receivedResult = jsonEncode(receivedResult);
+        }
+        testInfo.actual = receivedResult;
         approvalTests[testInfo.description]= testInfo;
-        expect(recievedResult).approve(testInfo.approvedOutput);
+        expect(receivedResult).approve(testInfo.approvedOutput);
         done();
     };
     return self;
@@ -67,7 +96,8 @@ function approveIt(description, testToRun){
 
             // Handle network errors
             req.onerror = function() {
-                reject(Error("Network Error"));
+                resolve('No approved output');
+                //reject(Error("Network Error"));
             };
 
             // Make the request

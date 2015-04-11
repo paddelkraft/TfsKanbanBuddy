@@ -1,21 +1,28 @@
 //apisnapshot.js
 
 
-function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl){
-	var self = this;
-	self.apiUrl = apiUrl;
-	self.boardUrl = boardUrl;
-	self.genericItemUrl= genericItemUrl;
-	self.projectUrl = projectUrl
+function ApiSnapshot($jq, _timeUtil, boardRecord){//apiUrl,boardUrl,genericItemUrl, projectUrl){
+	//.getBoardApiUrl(),boardRecord.boardUrl,boardRecord.getGenericItemUrl(),boardRecord.getProjectUrl())
+    var self = {};
+	self.apiUrl = boardRecord.getBoardApiUrl();
+	self.boardUrl = boardRecord.boardUrl;
+	self.genericItemUrl= boardRecord.getGenericItemUrl();
+	self.projectUrl = boardRecord.getProjectUrl();
+    if(boardRecord.cardCategory){
+        self.cardCategory = boardRecord.cardCategory;
+    }
+    if(boardRecord.__RequestVerificationToken){
+        self.__RequestVerificationToken = boardRecord.__RequestVerificationToken;
+    }
+
 	self.snapshot = null;
-	self.status = 0
-	self.get = function(callback){
-		$.get(apiUrl,callback);
+	self.status = 0;
+
+    self.get = function(callback){
+		$jq.get(self.apiUrl,callback);
 	};
 
 	function callback(data,status){
-		var lanes;
-		var tickets;
 		if (status === "success"){
 			self.snapshot = self.buildSnapshot(data);
 		}
@@ -29,10 +36,17 @@ function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl){
 			var lanes = self.getLanes(apiResponse);
 			var tickets = self.getTickets(apiResponse);
 			var snapshot = {};
-			snapshot.milliseconds = new Date().getTime();
-			snapshot.boardUrl = boardUrl;
-			snapshot.board = projectUrl; 
+			snapshot.milliseconds = _timeUtil.now().getTime();
+			snapshot.boardUrl = self.boardUrl;
+			snapshot.board = self.projectUrl;
 			snapshot.genericItemUrl = self.genericItemUrl;
+            if(self.cardCategory){
+                snapshot.cardCategory = self.cardCategory;
+            }
+            if(self.__RequestVerificationToken){
+                snapshot.__RequestVerificationToken = self.__RequestVerificationToken;
+            }
+            snapshot.doneState = self.getDoneState(apiResponse);
 			_.forEach(lanes,function(lane){
 				lane.tickets = self.ticketsInlane(tickets,lane.name);
 				lane.wip.limit = lane.wip.limit;
@@ -83,17 +97,124 @@ function ApiSnapshot(apiUrl,boardUrl,genericItemUrl, projectUrl){
 		return lanes;
 	};
 
+    self.getDoneState = function(apiResponse){
+        var doneLane = _.last(apiResponse.boardSettings.columns);
+        var doneStates = [];
+
+        _.forEach(doneLane.stateMappings,function(state){
+            doneStates.push(state);
+        });
+        return doneStates;
+    };
+
 	self.getSnapshot = function(callback){
 		if(self.status===0){
 			self.whenDone = callback;
 		}else{
-			callback();
+			callback(self.snapshot);
 		}
 	};
 	self.get(callback);
 	return self;
 }
 
+function ApiWorkItem($jq,request){
+    var self = {};
+    self.status = 0;
+    console.log("ApiWorkItem: " +jsonEncode(request));
+
+    self.get = function(callback){
+        $jq.get(request.apiUrl,callback);
+    };
+
+    self.post = function(callback){
+
+        $jq.post(request.url,request.content,callback);
+    }
+
+    function callbackGet(data,status){
+
+        if (status === "success"){
+            self.tickets = self.buildTicketsGet(data);
+        }
+        self.status = status;
+        if(self.whenDone){
+            self.whenDone(self.tickets);
+        }
+    }
+
+    function callbackPost(data,status){
+
+        if (status === "success"){
+            self.tickets = self.buildTicketsPost(data);
+        }
+        self.status = status;
+        if(self.whenDone){
+            self.whenDone(self.tickets);
+        }
+    }
+
+    self.then = function(callback){
+        if(self.status===0){
+            self.whenDone = callback;
+        }else{
+            callback(self.tickets);
+        }
+    };
+
+    function systemField(fieldName){
+        return fieldName.replace("System.","").toLowerCase();
+    }
+
+    self.buildTicketsGet = function (apiData){
+        var tickets = [];
+        _.forEach(apiData["value"], function(apiTicket){
+            var ticket = {};
+            ticket.id = apiTicket.id;
+            _forEachIndex(apiTicket.fields,function(fieldValue,index){
+                ticket[systemField(index)]= fieldValue;
+            });
+            tickets.push(ticket);
+        });
+
+        return tickets;
+    };
+
+    self.buildTicketsPost =function(apiData){
+        var columns = apiData.columns;
+        var rows = apiData.rows;
+        var tickets = [];
+        _.forEach(rows,function(row){
+            var ticket = {};
+            _forEachIndex(columns,function(column,index){
+                ticket[systemField(column)] = row[index];
+            });
+            tickets.push(ticket);
+        });
+        return tickets;
+    };
+
+    if(request.type === "get"){
+        self.get(callbackGet);
+    }else{
+        self.post(callbackPost);
+    }
+
+
+    return self;
+
+}
+
+function TfsApi(timeUtil,jQuery){
+    var self = {};
+    self.jQuery = jQuery;
+    self.timeUtil = timeUtil;
+
+    self.workItem = _.curry( ApiWorkItem)(self.jQuery);
+
+    self.snapshot = _.curry(ApiSnapshot)(self.jQuery,self.timeUtil);
+    return self;
+}
 
 
 

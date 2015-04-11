@@ -1,0 +1,1 @@
+{"http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20–%20Dev%20Gothenburg/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Custom":{"type":"BoardRecord","cardCategory":"Custom","boardUrl":"http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20–%20Dev%20Gothenburg/_backlogs/board/Acceptance%20Tests","projectName":"SEGOT-GDP"}}

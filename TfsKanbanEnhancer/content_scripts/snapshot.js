@@ -13,20 +13,18 @@
         takeSnapshot(false);
     }
 
-    function createTicketObject(element){
-        var isBlocked = (element.getAttribute("class").indexOf("blocked")> -1);
-        var ticketObject = {
-            id : element.getAttribute("data-item-id"),
-            //$itemElm.find(".title").text()
-            title : element.getElementsByClassName("title")[0].textContent,
-            
-        };
-        if(isBlocked){
-          ticketObject.blocked = isBlocked;
-        }
-        
-        return ticketObject;
+
+    function getBoardId(){
+        var url = $(".cumulative-flow-chart").find("img").attr("src");
+        var boardId = _.last(url.split("/_api")[0].split("/"));
+        return boardId;
     }
+
+    function getRequestVerificationToken(){
+        try{
+           return $('[name=__RequestVerificationToken]').val();
+        }catch (err){}
+    };
 
     function appendLiToUlByClass(matchClass, li) {
         var elems = document.getElementsByTagName('ul'), i;
@@ -48,30 +46,25 @@
     function boardUrl(){
         return decodeUrlKeepEncodedSpaces(document.URL);
     }
-   
-    
-    function getProjectUrl(){
-        return boardUrl().split("/_backlogs/")[0];
-    }
-
-
-    
 
     function getGenericItemUrl(){
+        var projectName =getProjectName();
+        return  boardUrl().split(projectName)[0] + projectName + "/_workitems#_a=edit&id=";
+    }
+
+    function getProjectName(){
         var projectName ;
         if(document.getElementsByClassName("project-name")[0]){ //older version
             projectName = document.getElementsByClassName("project-name")[0].textContent;
         }else {
             projectName =$("span[title~='Project']").text();
         }
-        log("Url = "+boardUrl());
-        return  boardUrl().split(projectName)[0] + projectName + "/_workitems#_a=edit&id=";
-    }
 
-    
+        return projectName;
+    }
     function takeSnapshot(giveFeedback){
         var message = {};
-        message.type = "save-snapshot";
+        message.type = "trigger-snapshot";
         message.snapshot = getBoardSnapshot();
         console.log("Snapshot = "+jsonEncode(message.snapshot));
         chrome.runtime.sendMessage(message, function(response){
@@ -82,31 +75,12 @@
         });
     }
 
-    function showFlowData(){
-         var message = {};
-        message.type = "show-flow-data";
-        message.board = boardUrl();
-        chrome.runtime.sendMessage(message, function(response){
-            log(response);
-        });
-    }
-
-    function openPage(page){
-         var message = {};
-        message.type = "show-flow-data";
-        message.page = page;
-        message.board = boardUrl();
-        message.boardUrl =
-        chrome.runtime.sendMessage(message, function(response){
-            log(response);
-        });
-    }
 
     function openDataPage(page){
         var message = {};
         message.type = "open-data-page";
         message.page = page;
-        message.board = boardUrl();
+        message.boardUrl = boardUrl();
         chrome.runtime.sendMessage(message, function(response){
             log(response);
         });
@@ -128,59 +102,21 @@
 
     function getBoardSnapshot(){
         var snapshot = {};
-        var i;
-        //snapshot.time = timestamp();
+        var token;
         snapshot.milliseconds = new Date().getTime();
-        var url =getProjectUrl();
-        snapshot.board=url;
         snapshot.boardUrl = decodeUrlKeepEncodedSpaces( document.URL);
-        snapshot.genericItemUrl = genericItemUrl;
-        var headerContainer = document.getElementsByClassName("header-container")[0];
-        var headers = headerContainer.getElementsByClassName("member-header-content");
-        var columnContainer = document.getElementsByClassName("content-container")[0];
-        var columns = columnContainer.getElementsByClassName("member-content");
-        snapshot.lanes = [];
-        for (i in headers) {
-            if(headers[i].textContent !== undefined){
-                var lane ={};
-                snapshot.lanes.push(lane);
-                lane.name =  headers[i].getAttribute("title");
-                lane.wip = {};
-                lane.wip.limit = 0;
-                lane.wip.limit =  0;
-                if(headers[i].getElementsByClassName("current")[0]){
-                    
-                    var current = headers[i].getElementsByClassName("current")[0].textContent;
-                    lane.wip.current = (current==="")?0:parseInt(current);
-
-                }
-                if(headers[i].getElementsByClassName("limit")[0])
-                {
-                    var limit = headers[i].getElementsByClassName("limit")[0].textContent.replace("/","");
-                    lane.wip.limit = (limit==="")?0:parseInt(limit) ;
-                }
-                var tickets = columns[i].getElementsByClassName("board-tile");
-                lane.tickets = [];
-                var j;
-                for (j in tickets){
-                    var ticket={};
-                    if (tickets[j].textContent !== undefined){
-                        lane.tickets.push(createTicketObject(tickets[j]));
-                        
-                    }
-                }
-                
-            }
-
-        }
+        snapshot.projectName = getProjectName();
+        snapshot.genericItemUrl = getGenericItemUrl();
+        snapshot.boardId = getBoardId();
         snapshot.cardCategory = getCardCategory();
+        token = getRequestVerificationToken();
+        if (token){
+            snapshot.__RequestVerificationToken = token;
+        }
         return snapshot;
     }
 
-    //addProductBacklogViewTabsLink("Take board Snapshot", "#","takeSnapshot", takeSnapshot);
-    addProductBacklogViewTabsLink("flow data", "#","showFlowData", showFlowData);
     addProductBacklogViewTabsLink("CFD", "#","cfd", function(){openDataPage("cfd")});
-    var genericItemUrl = getGenericItemUrl();
     onloadSnapshot();
 
 })();

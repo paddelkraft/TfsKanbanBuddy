@@ -1,7 +1,7 @@
 {
     "name": "TFS kanban buddy",
 
-    "version": "0.5.10",
+    "version": "0.6.0",
     "manifest_version": 2,
     "browser_action": {
         "default_title": "TFS kanban board enhancer",
@@ -71,7 +71,11 @@
                         "http://*/*/*/_backlogs/board*",
                         "https://*/*/*/_backlogs/board*"
                        ],
-            "js": ["utils_js/util.js","utils_js/jquery-2.1.1.min.js","content_scripts/snapshot.js"]
+            "js": ["/utils_js/lodash.js",
+                   "utils_js/util.js",
+                   "utils_js/jquery-2.1.1.min.js",
+                   "content_scripts/snapshot.js"
+                  ]
         },
         {
             "matches": ["http://*/*/*", "https://*/*/*"],

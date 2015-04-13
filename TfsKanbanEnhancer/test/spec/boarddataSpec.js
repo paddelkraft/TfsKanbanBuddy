@@ -573,16 +573,16 @@ describe("FlowTicket", function() {
   });
 });
 
+function ticketMovingAcrossTheBoard1ColumnPerDay(boardData,arrayWithTickets) {
+    boardData.addSnapshot(simpleSnapshot(0, arrayWithTickets));
+    boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY, [], arrayWithTickets));
+    boardData.addSnapshot(simpleSnapshot(2 * timeUtil.MILLISECONDS_DAY, [], [], arrayWithTickets));
+    boardData.addSnapshot(simpleSnapshot(3 * timeUtil.MILLISECONDS_DAY, [], [], [], arrayWithTickets));
+    return boardData;
+}
+
 describe("CFD",function(){
 
-  function ticketMovingAcrossTheBoard1ColumnPerDay(boardData,arrayWithTickets){
-    boardData.addSnapshot(simpleSnapshot(0,arrayWithTickets));
-    boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY,[],arrayWithTickets));
-    boardData.addSnapshot(simpleSnapshot(2*timeUtil.MILLISECONDS_DAY,[],[],arrayWithTickets));
-    boardData.addSnapshot(simpleSnapshot(3*timeUtil.MILLISECONDS_DAY,[],[],[],arrayWithTickets));
-    return boardData;
-  }
-  
   approveIt("CFD for ticket moving across board", function(approvals){
     var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket")]);
     approvals.verify(boardData.getCfdData());
@@ -636,4 +636,28 @@ describe("CFD",function(){
     approvals.verify(boardData.getCfdData(filter));
   });
 
+});
+
+describe("Cycletime",function(){
+    var boardData ;
+
+    it("no ticket should be finished",function(){
+        boardData = boardDataWith1Snapdhot();
+        expect(boardData.getCycleTimes("ToDo","In production")).jsonToBe([]);
+    });
+
+    it("one ticket should have cycleTime",function(){
+       boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData({}),[createSnapshotTicket("1","Test")]);
+       expect(boardData.getCycleTimes("ToDo","In production")).jsonToBe([{"id":"1","title":"Test","start":0,"end":259200000,"cycleTime":259200000}])
+    });
+
+    it("should have cycleTime ticket never seen in startlane or endlane",function(){
+        boardData = new BoardData({});
+        var arrayWithTickets = [createSnapshotTicket("1","Test")];
+
+            boardData.addSnapshot(simpleSnapshot(0, [], arrayWithTickets));
+            boardData.addSnapshot(simpleSnapshot(3 * timeUtil.MILLISECONDS_DAY, [], [], [], arrayWithTickets));
+
+        expect(boardData.getCycleTimes("ToDo","Dev DONE")).jsonToBe([{"id":"1","title":"Test","start":0,"end":259200000,"cycleTime":259200000}])
+    });
 });

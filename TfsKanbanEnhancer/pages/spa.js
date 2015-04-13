@@ -3,7 +3,11 @@ var app = angular.module("kanban",['ngRoute','ui.bootstrap']);
 
 
 
-
+app.filter("days", function() {
+    return function(input) {
+        return Math.round(input/timeUtil.MILLISECONDS_DAY);
+    };
+});
 
 
 app.directive('ngEnter', function () {
@@ -33,8 +37,6 @@ function cumulativeFlowDiagram  (cfdData,svg,id){
                 .color(keyColor)
                 .transitionDuration(300);
                 //.clipEdge(true);
-
-      // chart.stacked.scatter.clipVoronoi(false);
 
         chart.xAxis
           .tickFormat(function(d) { return d3.time.format('%Y-%m-%d')(new Date(d)); });
@@ -320,6 +322,7 @@ app.controller("TabController",[
       $scope.tabs.push({"caption": "Snapshot", "active":false, "route":"/snapshot/"});
       $scope.tabs.push({"caption": "FlowGrid", "active":true, "route":"/flowdatagrid/"});
       $scope.tabs.push({"caption": "FlowReport", "active":true, "route":"/flowreport/"});
+      $scope.tabs.push({"caption": "Cycletime", "active":true, "route":"/cycletime/"});
       $scope.boardUrl = _.last($location.url().split("/"));
       
       $scope.setActiveTab = function(url){
@@ -341,6 +344,36 @@ app.controller("TabController",[
     }
   ]
 );
+
+app.controller("CycletimeController", ['$scope','$route', '$routeParams', 'boardDataFactory',function( $scope, $route, $routeParams, boardDataFactory){
+    $scope.board = decodeUrl($routeParams.board);
+    var boardData;
+    $scope.cycletimes;
+    boardDataFactory.getBoardData($scope.board).then(function(response){
+        boardData = new BoardData(response);
+        $scope.cycletimes = boardData.getCycleTimes(boardData.getLaneHeaders()[0], _.last(boardData.getLaneHeaders()));
+        $scope.$apply();
+    },function(error){
+        console.log("send message failed");
+    });
+
+    $scope.downloadAsJson = function(){
+        downloadAsJson($scope.cycletimes,"Cycletimes");
+    };
+
+    $scope.showTicket = function(query) {
+        return function(ticket) {
+            var show = true;
+            if(!query || query===""){
+                return true;
+            }
+            if(ticket.id.indexOf(query)===-1 && ticket.title.indexOf(query)===-1){
+                show = false;
+            }
+            return show;
+        }
+    };
+}]);
 
 app.controller("SnapshotController", ['$scope','$route', '$routeParams', 'boardDataFactory','snapshotFactory',function( $scope, $route, $routeParams, boardDataFactory,snapshot){
     $scope.board = decodeUrl($routeParams.board);
@@ -537,8 +570,11 @@ app.config(['$routeProvider',
       }).when('/flowreport/:board', {
         templateUrl: 'templates/flowreport.html',
         controller: 'FlowReportController'
-      }).otherwise({
-        redirectTo: '/cfd/:board'
+      }).when('/cycletime/:board', {
+            templateUrl: 'templates/cycletime.html',
+            controller: 'CycletimeController'
+        }).otherwise({
+            redirectTo: '/cfd/:board'
       });
 	}
 ]);

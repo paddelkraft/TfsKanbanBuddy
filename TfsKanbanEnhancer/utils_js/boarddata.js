@@ -305,12 +305,56 @@ function BoardData(data){
         return grid;
 
     };
-    
+
+    self.getCycleTimes = function(startLane, endlane){
+        var cycleTimes = [];
+        var laneHeaders = self.getLaneHeaders();
+        var startIndex = _.indexOf(laneHeaders,startLane);
+        var endIndex = _.indexOf(laneHeaders,endlane);
+        _.forEach(self.flowData,function(ticket){
+            var cycleTime = {};
+            var cfdData;
+            if(_.isFunction(ticket)){
+                return;
+            }
+            if( endIndex <= _.indexOf(laneHeaders,ticket.inLane)){
+                cycleTime.id = ticket.id;
+                cycleTime.title = ticket.title;
+                cfdData = ticket.cfdData()
+                cycleTime.start = getCycletimeStart(laneHeaders,startIndex,cfdData);
+                cycleTime.end = getCycletimeEnd(laneHeaders,endIndex,cfdData);
+                cycleTime.cycleTime = cycleTime.end-cycleTime.start;
+                cycleTimes.push(cycleTime);
+            }
+        });
+        return cycleTimes;
+    };
+
+    function getCycletimeStart(laneHeaders,startIndex,cfdData){
+        var start;
+        _.forEach(cfdData,function(day){
+            if(_.indexOf(laneHeaders,day.lane)>= startIndex){
+                start = day.milliseconds;
+                return false;
+            }
+        });
+        return start;
+    }
+
+    function getCycletimeEnd(laneHeaders,endIndex,cfdData){
+        var end;
+        _.forEachRight(cfdData,function(day){
+            if(_.indexOf(laneHeaders,day.lane)>= endIndex){
+                end = day.milliseconds;
+            }else{
+                return false;
+            }
+        });
+        return end;
+    }
     //get a list of all historical lane names (used for reporting) 
     self.getLaneHeaders = function (){
         var lanes = newLaneNode("");
-        var lanesArray = [];
-        var lastAdded;
         var lastCheckedNode;
         console.log("getLaneHeaders");
         _.forEach(self.boardDesignHistory.boardDesignRecords,function(boardDesignRecord){

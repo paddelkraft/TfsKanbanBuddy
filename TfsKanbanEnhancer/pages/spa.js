@@ -349,9 +349,27 @@ app.controller("CycletimeController", ['$scope','$route', '$routeParams', 'board
     $scope.board = decodeUrl($routeParams.board);
     var boardData;
     $scope.cycletimes;
+    function setCycleTimes(){
+        $scope.cycletimes = boardData.getCycleTimes($scope.startLane, $scope.endLane);
+    }
+
+    $scope.setStartLane = function(startLane){
+        $scope.startLane = startLane;
+        setCycleTimes();
+    };
+
+    $scope.setEndLane = function(endLane){
+        $scope.endLane = endLane;
+        setCycleTimes();
+    };
     boardDataFactory.getBoardData($scope.board).then(function(response){
         boardData = new BoardData(response);
-        $scope.cycletimes = boardData.getCycleTimes(boardData.getLaneHeaders()[0], _.last(boardData.getLaneHeaders()));
+
+        $scope.laneHeaders = boardData.getLaneHeaders();
+        $scope.startLane = $scope.laneHeaders[0];
+        $scope.endLane = _.last($scope.laneHeaders);
+        $scope.cycletimes = boardData.getCycleTimes($scope.startLane, $scope.endLane);
+
         $scope.$apply();
     },function(error){
         console.log("send message failed");
@@ -372,6 +390,31 @@ app.controller("CycletimeController", ['$scope','$route', '$routeParams', 'board
             }
             return show;
         }
+    };
+
+
+
+    $scope.startStatus = {
+        isopen: false
+    };
+
+    $scope.endStatus = {
+        isopen: false
+    };
+    $scope.toggled = function(open) {
+        $log.log('Dropdown is now: ', open);
+    };
+
+    $scope.toggleStartDropdown = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+        $scope.startStatus.isopen = !$scope.startStatus.isopen;
+    };
+
+    $scope.toggleEndDropdown = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+        $scope.endStatus.isopen = !$scope.endStatus.isopen;
     };
 }]);
 

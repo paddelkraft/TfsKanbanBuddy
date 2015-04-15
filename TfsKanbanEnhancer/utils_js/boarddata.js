@@ -317,6 +317,9 @@ function BoardData(data){
             if(_.isFunction(ticket)){
                 return;
             }
+            if(ticket.isRemoved()){
+                return;
+            }
             if( endIndex <= _.indexOf(laneHeaders,ticket.inLane)){
                 cycleTime.id = ticket.id;
                 cycleTime.title = ticket.title;
@@ -921,6 +924,11 @@ function FlowTicket(flowItemData, genericItemUrl){
         }
         //console.log(jsonEncode(ticketData));
         return ticketData;
+    };
+
+    self.isRemoved = function(){
+        var removed = self.state && self.state==="removed";
+        return removed;
     };
 
 

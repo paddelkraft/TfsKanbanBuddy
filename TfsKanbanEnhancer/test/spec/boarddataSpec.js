@@ -651,6 +651,12 @@ describe("Cycletime",function(){
        expect(boardData.getCycleTimes("ToDo","In production")).jsonToBe([{"id":"1","title":"Test","start":0,"end":259200000,"cycleTime":259200000}])
     });
 
+    it("removeed ticket should not have cycleTime",function(){
+        boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData({}),[createSnapshotTicket("1","Test")]);
+        boardData.flowData["1"].state="removed";
+        expect(boardData.getCycleTimes("ToDo","In production")).jsonToBe([])
+    });
+
     it("should have cycleTime ticket never seen in startlane or endlane",function(){
         boardData = new BoardData({});
         var arrayWithTickets = [createSnapshotTicket("1","Test")];

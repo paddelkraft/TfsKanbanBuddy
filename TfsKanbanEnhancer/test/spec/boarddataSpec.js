@@ -630,6 +630,12 @@ describe("CFD",function(){
     approvals.verify(boardData.getCfdData(filter));
   });
 
+    approveIt("CFD for tickets filtered by CR%", function(approvals){
+        var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","CRATestTicket"),createSnapshotTicket("2"," CR TestTicket")]);
+        var filter = {"text" : "CR%"};
+        approvals.verify(boardData.getCfdData(filter));
+    });
+
   approveIt("CFD for tickets filtered no tickets found", function(approvals){
     var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket"),createSnapshotTicket("2"," CR TestTicket")]);
     var filter = {"text" : "_"};

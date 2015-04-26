@@ -116,7 +116,10 @@
         return snapshot;
     }
 
-    addProductBacklogViewTabsLink("CFD", "#","cfd", function(){openDataPage("cfd")});
+    addProductBacklogViewTabsLink("CFD", "#","reports", function(){openDataPage("cfd")});
+    addProductBacklogViewTabsLink("Snapshot", "#","snapshot", function(){openDataPage("snapshot")});
+    addProductBacklogViewTabsLink("Flow report", "#","flowreport", function(){openDataPage("flowreport")});
+    addProductBacklogViewTabsLink("Flow Data Grid", "#","flowdatagrid", function(){openDataPage("flowdatagrid")});
     onloadSnapshot();
 
 })();

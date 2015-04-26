@@ -10,12 +10,12 @@
         </div>
     </div>
     <div class="row">
-        <span class="col-lg-2">StartLane</span>
-        <span class="col-lg-2">EndLane</span>
+        <span class="col-lg-3">StartLane</span>
+        <span class="col-lg-3">EndLane</span>
     </div>
     <div class="row">
         <!-- Single button -->
-        <div class="btn-group col-lg-2" dropdown is-open="startStatus.isopen">
+        <div class="btn-group col-lg-3" dropdown is-open="startStatus.isopen">
             <button type="button" class="btn btn-default dropdown-toggle btn-block" dropdown-toggle >
                 {{startLane}} <span class="caret"></span>
             </button>
@@ -24,7 +24,7 @@
             </ul>
         </div>
 
-        <div class="btn-group col-lg-2" dropdown is-open="endStatus.isopen">
+        <div class="btn-group col-lg-3" dropdown is-open="endStatus.isopen">
             <button type="button" class="btn btn-default dropdown-toggle btn-block" dropdown-toggle >
                 {{endLane}} <span class="caret"></span>
             </button>
@@ -32,10 +32,13 @@
                 <li ng-repeat="header in laneHeaders"><a ng-click="setEndLane(header)">{{header}}</a></li>
             </ul>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
             <div class="text-input">
                 <input type="text" class="form-control" placeholder="filter" ng-model="filterText" >
             </div>
+        </div>
+        <div class="col-md-3">
+            <a ng-click="downloadAsCSV()" class="btn btn-default" id="csv">Export to excel</a>
         </div>
         <!--div class="col-md-2">
             <button type="button" class="btn btn-default navbar-btn" ng-click="downloadAsJson()">JSON</button>
@@ -43,7 +46,7 @@
         </div-->
     </div>
     <div class="table-responsive">
-        <table ng-if="lane.tickets.length!==0" class="table">
+        <table ng-if="lane.tickets.length!==0" class="table" id="cycletable">
             <thead>
             <tr><th>Id</th><th>Title</th><th style="width:150px;">{{startLane}}</th><th style="width:150px;">{{endLane}}</th><th style="width:150px;">Cycletime</th></tr>
             </thead>

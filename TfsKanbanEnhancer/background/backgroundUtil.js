@@ -66,11 +66,11 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
             //console.log(getStringFromStorage(key));
             break;
 
-        case "open-data-page"://board triggering flowData page opening
+        case "open-data-page"://board triggering spa page opening
             (function(){
                 var page = "spa.html";
                 var url = decodeUrlKeepEncodedSpaces(request.boardUrl);
-                console.log("flowdata for"  + request.boardUrl + " requested");
+                console.log("spa page for"  + request.boardUrl + " requested");
                 if(endsWith(request.boardUrl,"board")|| endsWith(request.boardUrl,"board/")){
                     url = _buddyDB.getRegisteredBoardUrl(request.boardUrl,"Microsoft.RequirementCategory");
                 }
@@ -86,21 +86,6 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
             })();
 
             break;
-        /*case "show-flow-data"://board triggering flowData page opening
-            var page = "flowData.html";
-            var url = request.boardUrl;
-            console.log("flowdata for"  + request.boardUrl + " requested");
-            if(endsWith(request.boardUrl,"board")|| endsWith(request.boardUrl,"board/")){
-                url = _buddyDB.getRegisteredBoardUrl(request.boardUrl,"Microsoft.RequirementCategory");
-            }
-            if(request.page){
-                page = request.page;
-            }
-            var newURL = "pages/"+page+"?"+encodeURIComponent(url);
-            chrome.tabs.create({ url: newURL });
-            sendResponse("OK");
-            console.log("show-flow-data handled flowdata.html opened");
-            break;*/
         case "get-flow-data"://flowdata page requesting data
             console.log("get-flow-data for board "+ request.boardUrl);
             var response = _buddyDB.getBoardData(request.boardUrl);

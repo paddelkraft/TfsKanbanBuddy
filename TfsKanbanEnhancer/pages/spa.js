@@ -375,6 +375,10 @@ app.controller("CycletimeController", ['$scope','$route', '$routeParams', 'board
         console.log("send message failed");
     });
 
+    $scope.downloadAsCSV = function(){
+        exportTableToCSV($("#cycletable"),"cycletimes"+timeUtil.timestamp()+".csv",$("#csv"));
+    };
+
     $scope.downloadAsJson = function(){
         downloadAsJson($scope.cycletimes,"Cycletimes");
     };
@@ -385,7 +389,11 @@ app.controller("CycletimeController", ['$scope','$route', '$routeParams', 'board
             if(!query || query===""){
                 return true;
             }
-            if(ticket.id.indexOf(query)===-1 && ticket.title.indexOf(query)===-1){
+            if(query.indexOf("%")===query.length-1){
+                var search = query.replace("%","");
+                show = (_.indexOf( ticket.title.split(" "),search)> -1);
+            }
+            else if(ticket.id.indexOf(query)===-1 && ticket.title.indexOf(query)===-1){
                 show = false;
             }
             return show;
@@ -440,7 +448,11 @@ app.controller("SnapshotController", ['$scope','$route', '$routeParams', 'boardD
             if(!query || query===""){
                 return true;
             }
-            if(ticket.id.indexOf(query)===-1 && ticket.title.indexOf(query)===-1){
+            if(query.indexOf("%")===query.length-1){
+                var search = query.replace("%","");
+                show = (_.indexOf( ticket.title.split(" "),search)> -1);
+            }
+            else if(ticket.id.indexOf(query)===-1 && ticket.title.indexOf(query)===-1){
                 show = false;
             }
             return show;
@@ -479,7 +491,11 @@ app.controller("FlowReportController", ['$scope','$route', '$routeParams', 'boar
             if(!query || query===""){
                 return true;
             }
-            if(row[0].indexOf(query)===-1 && row[1].indexOf(query)===-1 && row[3].indexOf(query)===-1 ){
+            if(query.indexOf("%")===query.length-1){
+                var search = query.replace("%","");
+                show = (_.indexOf( row[1].split(" "),search)> -1);
+            }
+            else if(row[0].indexOf(query)===-1 && row[1].indexOf(query)===-1 && row[3].indexOf(query)===-1 ){
                 show = false;
             }
             return show;
@@ -505,7 +521,8 @@ app.controller("FlowDataGridController", ['$scope','$route', '$routeParams', 'bo
     };
 
     $scope.downloadAsCSV = function(){
-        downloadAsCSV($scope.flowDataGrid,"FlowReport");
+        window.open('data:application/vnd.ms-excel,' + $('#fdg').html());
+        //downloadAsCSV($scope.flowDataGrid,"FlowReport");
     };
 
     $scope.flowDataGridData = function(){
@@ -518,7 +535,12 @@ app.controller("FlowDataGridController", ['$scope','$route', '$routeParams', 'bo
             if(!query || query===""){
                 return true;
             }
-            if(row[0].indexOf(query)===-1 && row[1].indexOf(query)===-1){
+
+            if(query.indexOf("%")===query.length-1){
+                var search = query.replace("%","");
+                show = (_.indexOf( row[1].split(" "),search)> -1);
+            }
+            else if(row[0].indexOf(query)===-1 && row[1].indexOf(query)===-1){
                 show = false;
             }
             return show;

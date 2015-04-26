@@ -674,13 +674,15 @@ function FlowData(flowData, genericItemUrl){
         var ticketData;
         _.forEach(self, function(ticket ){
             if(ticket instanceof FlowTicket && (!ticket.state || ticket.state!=="removed")){
+                ticketData = ticket.cfdData(filter);
                 if(filter && filter.text){
+                    if(filter.text.indexOf("%")===filter.text.length-1 && -1<_.indexOf(ticket.title.split(" "),filter.text.replace("%",""))){
+                        cfdData.push(ticketData);
+                    }
                     if(-1 < ticket.title.indexOf(filter.text)){
-                        ticketData = ticket.cfdData(filter);
                         cfdData.push(ticketData);
                     }
                 } else{
-                    ticketData = ticket.cfdData(filter);
                     cfdData.push(ticketData);
                 }
 

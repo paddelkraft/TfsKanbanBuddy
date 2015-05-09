@@ -290,3 +290,11 @@ function filterArray(arr, filterFunc){
          }
      }
  }
+
+ function _transform(arr,transFunction){
+     var result = [];
+     _.forEach(arr,function(element){
+         result.push(transFunction(element))
+     });
+     return result;
+ }

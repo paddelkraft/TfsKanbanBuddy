@@ -345,7 +345,7 @@ app.controller("TabController",[
   ]
 );
 
-app.controller("CycletimeController", ['$scope','$route', '$routeParams', 'boardDataFactory',function( $scope, $route, $routeParams, boardDataFactory){
+app.controller("CycletimeController", ['$scope','$window', '$route', '$routeParams', 'boardDataFactory',function( $scope, $window, $route, $routeParams, boardDataFactory){
     $scope.board = decodeUrl($routeParams.board);
     var boardData;
     $scope.cycletimes;
@@ -424,9 +424,13 @@ app.controller("CycletimeController", ['$scope','$route', '$routeParams', 'board
         $event.stopPropagation();
         $scope.endStatus.isopen = !$scope.endStatus.isopen;
     };
+
+    $scope.$on('$viewContentLoaded', function(event) {
+        $window._gaq.push(['_trackPageview', "Cycletime"]);
+    });
 }]);
 
-app.controller("SnapshotController", ['$scope','$route', '$routeParams', 'boardDataFactory','snapshotFactory',function( $scope, $route, $routeParams, boardDataFactory,snapshot){
+app.controller("SnapshotController", ['$scope', '$window','$route', '$routeParams', 'boardDataFactory','snapshotFactory',function( $scope, $window, $route, $routeParams, boardDataFactory,snapshot){
     $scope.board = decodeUrl($routeParams.board);
     var boardData;
     $scope.snapshot;
@@ -458,9 +462,13 @@ app.controller("SnapshotController", ['$scope','$route', '$routeParams', 'boardD
             return show;
         }
     };
+
+    $scope.$on('$viewContentLoaded', function(event) {
+        $window._gaq.push(['_trackPageview', "Snapshot"]);
+    });
 }]);
 
-app.controller("FlowReportController", ['$scope','$route', '$routeParams', 'boardDataFactory','flowReportFactory',function( $scope, $route, $routeParams, boardDataFactory,flowReport){
+app.controller("FlowReportController", ['$scope', '$window','$route', '$routeParams', 'boardDataFactory','flowReportFactory',function( $scope, $window, $route, $routeParams, boardDataFactory,flowReport){
     $scope.board = decodeUrl($routeParams.board);
     var boardData;
     $scope.flowReport;
@@ -501,9 +509,14 @@ app.controller("FlowReportController", ['$scope','$route', '$routeParams', 'boar
             return show;
         }
     };
+
+    $scope.$on('$viewContentLoaded', function(event) {
+        $window._gaq.push(['_trackPageview', "FlowReport"]);
+    });
+
 }]);
 
-app.controller("FlowDataGridController", ['$scope','$route', '$routeParams', 'boardDataFactory','flowDataGridFactory',function( $scope, $route, $routeParams, boardDataFactory,flowDataGrid){
+app.controller("FlowDataGridController", ['$scope','$route','$window', '$routeParams', 'boardDataFactory','flowDataGridFactory',function( $scope, $route, $window, $routeParams, boardDataFactory,flowDataGrid){
     $scope.board = decodeUrl($routeParams.board);
     var boardData;
     $scope.flowDataGrid;
@@ -546,10 +559,14 @@ app.controller("FlowDataGridController", ['$scope','$route', '$routeParams', 'bo
             return show;
         }
     };
+
+    $scope.$on('$viewContentLoaded', function(event) {
+        $window._gaq.push(['_trackPageview', "FlowDataGrid"]);
+    });
 }]);
 
 
-app.controller("CfdController", ['$scope','$route', '$routeParams', 'boardDataFactory','cfdFactory',function( $scope, $route, $routeParams, boardDataFactory,cfd){
+app.controller("CfdController", ['$scope','$route', '$window', '$routeParams', 'boardDataFactory','cfdFactory',function( $scope, $route, $window, $routeParams, boardDataFactory,cfd){
       
   $scope.cfdData = [];
   $scope.dt = 0;
@@ -557,6 +574,8 @@ app.controller("CfdController", ['$scope','$route', '$routeParams', 'boardDataFa
   $scope.filter = "";
   var cfdDownloadData = [];
   var cfdRawChartData = [];
+
+
       
     function updateCfd(cfdTableData){
       var cfdChartData;
@@ -616,6 +635,10 @@ app.controller("CfdController", ['$scope','$route', '$routeParams', 'boardDataFa
       var download = readableDatesOnCfdData(cfdDownloadData);
       downloadAsCSV(download,"CFD_Data");
     };
+
+    $scope.$on('$viewContentLoaded', function(event) {
+        $window._gaq.push(['_trackPageview', "CFD"]);
+    });
 
  }]);
 

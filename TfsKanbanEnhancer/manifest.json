@@ -29,6 +29,7 @@
                     "/utils_js/lodash.js",
                     "utils_js/util.js",
                     "utils_js/boarddata.js",
+                    "pages/analytics.js",
                     "background/backgroundUtil.js",
                     "background/apiSnapshot.js",
                     "background/background.js",
@@ -45,8 +46,9 @@
             "js": [
                     "utils_js/util.js",
                     "utils_js/jquery-2.1.1.min.js",
-                    "content_scripts/tfsBoardInit.js",
+
                     "content_scripts/board.js",
+                    "content_scripts/tfsBoardInit.js",
                     "content_scripts/projectUrl.js"
                   ]
     	},

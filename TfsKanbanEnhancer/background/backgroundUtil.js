@@ -58,6 +58,9 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
             //_buddyDB.saveSnapshot(request.snapshot);
             getApiSnapshot(_buddyDB.createBoardRecord(request.snapshot));
             sendResponse("Snapshot triggered");
+            if(_gaq){
+                _gaq.push(['_trackPageview', "KanbanBoard "+ request.snapshot.boardUrl]);
+            }
             break;
 
         case "set-board-data"://Incoming data from kanban board

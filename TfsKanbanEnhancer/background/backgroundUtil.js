@@ -58,7 +58,7 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
             //_buddyDB.saveSnapshot(request.snapshot);
             getApiSnapshot(_buddyDB.createBoardRecord(request.snapshot));
             sendResponse("Snapshot triggered");
-            if(_gaq){
+            if(typeof _gaq != 'undefined'){
                 _gaq.push(['_trackPageview', "KanbanBoard "+ request.snapshot.boardUrl]);
             }
             break;
@@ -103,6 +103,9 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
         case "delete-flow-data":
             console.log("delete-flow-data for " + request.board );
             _buddyDB.setBoardData(request.board,{});
+            break;
+        case "get-storage":
+            sendResponse(_buddyDB.exportLocalStorage());
             break;
     }
     return true;
@@ -367,6 +370,14 @@ function BuddyDB(_storage,apiUtil,tfsApi){
         console.log("registeredBoards saved to local storage " );
     };
 
+    self.exportLocalStorage = function() {
+        var storage = {};
+        _.forEach( _storage.keys(), function(key) {
+            storage[key] = _storage.getObjectFromStorage(key);
+        });
+        return storage
+    };
+
     return self;
 }
 
@@ -469,6 +480,15 @@ function StorageUtil(storage){
     self.saveStringToStorage = function (key, content){
         storage.setItem(key, content);
 
+    };
+
+    self.keys = function(){
+        var keys =[];
+        var key;
+        for(key in storage){
+            keys.push(key);
+        }
+        return keys;
     };
 
     return self;

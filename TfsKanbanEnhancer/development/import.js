@@ -34,3 +34,11 @@
 
         
     });
+
+    app.controller("exportController",function($scope){
+        $scope.exportStorage = function(){
+            chrome.runtime.sendMessage({"type": "get-storage"}, function(response) {
+                downloadAsJson(response,"tfsKanbanBuddyStorageExport");
+            });
+        }
+    });

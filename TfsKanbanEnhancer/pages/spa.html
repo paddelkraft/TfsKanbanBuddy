@@ -14,14 +14,6 @@
 
   </head>
   <body ng-app="kanban">
-  	<!--div class="container" ng-controller="tabController">
-  		<ul class="nav nav-tabs">
-		    <li class="active"><a href="#snapshot">Snapshot</a></li>
-		    <li><a href="#flowreport">FlowReport</a></li>
-		    <li><a href="#flowdatagrid">Flow data grid</a></li>
-		    <li><a href="#cfd">CFD</a></li>
-		</ul>
-  	</div -->
   	<div ng-controller = "TabController">
   		<tabset >
     		<tab ng-repeat="tab in tabs" heading="{{tab.caption}}" active="tab.active" disabled="tab.disabled" ng-click="goTo(tab.route)"></tab>

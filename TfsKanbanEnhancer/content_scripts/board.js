@@ -333,7 +333,7 @@ function removeColumnColor(){
  
     function setRelationAttribute($itemElm){
         var caseId;// Set relation
-        var tileData = $itemElm.text().split(" ");
+        var tileData = $itemElm.find(".title").text().split(" ");
         caseId = getRelationId(tileData);
         $itemElm.attr('data-case-id', caseId);
         

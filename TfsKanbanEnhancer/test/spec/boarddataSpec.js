@@ -12,7 +12,7 @@ function testSnapshot(milliseconds){
             "tickets": [
               {
                 "id": "4",
-                "title": "AT 1",
+                "title": "AT 1"
               }
             ]
           },
@@ -40,7 +40,7 @@ function testSnapshot(milliseconds){
             "tickets": [
               {
                 "id": "3",
-                "title": "CR 1",
+                "title": "CR 1"
               }
             ]
           },
@@ -218,7 +218,7 @@ describe("BoardData", function() {
 
     it("identical snapshots should result in 1 snapshot record",function(){
         expect(twoIdenticalSnapdhots().snapshotRecords.length).toBe(1);
-    })
+    });
 
   approveIt("boardData for 1 ticket moving back and forth",function(approvals){
     approvals.verify(jsonEncode(boardDataOneTicketMovingBackAndforth()));
@@ -287,7 +287,6 @@ describe("BoardData", function() {
     mergeData.addSnapshot(snapshot);
     boardData = mergeBoardData(boardData,mergeData);
     console.log(jsonEncode(boardData));
-    var mergedBoardDesign = boardData.boardDesignHistory.boardDesignRecords[0].getBoardDesignForSnapshot();
     approvals.verify(boardData.boardDesignHistory.boardDesignRecords);
   });
 
@@ -300,7 +299,6 @@ describe("BoardData", function() {
     mergeData.addSnapshot(snapshot);
     boardData = mergeBoardData(boardData,mergeData);
     var ticket = boardData.flowData["3"];
-    var lane = ticket.lanes["Dev DONE"];
     approvals.verify(ticket);
   });
 
@@ -573,11 +571,27 @@ describe("FlowTicket", function() {
   });
 });
 
+function startOfDay(day){
+    return timeUtil.MILLISECONDS_DAY * day;
+}
+
 function ticketMovingAcrossTheBoard1ColumnPerDay(boardData,arrayWithTickets) {
-    boardData.addSnapshot(simpleSnapshot(0, arrayWithTickets));
-    boardData.addSnapshot(simpleSnapshot(timeUtil.MILLISECONDS_DAY, [], arrayWithTickets));
-    boardData.addSnapshot(simpleSnapshot(2 * timeUtil.MILLISECONDS_DAY, [], [], arrayWithTickets));
-    boardData.addSnapshot(simpleSnapshot(3 * timeUtil.MILLISECONDS_DAY, [], [], [], arrayWithTickets));
+    boardData.addSnapshot(simpleSnapshot(startOfDay(0), arrayWithTickets));
+    boardData.addSnapshot(simpleSnapshot(startOfDay(1), [], arrayWithTickets));
+    boardData.addSnapshot(simpleSnapshot(startOfDay(2), [], [], arrayWithTickets));
+    boardData.addSnapshot(simpleSnapshot(startOfDay(3), [], [], [], arrayWithTickets));
+    return boardData;
+}
+
+function ticketInChangingLane(boardData,arrayWithTickets) {
+    var mySnapshot
+    boardData.addSnapshot(simpleSnapshot(startOfDay(1), [], arrayWithTickets));
+    mySnapshot = simpleSnapshot(startOfDay(2), [], arrayWithTickets)
+    mySnapshot.lanes[1].name = "Dev Doing";
+    boardData.addSnapshot(mySnapshot);
+    mySnapshot.milliseconds = startOfDay(3);
+    boardData.addSnapshot(mySnapshot);
+
     return boardData;
 }
 
@@ -588,11 +602,21 @@ describe("CFD",function(){
     approvals.verify(boardData.getCfdData());
   });
 
+    approveIt("CFD for ticket moving across board board changes midway", function(approvals){
+        var boardData = ticketInChangingLane(new BoardData(),[createSnapshotTicket("1","TestTicket")]);
+        approvals.verify(boardData.getCfdData());
+    });
+
   //nvD3 data format
   approveIt("CFD chart data for ticket moving across board", function(approvals){
     var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket")]);
     approvals.verify(boardData.buildCfdChartData(boardData.getCfdData()));
   });
+
+    approveIt("CFD chart data for ticket in changing lane", function(approvals){
+        var boardData = ticketInChangingLane(new BoardData(),[createSnapshotTicket("1","TestTicket")]);
+        approvals.verify(boardData.buildCfdChartData(boardData.getCfdData()));
+    });
 
   approveIt("CFD for tickets last two days moving across the board", function(approvals){
     var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket")]);

@@ -41,6 +41,7 @@ function LocalStorageMock(){
 
 
 
+
 describe("messageHandling",function(){
 
     function JqMock(response){
@@ -226,6 +227,61 @@ describe("messageHandling",function(){
         buddyDB.registerBoard(snapshot);
         return mockedLocalStorage;
     }
+
+    approveIt("should import storage data", function(approvals){
+        var backup = {"key1":"testing testing","key2":{"subkey":220}};
+        messageHandler(buddyDB,getApiSnapshot ,{"type":"set-storage", storageData:backup},{},function(){
+            mockedLocalStorage.convertDataEntriesToObjects();
+            approvals.verify(mockedLocalStorage.data);
+        });
+    });
+
+    describe ("export storage data", function(){
+        function exportMockOfStorage(){
+            var mock = {};
+
+
+            mock.setItem = function(key,content){
+                mock[key]=content;
+            };
+
+            mock.getItem = function(key){
+                return mock[key];
+            };
+
+            mock.removeItem = function(key){
+                delete mock[key];
+            };
+
+            mock.convertDataEntriesToObjects = function (){
+                _forEachIndex(mock,function(entry,key){
+                    if(!_.isFunction(mock[key]))
+                        mock[key] = jsonDecode(entry);
+                });
+            };
+
+            return mock
+        }
+
+        beforeEach(function(){
+            mockedLocalStorage = new exportMockOfStorage();
+            storageUtil = new StorageUtil(mockedLocalStorage);
+            buddyDB = new BuddyDB(storageUtil,ApiUtil(),TfsApi(TimeUtil(),JqMock("Empty response")));
+
+        });
+
+        approveIt("should export storage data", function(approvals){
+            var storedObject = {"key1":"testing testing","key2":{"subkey":220}};
+            mockedLocalStorage.setItem("save",jsonEncode(storedObject));
+            messageHandler(buddyDB,getApiSnapshot ,{"type":"get-storage"},{},function(response){
+                approvals.verify(response);
+            });
+        });
+    });
+
+
+
+
 
     it("(buddyDB) register board with first long then short url",function(){
         register2Boards("http://boardurl.com/_backlogs/board/Backlog%20items","http://boardurl.com/_backlogs/board");

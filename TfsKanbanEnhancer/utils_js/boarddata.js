@@ -469,11 +469,6 @@ function Snapshot(snapshot){
 
     }
 
-    self.getBoardApiUrl = function(){
-        var apiUrl = self.board.split("_backlogs")[0]+"_api/_backlog/GetBoard?__v=3";
-        return apiUrl;
-    };
-
     //extract the board design from snapshot
     self.getBoardDesign = function (){
         var boardLayout = [];
@@ -622,7 +617,7 @@ function FlowData(flowData, genericItemUrl){
                (lane===ticket.wasInLane(time))){
                 var snapshotTicket = {
                     "id" : ticket.id,
-                    "title" : ticket.title,
+                    "title" : ticket.title
                 };
                 
                 if(ticket.wasBlocked(time)===true){
@@ -813,7 +808,7 @@ function FlowTicket(flowItemData, genericItemUrl){
     };
 
      //where was this ticket at the given time if not certain returns where ticket was last seen.
-    self.wasInLaneContinous = function(milliseconds){
+    self.wasInLaneContinous = function(observationTime){
         var inLane=null;
         var closestEarlierObservation = 0;
         var lastSeenInLane = null;
@@ -822,12 +817,12 @@ function FlowTicket(flowItemData, genericItemUrl){
                 return false;
             }
             _.forEach(lane,function(laneRecord){
-                if(laneRecord.lastSeen >= milliseconds && milliseconds >= laneRecord.firstSeen){
+                if(laneRecord.lastSeen >= observationTime && observationTime >= laneRecord.firstSeen){
                     inLane = laneRecord.name;
                     return false;
                 }
 
-                if (laneRecord.lastSeen > closestEarlierObservation && laneRecord.lastSeen < milliseconds){
+                if (laneRecord.lastSeen > closestEarlierObservation && laneRecord.lastSeen < observationTime){
                     closestEarlierObservation = laneRecord.lastSeen;
                     lastSeenInLane = laneRecord.name;
                 }

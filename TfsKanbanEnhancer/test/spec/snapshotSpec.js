@@ -72,11 +72,18 @@ describe("Snapshot", function(){
 
 	});
 
-	it("should get api url", function (){
-		var snapshot = simpleSnapshot(10,[],[],[],[]);
-		snapshot.board = "http://tfs2010.it.volvo.net:8080/tfs/Global/SEGOT-eCom-VolvoPentaShop/PentaBusiness/_backlogs/board";
-		expect(snapshot.getBoardApiUrl()).toBe("http://tfs2010.it.volvo.net:8080/tfs/Global/SEGOT-eCom-VolvoPentaShop/PentaBusiness/_api/_backlog/GetBoard?__v=3");
-	});
+
+
+    it("should get 2015 api url", function (){
+        var snapshot = simpleSnapshot(10,[],[],[],[]);
+        var boardRecord;
+        snapshot.boardUrl = "http://tfs2010.it.volvo.net:8080/tfs/Global/SEGOT-eCom-VolvoPentaShop/PentaBusiness/_backlogs/board";
+        snapshot.projectName = "SEGOT-eCom-VolvoPentaShop";
+        snapshot.cardCategory = "pyttemjuk.kortKategori";
+        snapshot.boardId ="TestBoardId";
+        boardRecord = new BoardRecord(snapshot);
+        expect(boardRecord.getBoardApiUrl()).toBe("http://tfs2010.it.volvo.net:8080/tfs/Global/TestBoardId/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=pyttemjuk.kortKategori");
+    });
 });
 
 
@@ -104,6 +111,30 @@ describe("http.get apiSnapshot", function (){
 		apiSnapshot.milliseconds = 10000;
 		approvals.verify(apiSnapshot);
 	});
+});
+
+describe("http.get 2015 apiSnapshot", function (){
+    var apiUrl = "data/newBoardApi.json";
+    var boardUrl = "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection/_backlogs/board/";
+    var apiSnapshot;
+    beforeEach(function(done){
+        var boardRecord = new BoardRecord({"boardUrl":boardUrl,"cardCategory":"custom","projectName" : "https://paddelkraft.visualstudio.com/DefaultCollection/tfsDataCollection"})
+        var api;
+        boardRecord.getBoardApiUrl = function(){return apiUrl};
+        api = new ApiSnapshot($,timeUtil,boardRecord);
+        api.getSnapshot( function(snapshot){
+            console.log ("apiSnapshot = " + snapshot);
+            apiSnapshot = snapshot;
+            done();
+        });
+    });
+
+
+
+    approveIt("should getsnapshot from 2015 Api",function(approvals){
+        apiSnapshot.milliseconds = 10000;
+        approvals.verify(apiSnapshot);
+    });
 });
 
 describe("http.get apiSnapshot", function (){

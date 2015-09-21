@@ -1,0 +1,1 @@
+{"setItem":{},"getItem":{},"removeItem":{},"convertDataEntriesToObjects":{},"save":{"key1":"testing testing","key2":{"subkey":220}}}

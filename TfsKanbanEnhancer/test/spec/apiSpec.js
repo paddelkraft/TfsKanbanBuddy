@@ -138,36 +138,6 @@ describe("TFS Board API ", function() {
         approvals.verify(boardRegistry)
 	});
 
-	/*/Remove 0.6.0
-	approveIt("should remove boardUrl with encoded - in storage",function(approvals){
-		 var registeredBoards ={
-		 
-		  "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20%E2%80%93%20Dev%20Gothenburg/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Microsoft.RequirementCategory": {
-		    "boardUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20%E2%80%93%20Dev%20Gothenburg/_backlogs/board/Acceptance%20Tests",
-		    "projectUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20%E2%80%93%20Dev%20Gothenburg",
-		    "apiUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20%E2%80%93%20Dev%20Gothenburg/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Microsoft.RequirementCategory",
-		    "genericItemUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/_workitems#_a=edit&id=",
-		    "cardCategory": "Microsoft.RequirementCategory"
-		  },
-		  
-		  "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20–%20Dev%20Gothenburg/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Microsoft.RequirementCategory": {
-		    "boardUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20–%20Dev%20Gothenburg/_backlogs/board/Acceptance%20Tests",
-		    "projectUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20–%20Dev%20Gothenburg",
-		    "apiUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20–%20Dev%20Gothenburg/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Microsoft.RequirementCategory",
-		    "genericItemUrl": "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/_workitems#_a=edit&id=",
-		    "cardCategory": "Microsoft.RequirementCategory"
-		  }
-		};
-		var storageMock = BuddyDB(StorageUtil(_mockedLocalStorage),ApiUtil());
-		var boardRegistry = {};
-		var setRegisteredBoards = spyOn(storageMock,"setRegisteredBoards").and.callFake(function(input){
-			boardRegistry = input;
-		});
-		var getRegisteredBoards = spyOn(storageMock,"getRegisteredBoards")
-			.and.returnValue(registeredBoards);
-		storageMock.registerBoard(snapshot);
-		approvals.verify(boardRegistry);
-	});//end remove*/
 
 	approveIt("should use long boardUrl in storage",function(approvals){
 		var storageMock = BuddyDB(StorageUtil(_mockedLocalStorage),ApiUtil());;;

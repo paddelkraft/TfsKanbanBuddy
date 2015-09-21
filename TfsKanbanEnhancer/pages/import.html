@@ -8,25 +8,37 @@
     <script type="text/javascript" src="../utils_js/util.js"></script>
     <script type="text/javascript" src="../utils_js/boarddata.js"></script>
     <script type="text/javascript" src="../utils_js/converters.js"></script>
+    <!-- Bootstrap -->
+    <link href="../utils_js/bootstrap.min.css" rel="stylesheet">
+    <link href="../utils_js/src/nv.d3.css" rel="stylesheet" type="text/css">
 
 </head>
 <body>
 <div id="colorMapping" style="width:500px">
 
 
-    <div ng-app="import">
-        <div ng-controller="importController" id="links" style="width:500px" >
-            <div class="row500">
-                <hr>
-                Import data from file (BETA)
+    <div ng-app="import" class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="well">
+                    <h1>Import/Export all KanbanBuddy data to file! (BETA)</h1>
+
+                </div>
+
+
+            </div>
+        </div>
+        <div ng-controller="importController" id="import"  >
+            <div class="row col-sm-12">
+
+                <label class="control-label">Import data from export file</label>
                 <input type="file" id="importData" name="files[]" />
             </div>
         </div>
-        <div ng-controller="exportController" id="export" style="width:500px" >
-            <div class="row500">
+        <div ng-controller="exportController" id="export" >
+            <div class="row col-sm-12">
                 <hr>
-                Export all data in local storage (BETA)
-                <button  ng-click="exportStorage()">Export</button>
+                Export all data in local storage to a file <button  ng-click="exportStorage()" class="btn btn-default navbar-btn">Export</button>
             </div>
         </div>
     </div>

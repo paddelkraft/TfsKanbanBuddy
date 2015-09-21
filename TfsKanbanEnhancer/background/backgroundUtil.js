@@ -107,6 +107,10 @@ function messageHandler (_buddyDB, getApiSnapshot,request, sender, sendResponse)
         case "get-storage":
             sendResponse(_buddyDB.exportLocalStorage());
             break;
+        case "set-storage":
+            _buddyDB.importToLocalStorage(request.storageData);
+            sendResponse("success");
+            break;
     }
     return true;
 }
@@ -371,11 +375,20 @@ function BuddyDB(_storage,apiUtil,tfsApi){
     };
 
     self.exportLocalStorage = function() {
-        var storage = {};
+        var exportedData = {};
         _.forEach( _storage.keys(), function(key) {
-            storage[key] = _storage.getObjectFromStorage(key);
+            if(!_.isFunction(_storage[key])){
+                exportedData[key] = _storage.getObjectFromStorage(key);
+            }
         });
-        return storage
+        return exportedData
+    };
+
+    self.importToLocalStorage = function(data){
+        var key
+        for( key in data) {
+            _storage.saveObjectToStorage(key,data[key]);
+        }
     };
 
     return self;
@@ -504,16 +517,20 @@ function BoardRecord(input){
 
     }
 
+    if(input.boardId){
+        self.boardId = input.boardId;
+    }
+
     self.boardUrl = input.boardUrl;
     if(input.__RequestVerificationToken){
         self.__RequestVerificationToken =input.__RequestVerificationToken;
     }
 
-    if(input.genericItemUrl){
+    if(input.projectName){
+        self.projectName = input.projectName;
+    }else if(input.genericItemUrl){
         var projectUrl = input.genericItemUrl.replace("/_workitems#_a=edit&id=","");
         self.projectName = _.last(projectUrl.split("/"))
-    }else{
-        self.projectName = input.projectName;
     }
 
     self.getProjectUrl = function (){
@@ -548,6 +565,10 @@ function BoardRecord(input){
 
         if(!self.cardCategory){
             return self.getTeamUrl() + "/_api/_backlog/GetBoard?__v=3";
+        }
+
+        if(self.boardId){
+            return self.getCollectionUrl()+"/"+self.boardId +"/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName="+self.cardCategory;
         }
         return self.getTeamUrl() + "/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName="+self.cardCategory;
     };

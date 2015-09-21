@@ -63,10 +63,15 @@ function ApiSnapshot($jq, _timeUtil, boardRecord){//apiUrl,boardUrl,genericItemU
 			_.forEach(tickets, function(ticket){
 				if(ticket.lane === lane){
 					inLane.push({"id" : ticket.id, "title" : ticket.title});
-				}
+				}else if(lane.replace(" Doing","")=== ticket.lane && !ticket.done){
+                    inLane.push({"id" : ticket.id, "title" : ticket.title});
+                }else if(lane.replace(" Done","")=== ticket.lane && ticket.done){
+                    inLane.push({"id" : ticket.id, "title" : ticket.title});
+                }
 			});
 			return inLane;
 		};
+
 
 
 	self.getTickets = function (apiResponse){
@@ -76,13 +81,22 @@ function ApiSnapshot($jq, _timeUtil, boardRecord){//apiUrl,boardUrl,genericItemU
 		var id = "System.Id";
 		var title = "System.Title";
 		var lane = "_Kanban.Column";
+        var done = "_Kanban.Column.Done"
 		id = indexes.indexOf(id);
 		title = indexes.indexOf(title);
 		lane = _.findIndex(indexes,function(index){
 			return (index.indexOf(lane) > -1);
 		});
+
+        done = _.findIndex(indexes,function(index){
+            return (index.indexOf(done) > -1);
+        });
 		_.forEach(apiTickets,function(ticket){
-			tickets.push({"id" : ticket[id].toString(), "title" : ticket[title], "lane": ticket[lane]});
+			var doneValue = null;
+            if(done > -1){
+                doneValue = ticket[done];
+            }
+            tickets.push({"id" : ticket[id].toString(), "title" : ticket[title], "lane": ticket[lane], "done":doneValue});
 		});
 		return tickets;
 	};
@@ -92,7 +106,16 @@ function ApiSnapshot($jq, _timeUtil, boardRecord){//apiUrl,boardUrl,genericItemU
 		_.forEach(apiResponse.boardSettings.columns,function(apiLane){
 			var lane = {"name":apiLane.name};
 			lane.wip = {"limit" : apiLane.itemLimit};
-			lanes.push(lane);
+			if(apiLane.isSplit){
+                lane.name = lane.name + " Doing";
+                lanes.push(lane );
+                lane = {"name":apiLane.name + " Done" };
+                lane.wip = {"limit" : 0}
+                lanes.push(lane );
+            }else{
+                lanes.push(lane);
+            }
+
 		});
 		return lanes;
 	};

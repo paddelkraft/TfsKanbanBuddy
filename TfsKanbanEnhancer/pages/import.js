@@ -5,9 +5,8 @@
         
         function handleFileSelect(evt) {
             var files = evt.target.files; // FileList object
-            function importData(boardData){
-                  boardData = new BoardData(boardData);
-                  chrome.runtime.sendMessage({"type": "set-board-data","boardData": boardData}, function(response) {
+            function importData(storageData){
+                  chrome.runtime.sendMessage({"type": "set-storage","storageData": storageData}, function(response) {
                   alert("import done")
                   console.log(response);
                   location.reload();

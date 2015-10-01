@@ -62,10 +62,10 @@ function updateBoard(settings) {
  
  
     function setTileColor($itemElm,colorMap){
-        var itemClassification = "";
-        var tileData = $itemElm.find(".witTitle").text().split(" ");
+
+        var tileData = $itemElm.find(".clickable-title").text().split(" ");
         var newBoardSetup = false
-        itemClassification = tileData[0];
+        var itemClassification = tileData[0];
         // set woorktype
         if($itemElm.find(".editIcon").length !==0){
             newBoardSetup = true;

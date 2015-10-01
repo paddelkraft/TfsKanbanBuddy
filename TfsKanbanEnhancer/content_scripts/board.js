@@ -1,71 +1,71 @@
 function updateBoard(settings) {
-  
+
     var textFilter;
     var GET_KANBAN_BOARD_MAPPING = "get-color-map";
     var GET_TASK_BOARD_MAPPING = "get-task-color-map";
     var FILTER_IDENTIFIER ="|";
- 
+
     var is_focused = true;
- 
+
     var kanbanBoard = {
         "type"      : "kanbanBoard",
-        "tileClass" : "board-tile",
-        "relations" : true,
-        "wip"       : true
+        "tileClass":"board-tile",
+        "contentContainerClass":"board-tile-content-container",
+        "tileContentClass" : "board-tile-content"
     };
-    var customCardSize = ".largeCard {width: 150px !important;height: 95px !important;}";
- 
+
     var customStylePale =
-        ".$tileClass.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.yellow.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.blue.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.orange.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.green.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.pink.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.asure.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.purple.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.expediter.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.black.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.blocked.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.red.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.lightgreen.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.gray.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
-        ".$tileClass.standard.pale {background-color: transparent; border-color: #ddd; color: #ddd}"+
-        ".$tileClass.lightpurple.pale{background-color: transparent; border-color: #ddd; color: #ddd}"+ 
-        ".duedate.white.pale {background-color: transparent; color: #ddd}"+
-        ".duedate.yellow.pale {background-color: transparent; color: #ddd}"+
-        ".duedate.red.pale {background-color: transparent; color: #ddd}"
-        
-    ;
-    
+            ".pale {opacity: 0.4;}" +
+            ".$tileClass.yellow.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+            ".$tileClass.blue.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+            ".$tileClass.orange.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+            ".$tileClass.green.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+            ".$tileClass.pink.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+            ".$tileClass.asure.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+            ".$tileClass.purple.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+            ".$tileClass.expediter.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+            ".$tileClass.black.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+            ".$tileClass.blocked.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+            ".$tileClass.red.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+            ".$tileClass.lightgreen.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+            ".$tileClass.gray.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
+            ".$tileClass.std-1.pale {background-color: transparent; border-color: #ddd; color: #ddd}"+
+            ".$tileClass.lightpurple.pale {background-color: transparent; border-color: #ddd; color: #ddd}"+
+            ".board-tile.pale {border-left-color: transparent}"+
+            ".duedate.white.pale {background-color: transparent; color: #ddd}"+
+            ".duedate.yellow.pale {background-color: transparent; color: #ddd}"+
+            ".duedate.red.pale {background-color: transparent; color: #ddd}"
+
+        ;
+
     var customStyleColor =
-        ".$tileClass.blue {background-color: #3276b1; border-color: #285e8e; color: white} " +
-        ".$tileClass.yellow {background-color: yellow; border-color: #D7DF01; color: black} " +
-        ".$tileClass.orange {background-color: #FF8000; border-color: #DF7401; color: black} " +
-        ".$tileClass.green {background-color: #33A904; border-color: #1B5C01; color: white} " +
-        ".$tileClass.pink {background-color: #F781F3; border-color: #FA58F4; color: black} " +
-        ".$tileClass.asure {background-color: #00FFFF; border-color: #01DFD7; color: black} " +
-        ".$tileClass.purple {background-color: #9A2EFE; border-color: #A901DB; color: white} " +
-        ".$tileClass.expediter {background-color: black; border-color: #DDDDDD; color: white} " +
-        ".$tileClass.black {background-color: black; border-color: #DDDDDD; color: white} " +
-        ".$tileClass.blocked {background-color: #d2322d; border-color: #ac2925; color: white} " +
-        ".$tileClass.red {background-color: #d2322d; border-color: #ac2925; color: white} " +
-        ".$tileClass.lightgreen {background-color: #C3FCD4; border-color: #00FF80; color: black} " +
-        ".$tileClass.gray {background-color: #A1A19F; border-color:black; color: white} " +
-        ".$tileClass.standard {border-color: rgb(0, 156, 204); background-color: rgb(214, 236, 242) color = black}"+
-        ".$tileClass.lightpurple {background-color: rgb(238, 226, 242); border-color: rgb(119, 59, 147); color: black}"+
-        ".duedate.white {background-color: black; color: white} "+
-        ".duedate.yellow {background-color: black; color: yellow} "+
-        ".duedate.red {background-color: black; color: red} "+
-        ".inprogress.on-wip{background-color: #FBFBEF;}"+
-        ".inprogress.above-wip{background-color: #FBEFEF;}"+
-        ".inprogress.below-wip{background-color: #FFFFFF;}"
-        
-    ;
-    
-   
-    
-    
+            ".$tileClass.blue {background-color: #3276b1; border-color: #285e8e; color: white} " +
+            ".$tileClass.yellow {background-color: yellow !important; border-left: #D7DF01 !important; color: black !important} " +
+            ".$tileClass.orange {background-color: #FF8000; border-color: #DF7401; color: black} " +
+            ".$tileClass.green {background-color: #33A904; border-color: #1B5C01; color: white} " +
+            ".$tileClass.pink {background-color: #F781F3; border-color: #FA58F4; color: black} " +
+            ".$tileClass.asure {background-color: #00FFFF; border-color: #01DFD7; color: black} " +
+            ".$tileClass.purple {background-color: #9A2EFE; border-color: #A901DB; color: white} " +
+            ".$tileClass.expediter {background-color: black; border-color: #DDDDDD; color: white} " +
+            ".$tileClass.black {background-color: black; border-color: #DDDDDD; color: white} " +
+            ".$tileClass.blocked {background-color: #d2322d; border-color: #ac2925; color: white} " +
+            ".$tileClass.red {background-color: #d2322d; border-color: #ac2925; color: white} " +
+            ".$tileClass.lightgreen {background-color: #C3FCD4; border-color: #00FF80; color: black} " +
+            ".$tileClass.gray {background-color: #A1A19F; border-color:black; color: white} " +
+            ".$tileClass.std-1 {border-color: rgb(0, 156, 204); background-color: rgb(214, 236, 242) color = black}"+
+            ".$tileClass.lightpurple {background-color: rgb(238, 226, 242); border-color: rgb(119, 59, 147); color: black}"+
+            ".duedate.white {background-color: black; color: white} "+
+            ".duedate.yellow {background-color: black; color: yellow} "+
+            ".duedate.red {background-color: black; color: red} "+
+            ".inprogress.on-wip{background-color: #FBFBEF;}"+
+            ".inprogress.above-wip{background-color: #FBEFEF;}"+
+            ".inprogress.below-wip{background-color: #FFFFFF;}"
+
+        ;
+
+
+
+
     function improveBoard(colorMap, board) {
         //console.log("colorMap = " + jsonEncode(colorMap));
         //console.log("Board data " + jsonEncode(board) );
@@ -76,28 +76,29 @@ function updateBoard(settings) {
             console.log("no cards on board yet");
             return;
         }
-        
+
         var $tiles = getTiles(board);
         console.log($tiles.length + " tiles on board");
         var standardColors = getStandardColors($tiles);
         var standardCardClasses = generateStandardCardClasses(standardColors);
-        setStandardCardGlobalStyle(standardCardClasses);
-        setTileColors($tiles,colorMap,standardColors);
-        highlightDates($tiles);
-        //console.log("tile colors set");
-        if (board.relations){
-            setLargeCards($tiles);
+        var standardBorderColors = getStandardBorderColors();
+        var standardBorderClasses = generateStandardBoarderClasses(standardBorderColors);
+        var filters;
+        setStandardGlobalStyle(standardCardClasses);
+        setStandardGlobalStyle(standardBorderClasses);
+        function enhanceTiles($tiles) {
+            setTileColors($tiles, colorMap, standardColors, standardBorderColors);
+            highlightDates($tiles);
             setRelationAttributes($tiles);
-            var filters = setFilrerAttributes($tiles);
-            if (! jQuery.isEmptyObject(filters)) {
-                addFilterDropdown(filters);
-            }
-			addFilterTextbox();
+            setEnchanced($tiles);
         }
-        
-        
-        
- 
+        enhanceTiles($tiles);
+        filters = setFilrerAttributes($tiles);
+        if (! jQuery.isEmptyObject(filters)) {
+            addFilterDropdown(filters);
+        }
+        addFilterTextbox();
+
         if(board.removeClass != "undefined"){
             //console.log("Removing class " + board.removeClass);
             $("."+board.removeClass).each(function(){
@@ -105,164 +106,122 @@ function updateBoard(settings) {
                 $element.removeClass(board.removeClass);
             });
         }
-        
+
         function filterBoard(){
             if($("#filter-select").length !== 0){
                 applyFilter($("#filter-select").val(),board);
             }else{
                 applyFilter('show all',board);
             }
-            
+
             applyTextFilter(textFilter(),board);
         }
-        
-        $("#filter-select").change(filterBoard);
 
+        $("#filter-select").change(filterBoard);
         $("#filter-text").change(filterBoard);
 
-        if (board.wip) {
-            checkWip();
-        }
- 
-        if(board.update){
-            setTimeout(function(){improveBoard(colorMap,board);}, 5000);
-        }
-        reloadBoardTimeout(3600000);
- 
- 
-    }
- 
-function checkWip(){
-    var i;
-    var columns = getColumns();
-    var thisColumn,nextColumn ;
-     for (i = 1 ; i < columns.length-1 ; i++) { //fist and last column dont have wips.
-            thisColumn = columns[i];
-            nextColumn = (i<columns.length-2)? columns[i +1]:null; //Last lane never part of wip.
-            //console.log("check wip " + columns[i].title);
-            var wip, wipLimit, useNext = false;
-            if(thisColumn.wipLimit){
-                wipLimit = thisColumn.wipLimit;
-                wip = thisColumn.getCurrentWip();
-                //if next column is a done column (Wiplimit == 0)
-                if(nextColumn && !nextColumn.wipLimit ){
-                    //console.log("Include " + nextColumn.title + "in wip");
-                    useNext = true;
-                        wip += nextColumn.getCurrentWip();
-                    thisColumn.setCurrentWip(wip);
-                    nextColumn.setCurrentWip("");
-                }
- 
-                if(wip > wipLimit){
-                    //console.log("wipLimit broken");
-                    thisColumn .setColumnColor("above-wip");
-                    if(useNext){
-                        nextColumn.setColumnColor("above-wip");
-                    }
-                }else if(wip == wipLimit){
-                    //console.log("on wiplimit");
-                    thisColumn.setColumnColor("on-wip");
-                    if(useNext){
-                        nextColumn.setColumnColor("on-wip");
-                    }
-                }else{
-                    //console.log("below wiplimit");
-                    thisColumn.setColumnColor("below-wip");
-                    if(useNext){
-                        nextColumn.setColumnColor("below-wip");
-                    }
-                }
-            }
-            
-    }
-    setTimeout(checkWip, 5000);
-}
- 
-function getColumns(){
- 
-    var headerContainer = document.getElementsByClassName("header-container")[0];
-    var headers = headerContainer.getElementsByClassName("member-header-content");
-    var columnContainer = document.getElementsByClassName("content-container")[0];
-    var columnContainers = columnContainer.getElementsByClassName("member-content");
-    var columns =[];
-    for (var i in headers) {
-        if(headers[i].textContent !== undefined){
-           // console.log(headers[i].textContent);
-            column = {};
-            column.title = headers[i].getAttribute("title");
-            column.header = headers[i];
-            column.container = columnContainers[i];
-            column.removeColumnColor = removeColumnColor;
-            column.setColumnColor = setColumnColor;
-            column.setCurrentWip = setCurrentWip;
-            column.getCurrentWip = getCurrentWip;
-            //set wipLimit
-            if(column.header.getElementsByClassName("limit")[0]){
-                column.wipLimit = parseInt(column.header.getElementsByClassName("limit")[0].textContent.replace("/",""));
-                //console.log("wipLimit ="+column.wipLimit);
-            }
-            
-           columns.push(column);
-        }
-    }
- 
-    return columns;
- 
-}
- 
-function setCurrentWip(currentWip){
-    try{
-        this.header.getElementsByClassName("current")[0].textContent = currentWip;
-    }catch(e){}
-}
- 
-function getCurrentWip(){
-    return this.container.getElementsByClassName(kanbanBoard.tileClass).length;
-}
- 
-function setColumnColor( aClass){
-    this.removeColumnColor();
-    $(this.container).addClass(aClass);
-    $(this.header.parentNode).addClass(aClass);
-}
 
-function removeColumnColor(){
-    $(this.container).removeClass("on-wip");
-    $(this.header.parentNode).removeClass("on-wip");
-    $(this.container).removeClass("below-wip");
-    $(this.header.parentNode).removeClass("below-wip");
-    $(this.container).removeClass("above-wip");
-    $(this.header.parentNode).removeClass("above-wip");
-}
 
- 
- 
- 
-    function setTileColor($itemElm,colorMap,standardColors){
+        setInterval(function(){
+            var tiles = getTiles(board);
+            enhanceTiles(tiles);
+            console.log("Updated "+tiles.length + " tiles");
+        }, 2000);
+
+    }
+
+    function setTileColors($tiles, colorMap, standardColors,standardBorderColors){
+        $tiles.each(function () {
+            var $itemElm = $(this);
+            setTileColor($itemElm,colorMap,standardColors,standardBorderColors);
+
+        });
+    }
+
+    function isEnchanced($itemElm){
+        var $tileColorDiv =  $itemElm.find("."+kanbanBoard.tileContentClass)[0];
+        if($($tileColorDiv).attr("class").toString().indexOf("buddy")>-1){
+
+            return true;
+        }
+        return false;
+    };
+
+    function setEnchanced($items){
+        _.forEach($items, function(item){
+            var $tileColorDiv =  $(item).find("."+kanbanBoard.tileContentClass)[0];
+            $($tileColorDiv).addClass("buddy");
+        });
+
+    };
+
+
+
+    function setTileColor($itemElm,colorMap,standardColors, standardBorderColors){
         var itemClassification;
         var tileData = $itemElm.find(".title").text().split(" ");
-        var style = $itemElm.attr("style")
+        var $tileColorDiv =  $itemElm.find("."+kanbanBoard.tileContentClass)[0];
+        var style = $($tileColorDiv).attr("style")
         var styleIndex = _.indexOf(standardColors,style);
+        var contentContainerDiv = $itemElm.find("."+kanbanBoard.contentContainerClass)[0]
+        var borderStyle = $(contentContainerDiv).attr("style");
+        var borderStyleIndex = _.indexOf(standardBorderColors,borderStyle);
         itemClassification = tileData[0];
         // set woorktype
-        var color = colorMap[itemClassification];
-        if(typeof colorMap[itemClassification]!=="undefined"){
-            setClass($itemElm,colorMap[itemClassification]);
-        } else{
 
-            setClass($itemElm, "std"+styleIndex);
+        if(isEnchanced($itemElm)){
+            return
         }
+        if(typeof colorMap[itemClassification]!=="undefined"){
+            setTileContentClass($tileColorDiv,colorMap[itemClassification]);
+            replaceStyle($itemElm.find("."+kanbanBoard.contentContainerClass)[0],"border"+borderStyleIndex);
+        } else{
+            setTileContentClass($tileColorDiv,"std"+styleIndex);
+            replaceStyle($itemElm.find("."+kanbanBoard.contentContainerClass)[0],"border"+borderStyleIndex);
+        }
+
+    }
+
+    function setTileContentClass(tileColorDiv,colorClass){
+        replaceStyle(tileColorDiv,colorClass);
+        removeStyle($(tileColorDiv).find(".title"));
+    }
+
+    function getStandardBorderColors(){
+        var contentContainers = $("."+ kanbanBoard.contentContainerClass);
+        return getStyles(contentContainers);
+    }
+
+    function getStyles(items){
+        var styles = {};
+        _.forEach(items,function(item){
+            var style = $(item).attr("style");
+            if(style){
+                styles[style] = style;
+            }
+
+        });
+        var standardStyles = [];
+        _.forEach(styles,function(style){
+            standardStyles.push(style);
+            console.log("Std color :" + style);
+        });
+        return standardStyles;
     }
 
     function getStandardColors($tiles){
         var styles = {};
         _.forEach($tiles,function($tile){
-            var style = $($tile).attr("style");
-            styles[style] = style;
+            var style = $($tile).find("."+ kanbanBoard.tileContentClass).attr("style");
+            if(style){
+                styles[style] = style;
+            }
+
         });
         var standardColors = [];
         _.forEach(styles,function(style){
-           standardColors.push(style);
+            standardColors.push(style);
+            console.log("Std color :" + style);
         });
         return standardColors;
     }
@@ -271,30 +230,35 @@ function removeColumnColor(){
         var styles = {};
         var index = 0
         _.forEach(standardColors,function(color){
-            styles["std"+index] = ".board-tile.std"+index+".pale {background-color: transparent; border-color: #ddd; color: #ddd}"+
-            ".board-tile.std"+index + "{"+color+"}";
+            styles["std"+index] = "."+ kanbanBoard.tileContentClass+".std"+index + "{"+color+ "color: black}"+
+            "." + kanbanBoard.tileContentClass +".std"+index+".pale {background-color: transparent; border-color: #ddd; color: #ddd}";
             index++;
         });
         return styles;
     }
 
-    function setStandardCardGlobalStyle(styles){
+    function generateStandardBoarderClasses(standardBorderColors){
+        var styles = {};
+        var index = 0
+        _.forEach(standardBorderColors,function(color){
+            styles["std"+index] = ".agile-board .board-tile ."+ kanbanBoard.contentContainerClass+".border"+index + "{"+color+"}"+
+                ".agile-board .board-tile ."+ kanbanBoard.contentContainerClass+".border"+index + ".pale{border-left-color: #ddd;}"
+            ;
+            index++;
+        });
+        return styles;
+    }
+
+    function setStandardGlobalStyle(styles){
         var stdStyles ="";
         _.forEach(styles,function(style){
-           stdStyles += style;
+            stdStyles += style;
         });
         addGlobalStyle(stdStyles);
     }
- 
-    function setTileColors($tiles, colorMap, standardColors){
-        $tiles.each(function () {
-            var $itemElm = $(this);
-            setTileColor($itemElm,colorMap,standardColors);
-        });
-    }
 
-    function highlightDate($itemElm,colorMap){
-        var tileData = $itemElm.html();
+    function highlightDate($itemElm){
+        var tileData = $($itemElm.find(".clickable-title")).html();
         var date = tileData.match(/\d{4}-\d{2}-\d{2}/);
         var color = "white";
         var dateObject;
@@ -307,45 +271,39 @@ function removeColumnColor(){
             }else if (daysUntil < 7){
                 color = "yellow";
             }
-            $itemElm.html(tileData.replace(date, "<strong class='duedate "+color+"'>" + date + "</strong>"));
+            $($itemElm.find(".clickable-title")).html(tileData.replace(date, "<strong class='duedate "+color+"'>" + date + "</strong>"));
         }
     }
 
     function highlightDates($tiles){
         $tiles.each(function () {
             var $itemElm = $(this);
+            if(isEnchanced($itemElm)){
+                return
+            }
             highlightDate($itemElm);
         });
     }
- 
-    function setLargeCards($tiles){
-        $tiles.each(function () {
-            var $itemElm = $(this);
-            setLargeCard($itemElm);
-        });
-    }
- 
-    function setLargeCard($itemElm){
-        if($itemElm.find(".editIcon").length===0){
-            setClass($itemElm,"largeCard");
-        }
-    }
- 
+
+
     function setRelationAttribute($itemElm){
         var caseId;// Set relation
-        var tileData = $itemElm.find(".title").text().split(" ");
+        var tileData = $itemElm.text().split(" ");
+        if(isEnchanced($itemElm)){
+            return
+        }
         caseId = getRelationId(tileData);
         $itemElm.attr('data-case-id', caseId);
-        
+
     }
- 
+
     function setRelationAttributes($tiles){
-        $tiles.each(function () {
-            var $itemElm = $(this);
+        _.forEach($tiles,function (tile) {
+            var $itemElm = $(tile);
             setRelationAttribute($itemElm);
         });
     }
-    
+
     function getRelationId(tileData){
         var index;
         for (index = 0; index < tileData.length; index ++) {
@@ -355,65 +313,67 @@ function removeColumnColor(){
         }
         return "";
     }
-    
+
     function setFilerAttribute($itemElm){
-        var caseId = "";// Set relation
         var tileData = $itemElm.find(".title").text().split(" ");
-        filterId = getFilterId(tileData);
+        var filterId = getFilterId(tileData);
+        if(filterId){
+            tileData.pop();
+            $itemElm.find(".title").text(tileData.join(" "));
+        }
         $itemElm.attr('filter', filterId);
         return filterId;
-        
+
     }
- 
+
     function setFilrerAttributes($tiles){
         var filters = {};
         $tiles.each(function () {
             var $itemElm = $(this);
-            var filter = "";
-                filter = setFilerAttribute($itemElm);
-                if(filter !== ""){
-                    filters[filterId] = null;
-                }
+            var filter = setFilerAttribute($itemElm);
+            if(filter !== ""){
+                filters[filter] = null;
+            }
         });
         console.log("Filters found on board = " + jsonEncode(filters));
         return filters;
     }
- 
+
     function getFilterId(tileData){
         if(tileData[tileData.length-1].indexOf(FILTER_IDENTIFIER)===0){
             return tileData[tileData.length-1];
         }
         return "";
     }
- 
+
     function applyFilter(filter, board){
         getTiles(board)
-        .each(function () {
-            var $itemElm = $(this);
-            if (filter!=='show all' && filter != $itemElm.attr("filter")){
-                $itemElm.attr("style","display:none;");
-            }else{
-                $itemElm.attr("style","");
-            }
-        });
+            .each(function () {
+                var $itemElm = $(this);
+                if (filter!=='show all' && filter != $itemElm.attr("filter")){
+                    $itemElm.attr("style","display:none;");
+                }else{
+                    $itemElm.attr("style","");
+                }
+            });
     }
 
 
     function applyTextFilter(filter, board){
-		console.log("applyTextFilter: " + filter);
+        console.log("applyTextFilter: " + filter);
         getTiles(board)
-        .each(function () {
-            var $itemElm = $(this);
-			//var title=$itemElm.find(".title").text().toUpperCase();
-			var title=$itemElm.text().toUpperCase();
-			console.log("Title: " + title);
-			
-            if (title.indexOf(filter.toUpperCase()) === -1){
-                $itemElm.attr("style","display:none;");
-            }
-		});
+            .each(function () {
+                var $itemElm = $(this);
+                //var title=$itemElm.find(".title").text().toUpperCase();
+                var title=$itemElm.text().toUpperCase();
+                console.log("Title: " + title);
+
+                if (title.indexOf(filter.toUpperCase()) === -1){
+                    $itemElm.attr("style","display:none;");
+                }
+            });
     }
- 
+
     function addFilterDropdown(filters) {
         var select = document.createElement('select');
         select.setAttribute("id","filter-select");
@@ -426,23 +386,23 @@ function removeColumnColor(){
     }
 
     function watermark(inputId,watermarkText) {
-     $('#'+inputId).blur(function(){
-      if ($(this).val().length === 0){
-        $(this).val(watermarkText).addClass('watermark');
-      }
-        
-     }).focus(function(){
-      if ($(this).val() === watermarkText){
-        $(this).val('').removeClass('watermark');
-      }
-     }).val(watermarkText).addClass('watermark');
+        $('#'+inputId).blur(function(){
+            if ($(this).val().length === 0){
+                $(this).val(watermarkText).addClass('watermark');
+            }
+
+        }).focus(function(){
+            if ($(this).val() === watermarkText){
+                $(this).val('').removeClass('watermark');
+            }
+        }).val(watermarkText).addClass('watermark');
     }
 
- 
+
     function addFilterTextbox() {
         var textbox = document.createElement('input');
-		textbox.type = 'text';
-		textbox.setAttribute("id","filter-text");
+        textbox.type = 'text';
+        textbox.setAttribute("id","filter-text");
         $('.hub-title').append(textbox);
         watermark("filter-text","Filter cards");
         textFilter = function(){
@@ -454,59 +414,59 @@ function removeColumnColor(){
         };
     }
 
-
- 
-    
-    function setClass($elm, className) {
-        
-        $elm.addClass(className);
-        $elm.removeAttr( "style" );
+    function replaceStyle(elm, className) {
+        $(elm).addClass(className);
+        removeStyle(elm);
     }
-    
-    
+
+    function removeStyle(elm){
+        $(elm).removeAttr( "style" );
+    }
+
+
     function setCaseHighLight() {
         if ($("[data-case-id]").length < 1) {
             setTimeout(setCaseHighLight, 1000);
             return;
         }
-        
+
         function pale(){
-            $(this).addClass("pale");
-            $(this).find(".duedate").addClass("pale");
+            getTileContentDiv($(this)).addClass("pale");
+            getTileContentContainerDiv($(this)).addClass("pale");
+            $($(this).find(".duedate")).addClass("pale");
+            $($(this).find("img")).addClass("pale");
         }
 
         function normal(){
-            $(this).removeClass("pale");
-            $(this).find(".duedate").removeClass("pale");
+            getTileContentDiv($(this)).removeClass("pale");
+            getTileContentContainerDiv($(this)).removeClass("pale");
+            $($(this).find(".duedate")).removeClass("pale");
+            $($(this).find("img")).removeClass("pale");
         }
 
         $('[data-case-id]')
-        .mouseenter(function (evt) {
-            var caseId = $(evt.target).attr('data-case-id') || $(evt.target).closest('[data-case-id]').attr('data-case-id');
-            hovered = caseId;
-           
-            if(caseId !== ""){
-              console.log('Mouse enter... case #:' + caseId);
-              //$("[data-case-id!='" + caseId + "']").addClass('pale');
-              $("[data-case-id!='" + caseId + "']").each(pale);
-              //$("[data-case-id='" + caseId + "']").removeClass('pale');
-              $("[data-case-id='" + caseId + "']").each(normal);
-            }
-            
-        })
-        .mouseleave(function (evt) {
-            hovered = "";
-            setTimeout(function(){
-                if (hovered === ""){
-                    //$("[data-case-id]").removeClass('pale');
-                    $("[data-case-id]").each(normal);
-
+            .mouseenter(function (evt) {
+                var caseId = $(evt.target).attr('data-case-id') || $(evt.target).closest('[data-case-id]').attr('data-case-id');
+                if(caseId !== ""){
+                    console.log('Mouse enter... case #:' + caseId);
+                    $("[data-case-id!='" + caseId + "']").each(pale);
+                    $("[data-case-id='" + caseId + "']").each(normal);
                 }
-            },200);
-            
-        });
+
+            })
+            .mouseleave(function (evt) {
+                        $("[data-case-id]").each(normal);
+            });
     }
-    
+
+    function getTileContentDiv(boardTile){
+        return $(boardTile.find("."+kanbanBoard.tileContentClass)[0])
+    }
+
+    function getTileContentContainerDiv(boardTile){
+        return $(boardTile.find("."+kanbanBoard.contentContainerClass)[0])
+    }
+
     function addGlobalStyle(css) {
         var head, style;
         head = document.getElementsByTagName('head')[0];
@@ -516,24 +476,7 @@ function removeColumnColor(){
         style.innerHTML = css;
         head.appendChild(style);
     }
-    
-    
-    function isKanbanBoard(){
-        return document.URL.indexOf("/_backlogs/board")>-1;
-    }
- 
-    function getMessageType(){
-        var type = GET_TASK_BOARD_MAPPING;
-        if(isKanbanBoard()){
-            type = GET_KANBAN_BOARD_MAPPING;
-        }
-        return type;
-    }
- 
-    function getBoardType(){
-        return kanbanBoard;
-    }
- 
+
     function getTiles(board){
         var tiles;
         console.log("getTiles " + board.tileClass);
@@ -541,54 +484,34 @@ function removeColumnColor(){
         console.log("Tiles found");
         return tiles;
     }
-    
+
     function setTileClass(css, board){
-        var result = replaceAll(css ,"$tileClass", board.tileClass);
+        var result = replaceAll(css ,"$tileClass", board.tileContentClass);
         console.log("CSS " + result);
         return result;
     }
- 
+
     function escapeRegExp(string) {
         return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
     }
- 
+
     function replaceAll(string, find, replace) {
         return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
     }
- 
-    function reloadBoardTimeout(timeout){
-        if(!timeout){
-          timeout = 3600000; //Reload every hour 
-        }
-        setTimeout (location.reload,timeout);
-    }
-    
-    
+
     function getSettings(callback){
-      console.log("Settings " + jsonEncode(settings));
-      var colorMap = {};
-      
-      if(settings){
-          console.log("Settings.colormap");
-          var type = getMessageType();
-          if (settings.kanbanBoardColorMap){
+        console.log("Settings " + jsonEncode(settings));
+        var colorMap = {};
+        if(settings){
             colorMap = splitColors(settings.kanbanBoardColorMap);
-          }
-          
-          if(type === GET_TASK_BOARD_MAPPING){
-              colorMap = settings.taskBoardColorMap;
-          }
-      }
-      
-      callback(colorMap);
-       
-      
+        }
+        callback(colorMap);
     }
 
     function splitColors(colorMap){
         var splittedColorMap ={};
         var prefix;
-        var spit;
+        var split;
         var index;
         for (prefix in colorMap ){
             split = prefix.split(";");
@@ -599,41 +522,31 @@ function removeColumnColor(){
         }
         return splittedColorMap;
     }
-    
+
     function userscript () {
-        
+
         console.log("content-script board.js Starting");
         getSettings( function(response) {
-            var board = getBoardType();
+            var board = kanbanBoard;
             console.log("Board data " + jsonEncode(board) );
             console.log("colorMap " + jsonEncode(response));
             if(response){
                 improveBoard(response, board);
             }
- 
-            
-            if(board.relations){
-                setCaseHighLight();
-            }
-            
-            addGlobalStyle(
-                setTileClass(customCardSize+customStylePale +
-                    customStyleColor,
-                    board
-                )
-            );
-            
-            
+            setCaseHighLight();
+            addGlobalStyle(setTileClass(customStyleColor,board));
+            addGlobalStyle(setTileClass(customStylePale,board));
+
             $(window)
-            .focus(function () { is_focused = true; })
-            .blur(function () { is_focused = false; });
- 
+                .focus(function () { is_focused = true; })
+                .blur(function () { is_focused = false; });
+
         });
- 
-        
-        
+
+
+
     }
-    
+
     setTimeout(userscript,0);
-    
+
 }

@@ -66,6 +66,11 @@ function updateBoard(settings) {
         var tileData = $itemElm.find(".clickable-title").text().split(" ");
         var newBoardSetup = false
         var itemClassification = tileData[0];
+        if(itemClassification.indexOf("-")>-1){
+            try{
+                itemClassification = itemClassification.split("-")[1]
+            }catch (e){};
+        }
         // set woorktype
         if($itemElm.find(".editIcon").length !==0){
             newBoardSetup = true;

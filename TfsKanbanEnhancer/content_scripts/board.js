@@ -77,6 +77,7 @@ function updateBoard(settings) {
             return;
         }
         
+        
         var $tiles = getTiles(board);
         console.log($tiles.length + " tiles on board");
         var standardColors = getStandardColors($tiles);

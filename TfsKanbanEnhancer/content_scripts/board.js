@@ -1,8 +1,6 @@
 function updateBoard(settings) {
 
     var textFilter;
-    var GET_KANBAN_BOARD_MAPPING = "get-color-map";
-    var GET_TASK_BOARD_MAPPING = "get-task-color-map";
     var FILTER_IDENTIFIER ="|";
 
     var is_focused = true;
@@ -15,6 +13,7 @@ function updateBoard(settings) {
     };
 
     var customStylePale =
+            ".largecard {min-height: 60px;}"+
             ".pale {opacity: 0.4;}" +
             ".$tileClass.yellow.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
             ".$tileClass.blue.pale {background-color: transparent; border-color: #ddd; color: #ddd}" +
@@ -59,7 +58,9 @@ function updateBoard(settings) {
             ".duedate.red {background-color: black; color: red} "+
             ".inprogress.on-wip{background-color: #FBFBEF;}"+
             ".inprogress.above-wip{background-color: #FBEFEF;}"+
-            ".inprogress.below-wip{background-color: #FFFFFF;}"
+            ".inprogress.below-wip{background-color: #FFFFFF;}"+
+            ".dil{padding: 3px; bottom: 3px;right: 3px;position: absolute; background-color:black;color:white;}"
+
 
         ;
 
@@ -77,6 +78,7 @@ function updateBoard(settings) {
             return;
         }
 
+        $(".board-tile-content").addClass("largecard");
         var $tiles = getTiles(board);
         console.log($tiles.length + " tiles on board");
         var standardColors = getStandardColors($tiles);
@@ -120,7 +122,7 @@ function updateBoard(settings) {
         $("#filter-select").change(filterBoard);
         $("#filter-text").change(filterBoard);
 
-
+        daysInLane();
 
         setInterval(function(){
             var tiles = getTiles(board);
@@ -167,6 +169,12 @@ function updateBoard(settings) {
         var borderStyle = $(contentContainerDiv).attr("style");
         var borderStyleIndex = _.indexOf(standardBorderColors,borderStyle);
         itemClassification = tileData[0];
+        if(typeof colorMap[itemClassification] === "undefined" && itemClassification.indexOf("-")>-1){
+            try{
+                itemClassification = itemClassification.split("-")[1]
+            }catch (e){};
+        }
+
         // set woorktype
 
         if(isEnchanced($itemElm)){
@@ -447,14 +455,17 @@ function updateBoard(settings) {
         $('[data-case-id]')
             .mouseenter(function (evt) {
                 var caseId = $(evt.target).attr('data-case-id') || $(evt.target).closest('[data-case-id]').attr('data-case-id');
+                $($(this).find(".dil")).attr("style","");
                 if(caseId !== ""){
                     console.log('Mouse enter... case #:' + caseId);
+
                     $("[data-case-id!='" + caseId + "']").each(pale);
                     $("[data-case-id='" + caseId + "']").each(normal);
                 }
 
             })
             .mouseleave(function (evt) {
+                        $($(this).find(".dil")).attr("style","display:none;");
                         $("[data-case-id]").each(normal);
             });
     }

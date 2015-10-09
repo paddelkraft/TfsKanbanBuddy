@@ -120,6 +120,17 @@ function buildSnapshotForColumn(snapshot, flowData,laneIndex){
 	}
 }
 
+function buildBoardEnhancementData(boardData){
+    var snapshot = buildSnapshot(boardData);
+    var dilData = {};
+    _.forEach(snapshot.lanes,function(lane){
+        _.forEach(lane.tickets,function (ticket){
+            dilData[ticket.id] = ticket;
+        });
+    });
+    return dilData
+}
+
 function blockedDays (ticket) {
 	if(! ticket.blockedSince()){
 		return "";

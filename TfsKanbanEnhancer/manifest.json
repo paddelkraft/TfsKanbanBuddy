@@ -1,7 +1,7 @@
 {
     "name": "TFS 2015 kanban buddy (beta)",
 
-    "version": "0.7.1",
+    "version": "0.7.2",
     "manifest_version": 2,
     "browser_action": {
         "default_title": "TFS kanban board enhancer",
@@ -46,10 +46,12 @@
             "js": [
                     "utils_js/util.js",
                     "utils_js/jquery-2.1.1.min.js",
-
+                    "utils_js/boarddata.js",
+                    "pages/flowdata.js",
                     "content_scripts/board.js",
                     "content_scripts/tfsBoardInit.js",
-                    "content_scripts/projectUrl.js"
+                    "content_scripts/projectUrl.js",
+                    "content_scripts/daysinlane.js"
                   ]
     	},
         {

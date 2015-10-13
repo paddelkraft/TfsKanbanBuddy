@@ -1,0 +1,1599 @@
+<div class="rightPane hotkey-section hotkey-section-1" style="left: 200px;">
+
+
+    <div class="hub-title">
+
+        <script class="backlog-context" defer="defer" type="application/json"></script>
+
+        <div class="board-page-title-area">
+            Backlog items
+        </div>
+        <div class="small-chart-group-container">
+            <div class="velocity-chart small-chart-container" id="20" title="Velocity">
+                <!--script class="options" defer="defer" type="application/json">{
+                    "title": "Velocity",
+                    "iterationsNumber": 5,
+                    "errors": []
+                }</script>
+                <img width="140" height="40" tabindex="0" alt="" class="clickable" style=""
+                     src="/DefaultCollection/2d634c88-546d-42cf-a20b-f5573a8a65a2/_api/_teamChart/Velocity?chartOptions=%7B%22Width%22%3A140%2C%22Height%22%3A40%2C%22ShowDetails%22%3Afalse%2C%22Title%22%3A%22%22%7D&amp;counter=1&amp;iterationsNumber=5&amp;__v=5" -->
+            </div>
+            <div class="cumulative-flow-chart small-chart-container" id="21" title="Cumulative flow">
+                <!--script class="options" defer="defer" type="application/json">{
+                    "title": "Cumulative flow",
+                    "categoryRefName": "Microsoft.RequirementCategory",
+                    "errors": [],
+                    "startDate": null,
+                    "hideIncoming": false,
+                    "isTeamAdmin": true
+                }</script>
+                <img width="140" height="40" tabindex="0" alt="" class="clickable" style=""
+                     src="/DefaultCollection/2d634c88-546d-42cf-a20b-f5573a8a65a2/_api/_teamChart/CumulativeFlow?chartOptions=%7B%22Width%22%3A140%2C%22Height%22%3A40%2C%22ShowDetails%22%3Afalse%2C%22Title%22%3A%22%22%7D&amp;counter=1&amp;hubCategoryRefName=Microsoft.RequirementCategory&amp;__v=5"-->
+            </div>
+        </div>
+
+    </div>
+    <div class="hub-progress pageProgressIndicator" style="display: none;"></div>
+
+
+    <div class="right-hub-content">
+
+
+        <div class="hub-pivot">
+
+            <div class="views">
+
+                <ul class="pivot-view enhance productbacklog-view-tabs" id="15">
+                    <li data-id="backlog" title="Backlog"><a
+                            href="/DefaultCollection/tfsDataCollection/_backlogs/backlog/Backlog%20items">Backlog</a>
+                    </li>
+                    <li class="selected" data-id="board" title="Board"><a
+                            href="/DefaultCollection/tfsDataCollection/_backlogs/board/Backlog%20items">Board</a></li>
+                </ul>
+
+            </div>
+            <div class="filters">
+                <div id="130" class="agile-board-search-container base-filter-box search-input-control-container"><input
+                        type="text" class="text-filter-input" title="Filter" tabindex="0" style="display: none;"><span
+                        class="text-filter-image icon icon-header-search" style="display: none;"></span>
+
+                    <div class="search-icon-container" tabindex="0">
+                        <div class="icon icon-header-search" title="Filter the board"></div>
+                    </div>
+                </div>
+                <ul id="23" role="menubar" class="menu-bar board-settings">
+                    <li id="mi_25" role="menuitem" class="menu-item" title="Configure settings" command="settings"><span
+                            class="icon icon-settings"></span><span class="html"></span></li>
+                    <li id="mi_29" role="menuitem" class="menu-item" title="Enter full screen mode"
+                        command="fullscreen-toggle"><span class="icon icon-enter-full-screen"></span><span
+                            class="html"></span></li>
+                    <li class="menu-focus-container">
+                        <div class="menu-focus-receiver" tabindex="0" role="menu"></div>
+                    </li>
+                </ul>
+
+                <div class="agile-board-pivot-contributions">
+                    <ul id="131" role="menubar" class="menu-bar">
+                        <li class="menu-focus-container">
+                            <div class="menu-focus-receiver" tabindex="0" role="menu"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="hub-pivot-content">
+
+            <script class="team-settings-data" defer="defer" type="application/json"></script>
+            <script class="process-settings-data" defer="defer" type="application/json"></script>
+            <script class="workitemtype-colors" defer="defer" type="application/json">[
+                {
+                    "PrimaryColor": "FFCC293D",
+                    "SecondaryColor": "FFFAEAE5",
+                    "WorkItemTypeName": "Bug"
+                },
+                {
+                    "PrimaryColor": "FFFF9D00",
+                    "SecondaryColor": "FFFCEECF",
+                    "WorkItemTypeName": "Code Review Request"
+                },
+                {
+                    "PrimaryColor": "FFFF9D00",
+                    "SecondaryColor": "FFFCEECF",
+                    "WorkItemTypeName": "Code Review Response"
+                },
+                {
+                    "PrimaryColor": "FFFF7B00",
+                    "SecondaryColor": "FFFFD7B5",
+                    "WorkItemTypeName": "Epic"
+                },
+                {
+                    "PrimaryColor": "FF773B93",
+                    "SecondaryColor": "FFEEE2F2",
+                    "WorkItemTypeName": "Feature"
+                },
+                {
+                    "PrimaryColor": "FFFF9D00",
+                    "SecondaryColor": "FFFCEECF",
+                    "WorkItemTypeName": "Feedback Request"
+                },
+                {
+                    "PrimaryColor": "FFFF9D00",
+                    "SecondaryColor": "FFFCEECF",
+                    "WorkItemTypeName": "Feedback Response"
+                },
+                {
+                    "PrimaryColor": "FFFF9D00",
+                    "SecondaryColor": "FFFCEECF",
+                    "WorkItemTypeName": "Impediment"
+                },
+                {
+                    "PrimaryColor": "FF009CCC",
+                    "SecondaryColor": "FFD6ECF2",
+                    "WorkItemTypeName": "Product Backlog Item"
+                },
+                {
+                    "PrimaryColor": "FFFF9D00",
+                    "SecondaryColor": "FFFCEECF",
+                    "WorkItemTypeName": "Shared Parameter"
+                },
+                {
+                    "PrimaryColor": "FFFF9D00",
+                    "SecondaryColor": "FFFCEECF",
+                    "WorkItemTypeName": "Shared Steps"
+                },
+                {
+                    "PrimaryColor": "FFF2CB1D",
+                    "SecondaryColor": "FFF6F5D2",
+                    "WorkItemTypeName": "Task"
+                },
+                {
+                    "PrimaryColor": "FFFF9D00",
+                    "SecondaryColor": "FFFCEECF",
+                    "WorkItemTypeName": "Test Case"
+                },
+                {
+                    "PrimaryColor": "FFFF9D00",
+                    "SecondaryColor": "FFFCEECF",
+                    "WorkItemTypeName": "Test Plan"
+                },
+                {
+                    "PrimaryColor": "FFFF9D00",
+                    "SecondaryColor": "FFFCEECF",
+                    "WorkItemTypeName": "Test Suite"
+                }
+            ]</script>
+            <script class="team-members-data" defer="defer" type="application/json"></script>
+
+            <div class="agile-board-message-area"></div>
+            <div class="agile-board" id="22" style="height: 175px;">
+                <div class="horizontal" style="visibility: visible;">
+                    <div class="agile-header-container not-scrollable">
+                        <div class="horizontal-table" style="padding-right: 0px; width: 2688px;">
+                            <div class="header-container row header">
+                                <div class="cell proposed" style="width: 224px;">
+                                    <div id="32" class="click-to-edit horizontal">
+                                        <div class="member-header-content member header editable" title="ToDo"
+                                             style="max-width: 174px;">ToDo
+                                        </div>
+                                        <div class="member-header-edit member header"
+                                             style="display: none; max-width: 174px;"><input
+                                                class="member-header-content-input">
+
+                                            <div class="content-edit-cancel-image"></div>
+                                        </div>
+                                    </div>
+                                    <i class="icon hide" tabindex="0" title="Collapse"></i></div>
+                                <div class="cell inprogress split" style="width: 445px;">
+                                    <div id="36" class="click-to-edit horizontal">
+                                        <div class="member-header-content member header editable exceed" title="Req IP"
+                                             style="max-width: 371px;">Req IP
+                                        </div>
+                                        <div class="member-header-edit member header"
+                                             style="display: none; max-width: 371px;"><input
+                                                class="member-header-content-input">
+
+                                            <div class="content-edit-cancel-image"></div>
+                                        </div>
+                                    </div>
+                                    <div id="37" class="boards-controls-limit kanban-customize exceed"
+                                         title="Number of items / WIP Limit">
+                                        <div><span class="current">7</span><span class="separator">/</span><span
+                                                class="limit">1</span></div>
+                                    </div>
+                                    <span class="icon icon-info-white description" tabindex="0"
+                                          style="cursor: pointer;"></span></div>
+                                <div class="cell inprogress" style="width: 224px;">
+                                    <div id="39" class="click-to-edit horizontal">
+                                        <div class="member-header-content member header editable exceed"
+                                             title="Architecture IP" style="max-width: 150px;">Architecture IP
+                                        </div>
+                                        <div class="member-header-edit member header"
+                                             style="display: none; max-width: 150px;"><input
+                                                class="member-header-content-input">
+
+                                            <div class="content-edit-cancel-image"></div>
+                                        </div>
+                                    </div>
+                                    <div id="40" class="boards-controls-limit kanban-customize exceed"
+                                         title="Number of items / WIP Limit">
+                                        <div><span class="current">4</span><span class="separator">/</span><span
+                                                class="limit">3</span></div>
+                                    </div>
+                                    <span class="icon icon-info-white description" tabindex="0"
+                                          style="cursor: pointer;"></span></div>
+                                <div class="cell inprogress" style="width: 224px;">
+                                    <div id="42" class="click-to-edit horizontal">
+                                        <div class="member-header-content member header editable"
+                                             title="Architecture DONE" style="max-width: 178px;">Architecture DONE
+                                        </div>
+                                        <div class="member-header-edit member header"
+                                             style="display: none; max-width: 178px;"><input
+                                                class="member-header-content-input">
+
+                                            <div class="content-edit-cancel-image"></div>
+                                        </div>
+                                    </div>
+                                    <div id="43" class="boards-controls-limit kanban-customize under"
+                                         title="Number of items / WIP Limit">
+                                        <div><span class="current">5</span><span class="limit"></span></div>
+                                    </div>
+                                </div>
+                                <div class="cell inprogress" style="width: 224px;">
+                                    <div id="44" class="click-to-edit horizontal">
+                                        <div class="member-header-content member header editable" title="Dev IP"
+                                             style="max-width: 166px;">Dev IP
+                                        </div>
+                                        <div class="member-header-edit member header"
+                                             style="display: none; max-width: 166px;"><input
+                                                class="member-header-content-input">
+
+                                            <div class="content-edit-cancel-image"></div>
+                                        </div>
+                                    </div>
+                                    <div id="45" class="boards-controls-limit kanban-customize under"
+                                         title="Number of items / WIP Limit">
+                                        <div><span class="current">1</span><span class="separator">/</span><span
+                                                class="limit">5</span></div>
+                                    </div>
+                                </div>
+                                <div class="cell inprogress" style="width: 224px;">
+                                    <div id="46" class="click-to-edit horizontal">
+                                        <div class="member-header-content member header editable" title="Dev DONE"
+                                             style="max-width: 178px;">Dev DONE
+                                        </div>
+                                        <div class="member-header-edit member header"
+                                             style="display: none; max-width: 178px;"><input
+                                                class="member-header-content-input">
+
+                                            <div class="content-edit-cancel-image"></div>
+                                        </div>
+                                    </div>
+                                    <div id="47" class="boards-controls-limit kanban-customize under"
+                                         title="Number of items / WIP Limit">
+                                        <div><span class="current">4</span><span class="limit"></span></div>
+                                    </div>
+                                </div>
+                                <div class="cell inprogress" style="width: 224px;">
+                                    <div id="48" class="click-to-edit horizontal">
+                                        <div class="member-header-content member header editable" title="Test IP"
+                                             style="max-width: 166px;">Test IP
+                                        </div>
+                                        <div class="member-header-edit member header"
+                                             style="display: none; max-width: 166px;"><input
+                                                class="member-header-content-input">
+
+                                            <div class="content-edit-cancel-image"></div>
+                                        </div>
+                                    </div>
+                                    <div id="49" class="boards-controls-limit kanban-customize under"
+                                         title="Number of items / WIP Limit">
+                                        <div><span class="current">2</span><span class="separator">/</span><span
+                                                class="limit">5</span></div>
+                                    </div>
+                                </div>
+                                <div class="cell inprogress" style="width: 224px;">
+                                    <div id="50" class="click-to-edit horizontal">
+                                        <div class="member-header-content member header editable" title="Test DONE"
+                                             style="max-width: 178px;">Test DONE
+                                        </div>
+                                        <div class="member-header-edit member header"
+                                             style="display: none; max-width: 178px;"><input
+                                                class="member-header-content-input">
+
+                                            <div class="content-edit-cancel-image"></div>
+                                        </div>
+                                    </div>
+                                    <div id="51" class="boards-controls-limit kanban-customize under"
+                                         title="Number of items / WIP Limit">
+                                        <div><span class="current">2</span><span class="limit"></span></div>
+                                    </div>
+                                </div>
+                                <div class="cell inprogress" style="width: 224px;">
+                                    <div id="52" class="click-to-edit horizontal">
+                                        <div class="member-header-content member header editable" title="Approval"
+                                             style="max-width: 166px;">Approval
+                                        </div>
+                                        <div class="member-header-edit member header"
+                                             style="display: none; max-width: 166px;"><input
+                                                class="member-header-content-input">
+
+                                            <div class="content-edit-cancel-image"></div>
+                                        </div>
+                                    </div>
+                                    <div id="53" class="boards-controls-limit kanban-customize under"
+                                         title="Number of items / WIP Limit">
+                                        <div><span class="current">1</span><span class="separator">/</span><span
+                                                class="limit">5</span></div>
+                                    </div>
+                                </div>
+                                <div class="cell inprogress" style="width: 224px;">
+                                    <div id="54" class="click-to-edit horizontal">
+                                        <div class="member-header-content member header editable"
+                                             title="Redy for production" style="max-width: 166px;">Redy for production
+                                        </div>
+                                        <div class="member-header-edit member header"
+                                             style="display: none; max-width: 166px;"><input
+                                                class="member-header-content-input">
+
+                                            <div class="content-edit-cancel-image"></div>
+                                        </div>
+                                    </div>
+                                    <div id="55" class="boards-controls-limit kanban-customize under"
+                                         title="Number of items / WIP Limit">
+                                        <div><span class="current">1</span><span class="separator">/</span><span
+                                                class="limit">5</span></div>
+                                    </div>
+                                </div>
+                                <div class="cell complete" style="width: 224px;">
+                                    <div id="128" class="click-to-edit horizontal">
+                                        <div class="member-header-content member header editable" title="In production"
+                                             style="max-width: 174px;">In production
+                                        </div>
+                                        <div class="member-header-edit member header"
+                                             style="display: none; max-width: 174px;"><input
+                                                class="member-header-content-input">
+
+                                            <div class="content-edit-cancel-image"></div>
+                                        </div>
+                                    </div>
+                                    <i class="icon hide" tabindex="0" title="Collapse"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="agile-content-container scrollable" style="top: 27px; overflow-y: auto;">
+                        <div class="horizontal-table" style="width: 2688px;">
+                            <div class="content-container row content">
+                                <div class="cell member-content member content proposed ui-droppable" id="33"
+                                     style="width: 224px; position: relative;"><h2 class="label">ToDo</h2>
+
+                                    <div class="add-card-container">
+                                        <div id="34" class="board-add-card" title="Add: Product Backlog Item,Bug"
+                                             tabindex="0">
+                                            <div class="icon-add enabled"></div>
+                                            <span class="text">New item</span></div>
+                                        <div id="35"
+                                             class="search-input-container base-filter-box search-input-control-container">
+                                            <input type="text" class="text-filter-input" title="Filter" tabindex="0"
+                                                   style="display: none;"><span
+                                                class="text-filter-image icon icon-header-search"
+                                                style="display: none;"></span>
+
+                                            <div class="search-icon-container" tabindex="0" style="display: block;">
+                                                <div class="icon icon-header-search"
+                                                     title="Filter the first column"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="member-border-line"></div>
+                                    <div id="171" class="board-tile propagate-keydown-event ui-draggable" tabindex="0"
+                                         style="width: 199.667px;">
+                                        <div class="board-tile-content-container"
+                                             style="border-left-color: rgb(0, 156, 204);">
+                                            <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                 title="">
+                                                <div class="id-title-container">
+                                                    <div class="id" field="System.Id">46</div>
+                                                    <div class="title ellipsis" field="System.Title"
+                                                         title="CR #12345 |NyaAvgifter"><span class="clickable-title">CR #12345 |NyaAvgifter</span>
+                                                    </div>
+                                                </div>
+                                                <div class="card-context-menu" tabindex="0">
+                                                    <div class="icon icon-ellipsis"></div>
+                                                </div>
+                                                <div class="board-tile-annotations"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="166" class="board-tile propagate-keydown-event ui-draggable" tabindex="0"
+                                         style="width: 199.667px;">
+                                        <div class="board-tile-content-container"
+                                             style="border-left-color: rgb(0, 156, 204);">
+                                            <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                 title="">
+                                                <div class="id-title-container">
+                                                    <div class="id" field="System.Id">41</div>
+                                                    <div class="title ellipsis" field="System.Title"
+                                                         title="CR #1234 Gör Någonting kul"><span
+                                                            class="clickable-title">CR #1234 Gör Någonting kul</span>
+                                                    </div>
+                                                </div>
+                                                <div class="card-context-menu" tabindex="0">
+                                                    <div class="icon icon-ellipsis"></div>
+                                                </div>
+                                                <div class="board-tile-annotations"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cell member-content member content swimlanes" id="127">
+                                    <div class="member-vertical">
+                                        <div class="member-header ui-droppable">
+                                            <div class="icon swimlane-header-icon" tabindex="0"></div>
+                                            <div class="swimlane-member-header">
+                                                <div id="57" class="click-to-edit vertical">
+                                                    <div class="swimlane-header-title editable" title="expedite"
+                                                         style="width: 78px;">expedite
+                                                    </div>
+                                                    <div class="member-header-edit member header"
+                                                         style="display: none;"><input
+                                                            class="member-header-content-input">
+
+                                                        <div class="content-edit-cancel-image"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="58" class="swimlane-header-detail-count"><span>3</span><span
+                                                    title="Req IP">Req IP</span></div>
+                                            <div id="59" class="swimlane-header-detail-count hidden-header">
+                                                <span></span><span title="Architecture IP">Architecture IP</span></div>
+                                            <div id="60" class="swimlane-header-detail-count"><span>3</span><span
+                                                    title="Architecture DONE">Architecture DONE</span></div>
+                                            <div id="61" class="swimlane-header-detail-count hidden-header">
+                                                <span></span><span title="Dev IP">Dev IP</span></div>
+                                            <div id="62" class="swimlane-header-detail-count"><span>1</span><span
+                                                    title="Dev DONE">Dev DONE</span></div>
+                                            <div id="63" class="swimlane-header-detail-count hidden-header">
+                                                <span></span><span title="Test IP">Test IP</span></div>
+                                            <div id="64" class="swimlane-header-detail-count hidden-header">
+                                                <span></span><span title="Test DONE">Test DONE</span></div>
+                                            <div id="65" class="swimlane-header-detail-count hidden-header">
+                                                <span></span><span title="Approval">Approval</span></div>
+                                            <div id="66" class="swimlane-header-detail-count hidden-header">
+                                                <span></span><span
+                                                    title="Redy for production">Redy for production</span></div>
+                                        </div>
+                                        <div class="member-content swimlane horizontal" id="91">
+                                            <div class="agile-content-container not-scrollable">
+                                                <div class="horizontal-table">
+                                                    <div class="content-container row content">
+                                                        <div class="cell member-content member content inprogress split horizontal"
+                                                             id="74" style="width: 445px; position: relative;">
+                                                            <div class="agile-header-container not-scrollable">
+                                                                <div class="horizontal-table">
+                                                                    <div class="header-container row header">
+                                                                        <div class="cell inprogress split-column"
+                                                                             style="width: 221px;">
+                                                                            <div id="70"
+                                                                                 class="click-to-edit horizontal">
+                                                                                <div class="member-header-content member header"
+                                                                                     title="Doing">Doing
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="cell inprogress split-column"
+                                                                             style="width: 220px;">
+                                                                            <div id="72"
+                                                                                 class="click-to-edit horizontal">
+                                                                                <div class="member-header-content member header"
+                                                                                     title="Done">Done
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="agile-content-container not-scrollable">
+                                                                <div class="horizontal-table">
+                                                                    <div class="content-container row content">
+                                                                        <div class="cell member-content member content inprogress split-column ui-droppable"
+                                                                             id="71"
+                                                                             style="width: 221px; height: 200px;">
+                                                                            <div id="154"
+                                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                                 tabindex="0" style="width: 200.889px;">
+                                                                                <div class="board-tile-content-container"
+                                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                                         title="">
+                                                                                        <div class="id-title-container">
+                                                                                            <div class="id"
+                                                                                                 field="System.Id">21
+                                                                                            </div>
+                                                                                            <div class="title ellipsis"
+                                                                                                 field="System.Title"
+                                                                                                 title="CR Cfd diagram SPA |A">
+                                                                                                <span class="clickable-title">CR Cfd diagram SPA |A</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="card-context-menu"
+                                                                                             tabindex="0">
+                                                                                            <div class="icon icon-ellipsis"></div>
+                                                                                        </div>
+                                                                                        <div class="board-tile-annotations"></div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div id="160"
+                                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                                 tabindex="0" style="width: 200.889px;">
+                                                                                <div class="board-tile-content-container"
+                                                                                     style="border-left-color: rgb(204, 41, 61);">
+                                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                                         title=""
+                                                                                         style="background-color: rgb(255, 186, 105);">
+                                                                                        <div class="id-title-container">
+                                                                                            <div class="id"
+                                                                                                 field="System.Id">34
+                                                                                            </div>
+                                                                                            <div class="title ellipsis"
+                                                                                                 field="System.Title"
+                                                                                                 title="BUG detta är en till bug"
+                                                                                                 style="color: rgb(0, 0, 0);">
+                                                                                                <span class="clickable-title">BUG detta är en till bug</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="card-context-menu"
+                                                                                             tabindex="0">
+                                                                                            <div class="icon icon-ellipsis"></div>
+                                                                                        </div>
+                                                                                        <div class="board-tile-annotations"></div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="cell member-content member content inprogress split-column ui-droppable"
+                                                                             id="73"
+                                                                             style="width: 220px; height: 200px;">
+                                                                            <div id="175"
+                                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                                 tabindex="0" style="width: 201px;">
+                                                                                <div class="board-tile-content-container"
+                                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                                         title="">
+                                                                                        <div class="id-title-container">
+                                                                                            <div class="id"
+                                                                                                 field="System.Id">50
+                                                                                            </div>
+                                                                                            <div class="title ellipsis"
+                                                                                                 field="System.Title"
+                                                                                                 title="created"><span
+                                                                                                    class="clickable-title">created</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="card-context-menu"
+                                                                                             tabindex="0">
+                                                                                            <div class="icon icon-ellipsis"></div>
+                                                                                        </div>
+                                                                                        <div class="board-tile-annotations"></div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="member-border-line"></div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="76"
+                                                             style="width: 224px; position: relative; height: 200px;">
+                                                            <div class="member-border-line"></div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="78"
+                                                             style="width: 224px; position: relative; height: 200px;">
+                                                            <div class="member-border-line"></div>
+                                                            <div id="159"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(204, 41, 61);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title=""
+                                                                         style="background-color: rgb(255, 186, 105);">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">24</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="BUG #111 its a lot of bugs nowdays"
+                                                                                 style="color: rgb(0, 0, 0);"><span
+                                                                                    class="clickable-title">BUG #111 its a lot of bugs nowdays</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="162"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title=""
+                                                                         style="background-color: rgb(255, 186, 105);">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">37</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title" title="BUG A bug"
+                                                                                 style="color: rgb(0, 0, 0);"><span
+                                                                                    class="clickable-title">BUG A bug</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="165"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title=""
+                                                                         style="background-color: rgb(255, 186, 105);">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">40</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="BUG Fix something broken |Project"
+                                                                                 style="color: rgb(0, 0, 0);"><span
+                                                                                    class="clickable-title">BUG Fix something broken |Project</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="80"
+                                                             style="width: 224px; position: relative; height: 200px;">
+                                                            <div class="member-border-line"></div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="82"
+                                                             style="width: 224px; position: relative; height: 200px;">
+                                                            <div class="member-border-line"></div>
+                                                            <div id="141"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title=""
+                                                                         style="background-color: rgb(255, 230, 96);">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">7</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="MAINT #111 fixa 2015-10-19 dfklsfjsklödfjklnds fdsfksdfjlskfn fdjkfkdfn dfjlkdfäödk ckfjdfölkldfökflöldökfödlf dkfljfdlökfjsöf dslköfjf fkdf kfljfösajaöj"
+                                                                                 style="color: rgb(0, 0, 0);"><span
+                                                                                    class="clickable-title">MAINT #111 fixa 2015-10-19 dfklsfjsklödfjklnds fdsfksdfjlskfn fdjkfkdfn dfjlkdfäödk ckfjdfölkldfökflöldökfödlf dkfljfdlökfjsöf dslköfjf fkdf kfljfösajaöj</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="container witExtra">
+                                                                            <div class="field-container onTileEditDiv non-combo-behavior ellipsis assignedTo"
+                                                                                 field="System.AssignedTo">
+                                                                                <div class="field-inner-element ellipsis onTileEditTextDiv"
+                                                                                     title="Assigned to: Magnus Siverbrant <magnus.siverbrant@volvo.com>">
+                                                                                    <img title="Magnus Siverbrant"
+                                                                                         src="" url ="/DefaultCollection/_api/_common/IdentityImage?id=&amp;identifier=magnus.siverbrant%40volvo.com&amp;resolveAmbiguous=false&amp;identifierType=0&amp;size=0&amp;__v=5"><span
+                                                                                        class="avatar-only ellipsis">Magnus Siverbrant</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="tags field-container"
+                                                                             field="System.Tags">
+                                                                            <div id="143" class="tfs-tags">
+                                                                                <div class="tags-items-container">
+                                                                                    <ul>
+                                                                                        <li class="tag-item" title="CR">
+                                                                                            <span class="tag-container"
+                                                                                                  dir="ltr"><span
+                                                                                                    class="tag-box"
+                                                                                                    dir="ltr"
+                                                                                                    style="color: rgb(0, 0, 0); background-color: rgb(251, 253, 82);">CR</span></span>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations">
+                                                                            <div id="176" class="child-tasks-summary"
+                                                                                 tabindex="0">
+                                                                                <div class="work-item-color"
+                                                                                     style="background-color: rgb(242, 203, 29);"></div>
+                                                                                <div class="error-message-icon"></div>
+                                                                                <span class="work-item-summary-text"
+                                                                                      title="0 of 5 completed">0/5</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="84"
+                                                             style="width: 224px; position: relative; height: 200px;">
+                                                            <div class="member-border-line"></div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="86"
+                                                             style="width: 224px; position: relative; height: 200px;">
+                                                            <div class="member-border-line"></div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="88"
+                                                             style="width: 224px; position: relative; height: 200px;">
+                                                            <div class="member-border-line"></div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="90"
+                                                             style="width: 224px; position: relative; height: 200px;">
+                                                            <div class="member-border-line"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="member-vertical">
+                                        <div class="member-header default ui-droppable">
+                                            <div class="icon swimlane-header-icon" tabindex="0"></div>
+                                            <div class="swimlane-member-header">
+                                                <div id="92" class="click-to-edit vertical">
+                                                    <div class="swimlane-header-title editable" style="width: 78px;">
+                                                        &nbsp;</div>
+                                                    <div class="member-header-edit member header"
+                                                         style="display: none;"><input
+                                                            class="member-header-content-input">
+
+                                                        <div class="content-edit-cancel-image"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="93" class="swimlane-header-detail-count"><span>4</span><span
+                                                    title="Req IP">Req IP</span></div>
+                                            <div id="94" class="swimlane-header-detail-count"><span>4</span><span
+                                                    title="Architecture IP">Architecture IP</span></div>
+                                            <div id="95" class="swimlane-header-detail-count"><span>2</span><span
+                                                    title="Architecture DONE">Architecture DONE</span></div>
+                                            <div id="96" class="swimlane-header-detail-count"><span>1</span><span
+                                                    title="Dev IP">Dev IP</span></div>
+                                            <div id="97" class="swimlane-header-detail-count"><span>3</span><span
+                                                    title="Dev DONE">Dev DONE</span></div>
+                                            <div id="98" class="swimlane-header-detail-count"><span>2</span><span
+                                                    title="Test IP">Test IP</span></div>
+                                            <div id="99" class="swimlane-header-detail-count"><span>2</span><span
+                                                    title="Test DONE">Test DONE</span></div>
+                                            <div id="100" class="swimlane-header-detail-count"><span>1</span><span
+                                                    title="Approval">Approval</span></div>
+                                            <div id="101" class="swimlane-header-detail-count"><span>1</span><span
+                                                    title="Redy for production">Redy for production</span></div>
+                                        </div>
+                                        <div class="member-content swimlane horizontal" id="126">
+                                            <div class="agile-content-container not-scrollable">
+                                                <div class="horizontal-table">
+                                                    <div class="content-container row content">
+                                                        <div class="cell member-content member content inprogress split horizontal"
+                                                             id="109" style="width: 445px; position: relative;">
+                                                            <div class="agile-header-container not-scrollable">
+                                                                <div class="horizontal-table">
+                                                                    <div class="header-container row header">
+                                                                        <div class="cell inprogress split-column"
+                                                                             style="width: 221px;">
+                                                                            <div id="105"
+                                                                                 class="click-to-edit horizontal">
+                                                                                <div class="member-header-content member header"
+                                                                                     title="Doing">Doing
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="cell inprogress split-column"
+                                                                             style="width: 220px;">
+                                                                            <div id="107"
+                                                                                 class="click-to-edit horizontal">
+                                                                                <div class="member-header-content member header"
+                                                                                     title="Done">Done
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="agile-content-container not-scrollable">
+                                                                <div class="horizontal-table">
+                                                                    <div class="content-container row content">
+                                                                        <div class="cell member-content member content inprogress split-column ui-droppable"
+                                                                             id="106"
+                                                                             style="width: 221px; height: 226px;">
+                                                                            <div id="169"
+                                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                                 tabindex="0" style="width: 200.889px;">
+                                                                                <div class="board-tile-content-container"
+                                                                                     style="border-left-color: rgb(204, 41, 61);">
+                                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                                         title="">
+                                                                                        <div class="id-title-container">
+                                                                                            <div class="id"
+                                                                                                 field="System.Id">43
+                                                                                            </div>
+                                                                                            <div class="title ellipsis"
+                                                                                                 field="System.Title"
+                                                                                                 title="CR yet another one">
+                                                                                                <span class="clickable-title">CR yet another one</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="card-context-menu"
+                                                                                             tabindex="0">
+                                                                                            <div class="icon icon-ellipsis"></div>
+                                                                                        </div>
+                                                                                        <div class="board-tile-annotations"></div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div id="172"
+                                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                                 tabindex="0" style="width: 200.889px;">
+                                                                                <div class="board-tile-content-container"
+                                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                                         title="">
+                                                                                        <div class="id-title-container">
+                                                                                            <div class="id"
+                                                                                                 field="System.Id">47
+                                                                                            </div>
+                                                                                            <div class="title ellipsis"
+                                                                                                 field="System.Title"
+                                                                                                 title="kalle kula och hans vänner">
+                                                                                                <span class="clickable-title">kalle kula och hans vänner</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="card-context-menu"
+                                                                                             tabindex="0">
+                                                                                            <div class="icon icon-ellipsis"></div>
+                                                                                        </div>
+                                                                                        <div class="board-tile-annotations"></div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="cell member-content member content inprogress split-column ui-droppable"
+                                                                             id="108"
+                                                                             style="width: 220px; height: 226px;">
+                                                                            <div id="174"
+                                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                                 tabindex="0" style="width: 201px;">
+                                                                                <div class="board-tile-content-container"
+                                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                                         title="">
+                                                                                        <div class="id-title-container">
+                                                                                            <div class="id"
+                                                                                                 field="System.Id">49
+                                                                                            </div>
+                                                                                            <div class="title ellipsis"
+                                                                                                 field="System.Title"
+                                                                                                 title="Do more stuff">
+                                                                                                <span class="clickable-title">Do more stuff</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="card-context-menu"
+                                                                                             tabindex="0">
+                                                                                            <div class="icon icon-ellipsis"></div>
+                                                                                        </div>
+                                                                                        <div class="board-tile-annotations"></div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div id="170"
+                                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                                 tabindex="0" style="width: 201px;">
+                                                                                <div class="board-tile-content-container"
+                                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                                         title="">
+                                                                                        <div class="id-title-container">
+                                                                                            <div class="id"
+                                                                                                 field="System.Id">44
+                                                                                            </div>
+                                                                                            <div class="title ellipsis"
+                                                                                                 field="System.Title"
+                                                                                                 title="BL Blockat Item">
+                                                                                                <span class="clickable-title">BL Blockat Item</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="card-context-menu"
+                                                                                             tabindex="0">
+                                                                                            <div class="icon icon-ellipsis"></div>
+                                                                                        </div>
+                                                                                        <div class="board-tile-annotations"></div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="member-border-line"></div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="111"
+                                                             style="width: 224px; position: relative; height: 226px;">
+                                                            <div class="member-border-line"></div>
+                                                            <div id="146"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title="">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">10</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="BL SPIKE spike 2015-01-31 a |project">
+                                                                                <span class="clickable-title">BL SPIKE spike 2015-01-31 a |project</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="167"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title=""
+                                                                         style="background-color: rgb(226, 235, 254);">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">42</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="CR AT Mer kul saker på gång i"
+                                                                                 style="color: rgb(0, 0, 0);"><span
+                                                                                    class="clickable-title">CR AT Mer kul saker på gång i</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="tags field-container"
+                                                                             field="System.Tags">
+                                                                            <div id="168" class="tfs-tags">
+                                                                                <div class="tags-items-container">
+                                                                                    <ul>
+                                                                                        <li class="tag-item"
+                                                                                            title="$Maint"><span
+                                                                                                class="tag-container"
+                                                                                                dir="ltr"><span
+                                                                                                class="tag-box"
+                                                                                                dir="ltr">$Maint</span></span>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="173"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title="">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">48</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="mer nya kot"><span
+                                                                                    class="clickable-title">mer nya kot</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="163"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title="">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">38</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="CR Do something |Project"><span
+                                                                                    class="clickable-title">CR Do something |Project</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="113"
+                                                             style="width: 224px; position: relative; height: 226px;">
+                                                            <div class="member-border-line"></div>
+                                                            <div id="155"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title=""
+                                                                         style="background-color: rgb(255, 230, 96);">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">22</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title" title="CR 4425"
+                                                                                 style="color: rgb(0, 0, 0);"><span
+                                                                                    class="clickable-title">CR 4425</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="container witExtra">
+                                                                            <div class="field-container onTileEditDiv non-combo-behavior ellipsis assignedTo"
+                                                                                 field="System.AssignedTo">
+                                                                                <div class="field-inner-element ellipsis onTileEditTextDiv"
+                                                                                     title="Assigned to: Magnus Siverbrant <magnus.siverbrant@volvo.com>">
+                                                                                    <img title="Magnus Siverbrant"
+                                                                                         src="" url="/DefaultCollection/_api/_common/IdentityImage?id=&amp;identifier=magnus.siverbrant%40volvo.com&amp;resolveAmbiguous=false&amp;identifierType=0&amp;size=0&amp;__v=5"><span
+                                                                                        class="avatar-only ellipsis">Magnus Siverbrant</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="tags field-container"
+                                                                             field="System.Tags">
+                                                                            <div id="156" class="tfs-tags">
+                                                                                <div class="tags-items-container">
+                                                                                    <ul>
+                                                                                        <li class="tag-item" title="CR">
+                                                                                            <span class="tag-container"
+                                                                                                  dir="ltr"><span
+                                                                                                    class="tag-box"
+                                                                                                    dir="ltr"
+                                                                                                    style="color: rgb(0, 0, 0); background-color: rgb(251, 253, 82);">CR</span></span>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="157"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title=""
+                                                                         style="background-color: rgb(255, 230, 96);">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">23</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="AT created from board a #12 |filter"
+                                                                                 style="color: rgb(0, 0, 0);"><span
+                                                                                    class="clickable-title">AT created from board a #12 |filter</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="tags field-container"
+                                                                             field="System.Tags">
+                                                                            <div id="158" class="tfs-tags">
+                                                                                <div class="tags-items-container">
+                                                                                    <ul>
+                                                                                        <li class="tag-item" title="CR">
+                                                                                            <span class="tag-container"
+                                                                                                  dir="ltr"><span
+                                                                                                    class="tag-box"
+                                                                                                    dir="ltr"
+                                                                                                    style="color: rgb(0, 0, 0); background-color: rgb(251, 253, 82);">CR</span></span>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="115"
+                                                             style="width: 224px; position: relative; height: 226px;">
+                                                            <div class="member-border-line"></div>
+                                                            <div id="164"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title="">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">39</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="MA Update something"><span
+                                                                                    class="clickable-title">MA Update something</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="117"
+                                                             style="width: 224px; position: relative; height: 226px;">
+                                                            <div class="member-border-line"></div>
+                                                            <div id="152"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title="">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">19</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="Create Unstable version in chromestore 2015-02-02">
+                                                                                <span class="clickable-title">Create Unstable version in chromestore 2015-02-02</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="151"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title="">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">18</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="TEST Approval tests"><span
+                                                                                    class="clickable-title">TEST Approval tests</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="149"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 200.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title=""
+                                                                         style="background-color: rgb(255, 230, 96);">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">17</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="CR Yes one more 1"
+                                                                                 style="color: rgb(0, 0, 0);"><span
+                                                                                    class="clickable-title">CR Yes one more 1</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="container witExtra">
+                                                                            <div class="field-container onTileEditDiv non-combo-behavior ellipsis assignedTo"
+                                                                                 field="System.AssignedTo">
+                                                                                <div class="field-inner-element ellipsis onTileEditTextDiv"
+                                                                                     title="Assigned to: Magnus Siverbrant <magnus.siverbrant@volvo.com>">
+                                                                                    <img title="Magnus Siverbrant"
+                                                                                         src="" url ="/DefaultCollection/_api/_common/IdentityImage?id=&amp;identifier=magnus.siverbrant%40volvo.com&amp;resolveAmbiguous=false&amp;identifierType=0&amp;size=0&amp;__v=5"><span
+                                                                                        class="avatar-only ellipsis">Magnus Siverbrant</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="tags field-container"
+                                                                             field="System.Tags">
+                                                                            <div id="150" class="tfs-tags">
+                                                                                <div class="tags-items-container">
+                                                                                    <ul>
+                                                                                        <li class="tag-item" title="CR">
+                                                                                            <span class="tag-container"
+                                                                                                  dir="ltr"><span
+                                                                                                    class="tag-box"
+                                                                                                    dir="ltr"
+                                                                                                    style="color: rgb(0, 0, 0); background-color: rgb(251, 253, 82);">CR</span></span>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="119"
+                                                             style="width: 224px; position: relative; height: 226px;">
+                                                            <div class="member-border-line"></div>
+                                                            <div id="137"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 199.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title=""
+                                                                         style="background-color: rgb(102, 213, 137);">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">4</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="* AT #111 Test4"
+                                                                                 style="color: rgb(0, 0, 0);"><span
+                                                                                    class="clickable-title">* AT #111 Test4</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="tags field-container"
+                                                                             field="System.Tags">
+                                                                            <div id="138" class="tfs-tags">
+                                                                                <div class="tags-items-container">
+                                                                                    <ul>
+                                                                                        <li class="tag-item"
+                                                                                            title="$AT"><span
+                                                                                                class="tag-container"
+                                                                                                dir="ltr"><span
+                                                                                                class="tag-box"
+                                                                                                dir="ltr">$AT</span></span>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="136"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 199.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title="">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">3</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="CR #113 Test3"><span
+                                                                                    class="clickable-title">CR #113 Test3</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="121"
+                                                             style="width: 224px; position: relative; height: 226px;">
+                                                            <div class="member-border-line"></div>
+                                                            <div id="161"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 199.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(204, 41, 61);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title=""
+                                                                         style="background-color: rgb(255, 186, 105);">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">36</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="BUG Testing"
+                                                                                 style="color: rgb(0, 0, 0);"><span
+                                                                                    class="clickable-title">BUG Testing</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="144"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 199.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title="">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">8</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="TEST testing"><span
+                                                                                    class="clickable-title">TEST testing</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="123"
+                                                             style="width: 224px; position: relative; height: 226px;">
+                                                            <div class="member-border-line"></div>
+                                                            <div id="134"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 199.667px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title="">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">1</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="CR #111 Test1"><span
+                                                                                    class="clickable-title">CR #111 Test1</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="cell member-content member content inprogress ui-droppable"
+                                                             id="125"
+                                                             style="width: 224px; position: relative; height: 226px;">
+                                                            <div class="member-border-line"></div>
+                                                            <div id="145"
+                                                                 class="board-tile propagate-keydown-event ui-draggable"
+                                                                 tabindex="0" style="width: 203px;">
+                                                                <div class="board-tile-content-container"
+                                                                     style="border-left-color: rgb(0, 156, 204);">
+                                                                    <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                                         title="">
+                                                                        <div class="id-title-container">
+                                                                            <div class="id" field="System.Id">9</div>
+                                                                            <div class="title ellipsis"
+                                                                                 field="System.Title"
+                                                                                 title="FD 2014-10-10 #123 bla bla bla /maint">
+                                                                                <span class="clickable-title">FD 2014-10-10 #123 bla bla bla /maint</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="card-context-menu" tabindex="0">
+                                                                            <div class="icon icon-ellipsis"></div>
+                                                                        </div>
+                                                                        <div class="board-tile-annotations"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cell member-content member content complete ui-droppable" id="129"
+                                     style="width: 224px; position: relative;"><h2 class="label">In production</h2>
+
+                                    <div class="member-border-line"></div>
+                                    <div id="135" class="board-tile propagate-keydown-event ui-draggable" tabindex="0"
+                                         style="width: 199.667px;">
+                                        <div class="board-tile-content-container"
+                                             style="border-left-color: rgb(0, 156, 204);">
+                                            <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                 title="">
+                                                <div class="id-title-container">
+                                                    <div class="id" field="System.Id">2</div>
+                                                    <div class="title ellipsis" field="System.Title"
+                                                         title="! CR #112 Test 2"><span class="clickable-title">! CR #112 Test 2</span>
+                                                    </div>
+                                                </div>
+                                                <div class="card-context-menu" tabindex="0">
+                                                    <div class="icon icon-ellipsis"></div>
+                                                </div>
+                                                <div class="board-tile-annotations"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="153" class="board-tile propagate-keydown-event ui-draggable" tabindex="0"
+                                         style="width: 199.667px;">
+                                        <div class="board-tile-content-container"
+                                             style="border-left-color: rgb(0, 156, 204);">
+                                            <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                 title="">
+                                                <div class="id-title-container">
+                                                    <div class="id" field="System.Id">20</div>
+                                                    <div class="title ellipsis" field="System.Title"
+                                                         title="SPIKE #99 /Proj"><span class="clickable-title">SPIKE #99 /Proj</span>
+                                                    </div>
+                                                </div>
+                                                <div class="card-context-menu" tabindex="0">
+                                                    <div class="icon icon-ellipsis"></div>
+                                                </div>
+                                                <div class="board-tile-annotations"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="148" class="board-tile propagate-keydown-event ui-draggable" tabindex="0"
+                                         style="width: 199.667px;">
+                                        <div class="board-tile-content-container"
+                                             style="border-left-color: rgb(0, 156, 204);">
+                                            <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                 title="">
+                                                <div class="id-title-container">
+                                                    <div class="id" field="System.Id">15</div>
+                                                    <div class="title ellipsis" field="System.Title"
+                                                         title="CR Automatic snapshots"><span class="clickable-title">CR Automatic snapshots</span>
+                                                    </div>
+                                                </div>
+                                                <div class="card-context-menu" tabindex="0">
+                                                    <div class="icon icon-ellipsis"></div>
+                                                </div>
+                                                <div class="board-tile-annotations"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="139" class="board-tile propagate-keydown-event ui-draggable" tabindex="0"
+                                         style="width: 199.667px;">
+                                        <div class="board-tile-content-container"
+                                             style="border-left-color: rgb(0, 156, 204);">
+                                            <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                 title="" style="background-color: rgb(255, 186, 105);">
+                                                <div class="id-title-container">
+                                                    <div class="id" field="System.Id">5</div>
+                                                    <div class="title ellipsis" field="System.Title"
+                                                         title="BUG #3587 critical" style="color: rgb(0, 0, 0);"><span
+                                                            class="clickable-title">BUG #3587 critical</span></div>
+                                                </div>
+                                                <div class="card-context-menu" tabindex="0">
+                                                    <div class="icon icon-ellipsis"></div>
+                                                </div>
+                                                <div class="board-tile-annotations"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="147" class="board-tile propagate-keydown-event ui-draggable" tabindex="0"
+                                         style="width: 199.667px;">
+                                        <div class="board-tile-content-container"
+                                             style="border-left-color: rgb(0, 156, 204);">
+                                            <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                 title="">
+                                                <div class="id-title-container">
+                                                    <div class="id" field="System.Id">14</div>
+                                                    <div class="title ellipsis" field="System.Title"
+                                                         title="CR CFD diagram"><span class="clickable-title">CR CFD diagram</span>
+                                                    </div>
+                                                </div>
+                                                <div class="card-context-menu" tabindex="0">
+                                                    <div class="icon icon-ellipsis"></div>
+                                                </div>
+                                                <div class="board-tile-annotations"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="140" class="board-tile propagate-keydown-event ui-draggable" tabindex="0"
+                                         style="width: 199.667px;">
+                                        <div class="board-tile-content-container"
+                                             style="border-left-color: rgb(0, 156, 204);">
+                                            <div class="board-tile-content board-tile-content-bottom-border ui-droppable"
+                                                 title="">
+                                                <div class="id-title-container">
+                                                    <div class="id" field="System.Id">6</div>
+                                                    <div class="title ellipsis" field="System.Title"
+                                                         title="SUPPORT #not support"><span class="clickable-title">SUPPORT #not support</span>
+                                                    </div>
+                                                </div>
+                                                <div class="card-context-menu" tabindex="0">
+                                                    <div class="icon icon-ellipsis"></div>
+                                                </div>
+                                                <div class="board-tile-annotations"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script type="text/javascript">
+                require(["Agile/Scripts/TFS.Agile.QuickStart.Kanban"], function (TFS_AGILE_QUICKSTART_KANBAN) {
+                    TFS_AGILE_QUICKSTART_KANBAN.startKanbanQuickStart();
+                });
+            </script>
+            <script class="bugs-behavior-ui-state" defer="defer" type="application/json">{
+                "bugsBehaviorState": {
+                    "uiState": 2,
+                    "missingFields": null,
+                    "workItemType": null
+                }
+            }</script>
+
+        </div>
+
+    </div>
+
+</div>

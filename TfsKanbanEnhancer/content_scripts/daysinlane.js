@@ -21,7 +21,9 @@ function daysInLane(){
              var element = $(this);
              var ticketId = $(element.siblings(".id-title-container").find(".id")).text();
              element.attr("style","display:none;");
-             if(dilData[ticketId].blockedSince !==""){
+             if(!dilData[ticketId]){
+                 element.remove();
+             }else if(dilData[ticketId].blockedSince !==""){
                  element.html("Days blocked = " + dilData[ticketId].blockedSince);
              }else{
                  element.html("Days in lane = "+ dilData[ticketId].daysInColumn);

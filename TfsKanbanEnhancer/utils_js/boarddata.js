@@ -229,13 +229,37 @@ function BoardData(data){
         return chartData;
     };
 
+    function  cfdSampleTimes(filter){
+        var start = self.snapshotRecords[0].firstSeen;
+        var end = _.last(self.snapshotRecords).lastSeen;
+        if(filter){
+            if(filter.startMilliseconds){
+                start = filter.startMilliseconds;
+            }
+            if(filter.endMilliseconds){
+                end = filter.endMilliseconds;
+            }
+        }
+        return generateCfdSampleTimes(start,end);
+    }
+
+
     self.getCfdData = function(filter){
         var columnIndexes = getCfdColumnIndexes(self.getLaneHeaders().reverse());
-        var cfdData = self.flowData.getCfdData(filter);
+        var sampleTimes = cfdSampleTimes(filter)
+        var cfdData;
+        var cfdGrid;
+        var rowIndexes;
+        if(!filter){
+            filter = {};
+        }
+        filter.sampleTimes = sampleTimes
+        cfdData = self.flowData.getCfdData(filter);
         console.log("getCfdData");
         //console.log(jsonEncode(cfdData));
-        var cfdGrid = getCfdGrid(filter);
-        var rowIndexes = getCfdRowIndexes(cfdGrid);
+        cfdGrid = getCfdGrid(filter);
+        rowIndexes = getCfdRowIndexes(cfdGrid);
+
         _.forEach(cfdData,function(ticket){
             //console.log(jsonEncode(ticket));
             _.forEach(ticket,function(day){
@@ -276,34 +300,18 @@ function BoardData(data){
 
     var getCfdGrid = function(filter){
         var laneHeaders = self.getLaneHeaders().reverse();
-        var start = timeUtil.dayStart(self.snapshotRecords[0].firstSeen);
-        var end = timeUtil.dayStart(self.snapshotRecords[self.snapshotRecords.length-1].lastSeen + timeUtil.MILLISECONDS_DAY);
-        var days;
         var grid;
         var row ;
-        
-        if(filter){
-            if(filter.startMilliseconds){
-                start = filter.startMilliseconds;
-            }
-            if(filter.endMilliseconds){
-                 end = filter.endMilliseconds;
-            }
-        }
-
-        days = Math.floor((end - start)/timeUtil.MILLISECONDS_DAY +1);
-        grid = gridOf(0,days+1,laneHeaders.length+1);
+        grid = gridOf(0,filter.sampleTimes.length+1,laneHeaders.length+1);
         row = 0;
-        
         
         console.log("getCfdGrid");
         grid[row] = ["Date"].concat(laneHeaders);
-        for(row = 0 ; row < days; row++){
-            //grid[row+1][0] = timeUtil.isoDateFormat(start+row*timeUtil.MILLISECONDS_DAY);
-            grid[row+1][0] = (start+row*timeUtil.MILLISECONDS_DAY);
+
+        for(row = 0 ; row < filter.sampleTimes.length; row++){
+            grid[row+1][0] = filter.sampleTimes[row];
         }
         return grid;
-
     };
 
     self.getCycleTimes = function(startLane, endlane){
@@ -389,7 +397,6 @@ function BoardData(data){
         };
 
         header.insert = function(node){
-            var tempNext = null;
             if(!this.next){
                 this.next = node;
             }else{
@@ -667,19 +674,27 @@ function FlowData(flowData, genericItemUrl){
     self.getCfdData = function(filter){
         var cfdData = [];
         var ticketData;
+
         _.forEach(self, function(ticket ){
+            var add = false;
             if(ticket instanceof FlowTicket && (!ticket.state || ticket.state!=="removed")){
-                ticketData = ticket.cfdData(filter);
                 if(filter && filter.text){
                     if(filter.text.indexOf("%")===filter.text.length-1 && -1<_.indexOf(ticket.title.split(" "),filter.text.replace("%",""))){
-                        cfdData.push(ticketData);
+                        add = true;
                     }
                     if(-1 < ticket.title.indexOf(filter.text)){
-                        cfdData.push(ticketData);
+                        add = true;
                     }
                 } else{
-                    cfdData.push(ticketData);
+                    add = true;
                 }
+                if(add){
+                    ticketData = ticket.cfdData(filter);
+                    cfdData.push(ticketData);
+                }else{
+                    var i=1;
+                }
+
 
                 
                 //console.log(jsonEncode(cfdData));
@@ -764,11 +779,8 @@ function FlowTicket(flowItemData, genericItemUrl){
     //time when ticket was last seen
     self.lastSeen = function () {
         var lastSeen = 0;
-        var laneName;
-        var lane;
         _.forEach(self.lanes, function(lane){
             _.forEach(lane,function(laneRecord){
-            
                 if(laneRecord.lastSeen>lastSeen){
                     lastSeen = laneRecord.lastSeen;
                 }
@@ -902,24 +914,20 @@ function FlowTicket(flowItemData, genericItemUrl){
 
     self.cfdData = function(filter){
         var start = self.enteredBoard();
-        var end = self.lastSeen();
         var ticketData = [];
-        var time ;
         var dayRecord;
+        if(!filter){
+            filter = {
+                sampleTimes:generateCfdSampleTimes(start,self.lastSeen())
+            };
+        }
+        _.forEach (filter.sampleTimes, function(sampleTime){
+            if(sampleTime>=start){
+                dayRecord = {"lane":self.wasInLaneContinous(sampleTime),milliseconds : sampleTime};
+                ticketData.push(dayRecord);
+            }
+        });
 
-        if (filter){
-            if (filter.startMilliseconds && (filter.startMilliseconds>start)){
-                start = filter.startMilliseconds;
-            }
-            if (filter.endMilliseconds && (filter.endMilliseconds<end)){
-                end = filter.endMilliseconds;
-            }
-        }
-        for (time = start; time < timeUtil.dayStart(end+2*timeUtil.MILLISECONDS_DAY); time = timeUtil.dayStart(time+timeUtil.MILLISECONDS_DAY)){
-            dayRecord = {"lane":self.wasInLaneContinous(time),milliseconds : time};
-            ticketData.push(dayRecord);
-        }
-        //console.log(jsonEncode(ticketData));
         return ticketData;
     };
 

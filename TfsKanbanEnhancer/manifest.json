@@ -1,7 +1,7 @@
 {
     "name": "TFS 2013 kanban buddy",
 
-    "version": "0.6.38",
+    "version": "0.6.4",
     "manifest_version": 2,
     "browser_action": {
         "default_title": "TFS kanban board enhancer",

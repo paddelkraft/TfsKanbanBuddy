@@ -569,6 +569,11 @@ describe("FlowTicket", function() {
     flowTicket = flowticketWithTwoRecordsInLane(1.1 * timeUtil.MILLISECONDS_DAY);
     approvals.verify(flowTicket.cfdData());
   });
+
+    approveIt("ticket should return cfdData with later starting time", function(approvals) {
+        flowTicket = flowticketWithTwoRecordsInLane(1.1 * timeUtil.MILLISECONDS_DAY);
+        approvals.verify(flowTicket.cfdData({startMilliseconds:2*timeUtil.MILLISECONDS_DAY}));
+    });
 });
 
 function startOfDay(day){
@@ -653,6 +658,12 @@ describe("CFD",function(){
     var filter = {"text" : "CR"};
     approvals.verify(boardData.getCfdData(filter));
   });
+
+    approveIt("CFD for tickets filtered by empty string", function(approvals){
+        var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","TestTicket"),createSnapshotTicket("2"," CR TestTicket")]);
+        var filter = {"text" : ""};
+        approvals.verify(boardData.getCfdData(filter));
+    });
 
     approveIt("CFD for tickets filtered by CR%", function(approvals){
         var boardData = ticketMovingAcrossTheBoard1ColumnPerDay(new BoardData(),[createSnapshotTicket("1","CRATestTicket"),createSnapshotTicket("2"," CR TestTicket")]);

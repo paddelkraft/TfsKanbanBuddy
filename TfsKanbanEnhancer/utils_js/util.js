@@ -298,3 +298,27 @@ function filterArray(arr, filterFunc){
      });
      return result;
  }
+
+ function cfdSamplingIntervall(start,end){
+     var days = Math.floor((end - start)/timeUtil.MILLISECONDS_DAY);
+     var interval = Math.floor(days/50);
+     if(interval===0){
+         interval = 1;
+     }
+     return interval;
+ }
+
+ function generateCfdSampleTimes(start,end){
+     var interval;
+     var sampleTimes = [];
+     start = timeUtil.dayStart(start);
+     end = timeUtil.dayStart(end);
+     end = end + timeUtil.MILLISECONDS_DAY;
+     interval = cfdSamplingIntervall(start,end);
+     start = start - interval*timeUtil.MILLISECONDS_DAY;
+     while(end>start){
+         sampleTimes.push(end);
+         end -= timeUtil.MILLISECONDS_DAY*interval;
+     }
+     return sampleTimes.reverse();
+ }

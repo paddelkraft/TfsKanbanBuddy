@@ -34,8 +34,8 @@ describe("TimeUtil", function() {
     
   });
 
-  testValues = [1,2,15];
-  expected = ["new",2,"15 (old)"];
+  var testValues = [1,2,15];
+  var expected = ["new",2,"15 (old)"];
   for(i in testValues){
     
     (function (input,expectedResult){
@@ -47,4 +47,46 @@ describe("TimeUtil", function() {
     })(testValues[i],expected[i]);
   }
 
+ });
+
+describe("cfdUtil",function(){
+    var testValues = [0,1,49,50,99,100,149,150];
+    describe("cfdSamplingInterval",function(){
+
+       var expected = [1,1,1,1,1,2,2,3]
+       var i;
+       for(i in testValues){
+           (function(value,expected){
+               it("should be "+ expected +" when start - end = "+ value ,function(){
+                expect(cfdUtil.cfdSamplingIntervall(0,value*timeUtil.MILLISECONDS_DAY)).toBe(expected);
+               });
+           })(testValues[i],expected[i]);
+       }
+
+   });
+
+    describe("cfdSamplingTimes",function(){
+        var expected = [2,3,51,52,51,52,51,52]
+        var i;
+        for(i in testValues){
+            (function(value,expected){
+                it("should have length "+ expected +" when start is 0 and  end is "+ value ,function(){
+                    expect(cfdUtil.generateCfdSampleTimes(0,value*timeUtil.MILLISECONDS_DAY).length).toBe(expected);
+                });
+            })(testValues[i],expected[i]);
+        }
+    });
+
+    describe("readableDatesOnCfdData",function(){
+        var cfdData = [
+                ["Date","ToDo","Done"],
+                [0,0,0],
+                [timeUtil.MILLISECONDS_DAY,0,0],
+                [2*timeUtil.MILLISECONDS_DAY,0,0]
+        ]
+
+        approveIt("should replace millisecond times with readable dates",function(approvals){
+            approvals.verify(cfdUtil.readableDatesOnCfdData(cfdData));
+        });
+    });
 });

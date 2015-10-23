@@ -138,17 +138,7 @@ app.factory("cfdFactory", function () {
         return chartData;
     };
 
-    factory.readableDatesOnCfdData = function (data) {
-        var copy = _.cloneDeep(data);
-        var index;
-        for (index = 1; index < data.length; index++) {
-
-            if (!isNaN(data[index][0])) {
-                copy[index][0] = timeUtil.isoDateFormat(data[index][0]);
-            }
-        }
-        return copy;
-    };
+    factory.readableDatesOnCfdData = cfdUtil.readableDatesOnCfdData;
 
     factory.doneStartsFrom0 = function (cfdChartData) {
         cfdChartData = _.cloneDeep(cfdChartData);
@@ -650,12 +640,12 @@ app.controller("CfdController", ['$scope', '$route', '$window', '$routeParams', 
     };
 
     $scope.downloadAsJson = function () {
-        var download = readableDatesOnCfdData(cfdDownloadData);
+        var download = cfd.readableDatesOnCfdData(cfdDownloadData);
         downloadAsJson(download, "CFD_Data");
     };
 
     $scope.downloadAsCSV = function () {
-        var download = readableDatesOnCfdData(cfdDownloadData);
+        var download = cfd.readableDatesOnCfdData(cfdDownloadData);
         downloadAsCSV(download, "CFD_Data");
     };
 

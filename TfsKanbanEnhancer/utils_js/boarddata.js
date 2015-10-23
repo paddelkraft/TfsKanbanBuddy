@@ -240,7 +240,7 @@ function BoardData(data){
                 end = filter.endMilliseconds;
             }
         }
-        return generateCfdSampleTimes(start,end);
+        return cfdUtil.generateCfdSampleTimes(start,end);
     }
 
 
@@ -918,7 +918,7 @@ function FlowTicket(flowItemData, genericItemUrl){
         var dayRecord;
         if(!filter){
             filter = {
-                sampleTimes:generateCfdSampleTimes(start,self.lastSeen())
+                sampleTimes:cfdUtil.generateCfdSampleTimes(start,self.lastSeen())
             };
         }
         _.forEach (filter.sampleTimes, function(sampleTime){

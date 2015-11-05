@@ -213,9 +213,13 @@ function decodeUrl(encoded) {
 }
 
 function encodeUrl(url) {
-    var withoutColons = url.replace(/:/g, "(_)");
-    var withoutSlashes = url.replace(/\//g, "(-)");
-    return url.replace(/:/g, "(_)").replace(/\//g, "(-)");
+    try{
+        var withoutColons = url.replace(/:/g, "(_)");
+        var withoutSlashes = url.replace(/\//g, "(-)");
+        return url.replace(/:/g, "(_)").replace(/\//g, "(-)");
+    }catch(e){}
+    return "";
+
 }
 function filterArray(arr, filterFunc) {
     var filteredArray = [];

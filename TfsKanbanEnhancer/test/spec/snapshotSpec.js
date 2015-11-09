@@ -72,10 +72,18 @@ describe("Snapshot", function(){
 
 	});
 
-
+    it("should get 2013 api url", function (){
+        var snapshot = {};
+        var boardRecord;
+        snapshot.boardUrl = "http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20%E2%80%93%20Dev%20Gothenburg/_backlogs/board/Features";
+        snapshot.projectName = "SEGOT-GDP";
+        snapshot.cardCategory = "Microsoft.FeatureCategory";
+        boardRecord = new BoardRecord(snapshot);
+        expect(boardRecord.getBoardApiUrl()).toBe("http://tfs.it.volvo.net:8080/tfs/Global/SEGOT-GDP/Team%203%20%E2%80%93%20Dev%20Gothenburg/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName=Microsoft.FeatureCategory");
+    });
 
     it("should get 2015 api url", function (){
-        var snapshot = simpleSnapshot(10,[],[],[],[]);
+        var snapshot = {};
         var boardRecord;
         snapshot.boardUrl = "http://tfs2010.it.volvo.net:8080/tfs/Global/SEGOT-eCom-VolvoPentaShop/PentaBusiness/_backlogs/board";
         snapshot.projectName = "SEGOT-eCom-VolvoPentaShop";

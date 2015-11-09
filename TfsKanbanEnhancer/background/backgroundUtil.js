@@ -536,7 +536,6 @@ function BoardRecord(input){
 
 
     self.getGenericItemUrl = function(){
-
         return  self.getProjectUrl() + "/_workitems#_a=edit&id=";
     };
 
@@ -559,14 +558,6 @@ function BoardRecord(input){
     };
 
     self.getBoardApiUrl = function(){
-
-        if(!self.cardCategory){
-            return self.getTeamUrl() + "/_api/_backlog/GetBoard?__v=3";
-        }
-
-        if(self.boardId){
-            return self.getCollectionUrl()+"/"+self.boardId +"/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName="+self.cardCategory;
-        }
         return self.getTeamUrl() + "/_api/_backlog/GetBoard?__v=5&hubCategoryReferenceName="+self.cardCategory;
     };
 

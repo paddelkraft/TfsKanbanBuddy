@@ -107,7 +107,7 @@
         snapshot.boardUrl = decodeUrlKeepEncodedSpaces( document.URL);
         snapshot.projectName = getProjectName();
         snapshot.genericItemUrl = getGenericItemUrl();
-        snapshot.boardId = getBoardId();
+        //snapshot.boardId = getBoardId();
         snapshot.cardCategory = getCardCategory();
         token = getRequestVerificationToken();
         if (token){

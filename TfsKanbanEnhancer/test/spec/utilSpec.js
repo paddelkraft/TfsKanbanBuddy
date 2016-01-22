@@ -90,3 +90,11 @@ describe("cfdUtil",function(){
         });
     });
 });
+
+describe("sort array",function(){
+    it("should sort filters",function(){
+        var filters = ["|NyaAvgifter", "|A", "|Project", "|project", "|filter"];
+        filters = filters.sort(caseInsensitiveSort);
+        expect(filters).toEqual(["|A", "|filter","|NyaAvgifter",  "|Project", "|project", ])
+    });
+});

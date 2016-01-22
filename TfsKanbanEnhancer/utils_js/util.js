@@ -232,6 +232,10 @@ function filterArray(arr, filterFunc) {
     return filteredArray;
 }
 
+function caseInsensitiveSort (a, b) {
+    return a.toLowerCase().localeCompare(b.toLowerCase());
+}
+
 function exportTableToCSV($table, filename, trigger) {
     var $rows;
 
@@ -335,6 +339,7 @@ var cfdUtil = {
         }
         return copy;
     }
+
 
 };
 

@@ -419,9 +419,9 @@ function removeColumnColor(){
         var select = document.createElement('select');
         select.setAttribute("id","filter-select");
         var html = "<option value='show all'>Show all </option><option value=''>Unfiltered</option>";
-        for(var filter in filters){
+        _.forEach( Object.keys(filters).sort(caseInsensitiveSort),function(filter){
             html += "<option value='"+ filter + "'>"+filter.replace(FILTER_IDENTIFIER,"") + "</option>";
-        }
+        });
         select.innerHTML = html;
         $('.hub-title').append(select);
     }
